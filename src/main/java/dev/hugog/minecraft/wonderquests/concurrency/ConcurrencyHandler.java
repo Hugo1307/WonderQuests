@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import lombok.Getter;
 
 @Singleton
 public class ConcurrencyHandler {
