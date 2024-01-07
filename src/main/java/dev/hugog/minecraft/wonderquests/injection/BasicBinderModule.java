@@ -12,6 +12,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesReposit
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
+import dev.hugog.minecraft.wonderquests.data.repositories.VariableValuesRepository;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,13 +36,21 @@ public class BasicBinderModule extends AbstractModule {
   @Singleton
   @Provides
   @Inject
-  public List<AbstractDataRepository> dataRepositories(PlayersRepository playersRepository,
+  public List<AbstractDataRepository> dataRepositories(
+      PlayersRepository playersRepository,
       QuestsRepository questsRepository, QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository) {
-
-    return List.of(playersRepository, questsRepository, questObjectivesRepository,
-        questRequirementsRepository, questRewardsRepository);
+      QuestRewardsRepository questRewardsRepository,
+      VariableValuesRepository variableValuesRepository
+  ) {
+    return List.of(
+        playersRepository,
+        questsRepository,
+        questObjectivesRepository,
+        questRequirementsRepository,
+        questRewardsRepository,
+        variableValuesRepository
+    );
 
   }
 

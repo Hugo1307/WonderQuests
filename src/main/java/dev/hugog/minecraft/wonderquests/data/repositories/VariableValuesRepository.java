@@ -8,28 +8,27 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-public class QuestRewardsRepository extends AbstractDataRepository {
+public class VariableValuesRepository extends AbstractDataRepository {
 
   @Inject
-  public QuestRewardsRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
+  public VariableValuesRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
       ConcurrencyHandler concurrencyHandler) {
-    super("quest_reward", 1, logger, dataSource, concurrencyHandler);
+    super("variable_value", 0, logger, dataSource, concurrencyHandler);
   }
 
   @Override
   public void createTable() {
 
-    // Create table using SQL
+    // Create quest table using SQL
     concurrencyHandler.run(() -> dataSource.apply(con -> {
 
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "CREATE TABLE IF NOT EXISTS quest_reward ("
-                + "id UUID PRIMARY KEY,"
-                + "quest_id INT4 REFERENCES quest (id),"
-                + "type VARCHAR(31) NOT NULL,"
-                + "value_id INTEGER REFERENCES variable_value (id) NOT NULL"
+            "CREATE TABLE IF NOT EXISTS variable_value ("
+                + "id SERIAL PRIMARY KEY,"
+                + "value1 VARCHAR(128),"
+                + "value2 REAL"
                 + ");");
 
         ps.execute();

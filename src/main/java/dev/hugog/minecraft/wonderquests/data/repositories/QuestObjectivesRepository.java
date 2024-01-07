@@ -29,7 +29,7 @@ public class QuestObjectivesRepository extends AbstractDataRepository {
                 + "id UUID PRIMARY KEY,"
                 + "quest_id INT4 REFERENCES quest (id),"
                 + "type VARCHAR(31) NOT NULL,"
-                + "value JSON NOT NULL"
+                + "value_id INTEGER REFERENCES variable_value (id) NOT NULL"
                 + ");");
 
         ps.execute();
