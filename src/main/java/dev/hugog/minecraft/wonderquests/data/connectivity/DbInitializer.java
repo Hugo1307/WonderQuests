@@ -12,11 +12,11 @@ public class DbInitializer {
 
   private final Logger logger;
 
-  private final List<AbstractDataRepository> dataRepositories;
+  private final List<AbstractDataRepository<?,?>> dataRepositories;
 
   @Inject
   public DbInitializer(@Named("bukkitLogger") Logger logger,
-      List<AbstractDataRepository> dataRepositories) {
+      List<AbstractDataRepository<?,?>> dataRepositories) {
     this.logger = logger;
     this.dataRepositories = dataRepositories;
   }
@@ -34,7 +34,7 @@ public class DbInitializer {
         .toList();
 
     // Sort the tables by priority to create them in the correct order
-    List<AbstractDataRepository> tablesSortedByPriority = dataRepositories.stream()
+    List<AbstractDataRepository<?,?>> tablesSortedByPriority = dataRepositories.stream()
         .sorted(Comparator.comparingInt(AbstractDataRepository::getPriority))
         .toList();
 
