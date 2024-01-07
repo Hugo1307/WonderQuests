@@ -2,11 +2,13 @@ package dev.hugog.minecraft.wonderquests.concurrency;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Singleton;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Singleton
@@ -35,6 +37,19 @@ public class ConcurrencyHandler {
 
   }
 
+  public CompletableFuture<Void> runAfterMultiple(CompletableFuture<?>[] completableFutures,
+      Runnable runnable, boolean async) {
+
+    if (async) {
+      return CompletableFuture.allOf(completableFutures).thenRunAsync(runnable, executorPool);
+    } else {
+      Arrays.stream(completableFutures).forEach(CompletableFuture::join);
+      runnable.run();
+      return CompletableFuture.completedFuture(null);
+    }
+
+  }
+
   public CompletableFuture<Void> runDelayed(Runnable runnable, long delay, TimeUnit timeUnit,
       boolean async) {
 
@@ -57,6 +72,22 @@ public class ConcurrencyHandler {
       return CompletableFuture.completedFuture(supplier.get());
     }
 
+  }
+
+  public <T> CompletableFuture<Void> thenAccept(CompletableFuture<T> completableFuture,
+      Consumer<? super T> consumer, boolean async) {
+
+    if (async) {
+      return completableFuture.thenAcceptAsync(consumer, executorPool);
+    } else {
+      consumer.accept(completableFuture.join());
+      return CompletableFuture.completedFuture(null);
+    }
+
+  }
+
+  public CompletableFuture<?>[] getListOfFutures(CompletableFuture<?>... futures) {
+    return futures;
   }
 
 }
