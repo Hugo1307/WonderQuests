@@ -4,11 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
+import dev.hugog.minecraft.wonderquests.data.models.PlayerModel;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class PlayersRepository extends AbstractDataRepository {
+public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID> {
 
   @Inject
   public PlayersRepository(@Named("bukkitLogger") Logger logger,
@@ -42,6 +46,21 @@ public class PlayersRepository extends AbstractDataRepository {
       }
     });
 
+  }
+
+  @Override
+  public CompletableFuture<Optional<PlayerModel>> findById(UUID id) {
+    return null;
+  }
+
+  @Override
+  public CompletableFuture<UUID> insert(PlayerModel model) {
+    return null;
+  }
+
+  @Override
+  public CompletableFuture<Void> delete(UUID id) {
+    return null;
   }
 
 }

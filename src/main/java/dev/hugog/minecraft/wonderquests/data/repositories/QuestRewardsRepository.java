@@ -4,11 +4,17 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
+import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class QuestRewardsRepository extends AbstractDataRepository {
+public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardModel, Integer> {
 
   @Inject
   public QuestRewardsRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
@@ -26,13 +32,19 @@ public class QuestRewardsRepository extends AbstractDataRepository {
 
         PreparedStatement ps = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_reward ("
-                + "id UUID PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "quest_id INT4 REFERENCES quest (id),"
                 + "type VARCHAR(31) NOT NULL,"
-                + "value_id INTEGER REFERENCES variable_value (id) NOT NULL"
+                + "num_value FLOAT8,"
+                + "str_value VARCHAR(255)"
                 + ");");
 
         ps.execute();
+
+        PreparedStatement createIndexPs = con.prepareStatement(
+            "CREATE INDEX IF NOT EXISTS quest_reward_quest_id_idx ON quest_reward (quest_id);");
+
+        createIndexPs.execute();
 
       } catch (SQLException e) {
         logger.severe(String.format("Error while creating the %s table! Caused by: %s", tableName,
@@ -45,6 +57,84 @@ public class QuestRewardsRepository extends AbstractDataRepository {
         logger.info(String.format("%s table created!", tableName));
       }
     });
+
+  }
+
+  @Override
+  public CompletableFuture<Optional<QuestRewardModel>> findById(Integer id) {
+    return null;
+  }
+
+  @Override
+  public CompletableFuture<Integer> insert(QuestRewardModel model) {
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO quest_reward (quest_id, type, num_value, str_value) VALUES (?, ?, ?, ?) RETURNING id;");
+
+        ps.setInt(1, model.questId());
+        ps.setString(2, model.type());
+        ps.setFloat(3, model.numericValue());
+        ps.setString(4, model.stringValue());
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+          return rs.getInt("id");
+        } else {
+          throw new SQLException("No id was returned after inserting a new quest reward!");
+        }
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while inserting a new %s! Caused by: %s", tableName,
+            e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
+  }
+
+  @Override
+  public CompletableFuture<Void> delete(Integer id) {
+    return null;
+  }
+
+  public CompletableFuture<List<QuestRewardModel>> findAllByQuestId(Integer questId) {
+
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT * FROM quest_reward WHERE quest_id = ?;");
+
+        ps.setInt(1, questId);
+
+        ResultSet rs = ps.executeQuery();
+
+        List<QuestRewardModel> objectives = new ArrayList<>();
+
+        while (rs.next()) {
+          objectives.add(new QuestRewardModel(
+              rs.getInt("id"),
+              rs.getInt("quest_id"),
+              rs.getString("type"),
+              rs.getString("str_value"),
+              rs.getFloat("num_value")
+          ));
+        }
+
+        return objectives;
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while finding objectives for quest with id %d! Caused by: %s", questId,
+            e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
 
   }
 
