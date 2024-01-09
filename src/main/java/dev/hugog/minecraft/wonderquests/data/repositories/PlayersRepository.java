@@ -58,7 +58,7 @@ public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID>
         PreparedStatement ps = con.prepareStatement(
             "SELECT * FROM player WHERE id = ?;");
 
-        ps.setObject(1, UUID.class);
+        ps.setObject(1, id);
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
