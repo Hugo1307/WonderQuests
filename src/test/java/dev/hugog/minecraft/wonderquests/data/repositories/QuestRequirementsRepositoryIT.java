@@ -44,7 +44,8 @@ public class QuestRequirementsRepositoryIT {
     QuestsRepository questsRepository = new QuestsRepository(
         Logger.getLogger(this.getClass().getName()), dataSource,
         concurrencyHandler);
-    questRequirementsRepository = new QuestRequirementsRepository(Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
+    questRequirementsRepository = new QuestRequirementsRepository(
+        Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
 
     // Create quest table before creating quest objectives table because of foreign key
     questsRepository.createTable().join();
@@ -73,7 +74,8 @@ public class QuestRequirementsRepositoryIT {
   public void findById_ReturnsQuestRequirementWhenExists() {
     int id = 1;
 
-    QuestRequirementModel questRequirementModel = new QuestRequirementModel(id, 1, "Test Type", "Test String Value", 1.0f);
+    QuestRequirementModel questRequirementModel = new QuestRequirementModel(id, 1, "Test Type",
+        "Test String Value", 1.0f);
 
     questRequirementsRepository.insert(questRequirementModel).join();
 
@@ -89,7 +91,9 @@ public class QuestRequirementsRepositoryIT {
   public void findById_ReturnsEmptyWhenNotExists() {
     int id = 1;
 
-    questRequirementsRepository.findById(id).thenAccept(questRequirement -> Assertions.assertFalse(questRequirement.isPresent())).join();
+    questRequirementsRepository.findById(id)
+        .thenAccept(questRequirement -> Assertions.assertFalse(questRequirement.isPresent()))
+        .join();
   }
 
   @Test
@@ -97,9 +101,11 @@ public class QuestRequirementsRepositoryIT {
   public void insert_SuccessfullyInsertsQuestRequirementIntoDatabase() {
     int id = 1;
 
-    questRequirementsRepository.insert(new QuestRequirementModel(id, 1, "Test Type", "Test String Value", 1.0f)).join();
+    questRequirementsRepository.insert(
+        new QuestRequirementModel(id, 1, "Test Type", "Test String Value", 1.0f)).join();
 
-    questRequirementsRepository.findById(id).thenAccept(questRequirement -> Assertions.assertTrue(questRequirement.isPresent())).join();
+    questRequirementsRepository.findById(id)
+        .thenAccept(questRequirement -> Assertions.assertTrue(questRequirement.isPresent())).join();
   }
 
   @Test
@@ -107,11 +113,14 @@ public class QuestRequirementsRepositoryIT {
   public void delete_DeletesQuestRequirementFromDatabase() {
     int id = 1;
 
-    questRequirementsRepository.insert(new QuestRequirementModel(id, 1, "Test Type", "Test String Value", 1.0f)).join();
+    questRequirementsRepository.insert(
+        new QuestRequirementModel(id, 1, "Test Type", "Test String Value", 1.0f)).join();
 
     questRequirementsRepository.delete(id).join();
 
-    questRequirementsRepository.findById(id).thenAccept(questRequirement -> Assertions.assertFalse(questRequirement.isPresent())).join();
+    questRequirementsRepository.findById(id)
+        .thenAccept(questRequirement -> Assertions.assertFalse(questRequirement.isPresent()))
+        .join();
   }
 
   @Test
@@ -126,8 +135,10 @@ public class QuestRequirementsRepositoryIT {
   public void findAllByQuestId_ReturnsAllQuestRequirementsForGivenQuestId() {
     int questId = 1;
 
-    QuestRequirementModel questRequirementModel1 = new QuestRequirementModel(1, questId, "Test Type 1", "Test String Value 1", 1.0f);
-    QuestRequirementModel questRequirementModel2 = new QuestRequirementModel(2, questId, "Test Type 2", "Test String Value 2", 2.0f);
+    QuestRequirementModel questRequirementModel1 = new QuestRequirementModel(1, questId,
+        "Test Type 1", "Test String Value 1", 1.0f);
+    QuestRequirementModel questRequirementModel2 = new QuestRequirementModel(2, questId,
+        "Test Type 2", "Test String Value 2", 2.0f);
 
     questRequirementsRepository.insert(questRequirementModel1).join();
     questRequirementsRepository.insert(questRequirementModel2).join();
