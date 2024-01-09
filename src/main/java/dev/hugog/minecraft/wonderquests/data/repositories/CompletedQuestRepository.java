@@ -23,9 +23,9 @@ public class CompletedQuestRepository extends AbstractDataRepository<CompletedQu
   }
 
   @Override
-  public void createTable() {
+  public CompletableFuture<Void> createTable() {
 
-    concurrencyHandler.run(() -> dataSource.apply(con -> {
+    return concurrencyHandler.run(() -> dataSource.apply(con -> {
 
       try {
 

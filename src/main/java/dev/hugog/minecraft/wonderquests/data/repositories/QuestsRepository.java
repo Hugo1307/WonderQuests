@@ -16,15 +16,15 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
 
   @Inject
   public QuestsRepository(@Named("bukkitLogger") Logger logger,
-      ConcurrencyHandler concurrencyHandler, DataSource dataSource) {
+      DataSource dataSource, ConcurrencyHandler concurrencyHandler) {
     super("quest", 0, logger, dataSource, concurrencyHandler);
   }
 
   @Override
-  public void createTable() {
+  public CompletableFuture<Void> createTable() {
 
     // Create quest table using SQL
-    concurrencyHandler.run(() -> dataSource.apply(con -> {
+    return concurrencyHandler.run(() -> dataSource.apply(con -> {
 
       try {
 

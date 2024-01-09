@@ -23,10 +23,10 @@ public class QuestRequirementsRepository extends AbstractDataRepository<QuestReq
   }
 
   @Override
-  public void createTable() {
+  public CompletableFuture<Void> createTable() {
 
     // Create quest table using SQL
-    concurrencyHandler.run(() -> dataSource.apply(con -> {
+    return concurrencyHandler.run(() -> dataSource.apply(con -> {
 
       try {
 

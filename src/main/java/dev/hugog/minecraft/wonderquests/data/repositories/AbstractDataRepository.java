@@ -71,7 +71,7 @@ public abstract class AbstractDataRepository<T extends DataModel, C> {
 
   }
 
-  public abstract void createTable();
+  public abstract CompletableFuture<Void> createTable();
 
   public abstract CompletableFuture<Optional<T>> findById(C id);
 
