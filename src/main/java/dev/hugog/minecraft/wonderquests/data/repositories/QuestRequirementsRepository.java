@@ -157,7 +157,7 @@ public class QuestRequirementsRepository extends
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "SELECT * FROM quest_objective WHERE quest_id = ?;");
+            "SELECT * FROM quest_requirement WHERE quest_id = ?;");
 
         ps.setInt(1, questId);
 
