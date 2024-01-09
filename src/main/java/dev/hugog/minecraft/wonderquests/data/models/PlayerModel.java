@@ -3,13 +3,11 @@ package dev.hugog.minecraft.wonderquests.data.models;
 import dev.hugog.minecraft.wonderquests.data.dtos.PlayerDto;
 import java.util.UUID;
 
-public class PlayerModel implements DataModel<PlayerDto> {
-
-    private UUID playerId;
+public record PlayerModel(UUID playerId) implements DataModel<PlayerDto> {
 
     @Override
     public PlayerDto toDto() {
-        return null;
+        return new PlayerDto(playerId);
     }
 
 }
