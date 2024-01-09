@@ -94,7 +94,12 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO active_quest (player_id, quest_id, completed_goals, progress) VALUES (?, ?, ?, ?);");
+            "INSERT INTO active_quest (player_id, quest_id, completed_goals, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
+
+        ps.setObject(1, model.playerId());
+        ps.setInt(2, model.questId());
+        ps.setInt(3, model.completedGoals());
+        ps.setFloat(4, model.progress());
 
         ResultSet rs = ps.executeQuery();
 
