@@ -14,7 +14,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class CompletedQuestRepository extends AbstractDataRepository<CompletedQuestModel, PlayerQuestKey> {
+public class CompletedQuestRepository extends
+    AbstractDataRepository<CompletedQuestModel, PlayerQuestKey> {
 
   @Inject
   public CompletedQuestRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
@@ -75,8 +76,9 @@ public class CompletedQuestRepository extends AbstractDataRepository<CompletedQu
         }
 
       } catch (SQLException e) {
-        logger.severe(String.format("Error while finding %s with id %s! Caused by: %s", tableName, id,
-            e.getMessage()));
+        logger.severe(
+            String.format("Error while finding %s with id %s! Caused by: %s", tableName, id,
+                e.getMessage()));
         throw new RuntimeException(e);
       }
 
@@ -94,7 +96,10 @@ public class CompletedQuestRepository extends AbstractDataRepository<CompletedQu
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO completed_quest (player_id, quest_id) VALUES (?, ?);");
+            "INSERT INTO completed_quest (player_id, quest_id) VALUES (?, ?) RETURNING player_id, quest_id;");
+
+        ps.setObject(1, model.playerId());
+        ps.setInt(2, model.questId());
 
         ResultSet rs = ps.executeQuery();
 
@@ -123,7 +128,7 @@ public class CompletedQuestRepository extends AbstractDataRepository<CompletedQu
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "DELETE FROM quest WHERE player_id = ? AND quest_id = ?;");
+            "DELETE FROM completed_quest WHERE player_id = ? AND quest_id = ?;");
 
         ps.setObject(1, id.playerId());
         ps.setInt(2, id.questId());
