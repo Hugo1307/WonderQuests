@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'corretto'
+          cache: 'maven'
 
       - name: Run Unit Tests
         run: mvn test
@@ -35,6 +37,8 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'corretto'
+          cache: 'maven'
 
       - name: Verify Code Quality
         run: mvn verify
@@ -52,6 +56,8 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'corretto'
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
