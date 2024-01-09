@@ -14,7 +14,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class QuestObjectivesRepository extends AbstractDataRepository<QuestObjectiveModel, Integer> {
+public class QuestObjectivesRepository extends
+    AbstractDataRepository<QuestObjectiveModel, Integer> {
 
   @Inject
   public QuestObjectivesRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
@@ -62,7 +63,37 @@ public class QuestObjectivesRepository extends AbstractDataRepository<QuestObjec
 
   @Override
   public CompletableFuture<Optional<QuestObjectiveModel>> findById(Integer id) {
-    return null;
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT * FROM quest_objective WHERE id = ?;");
+
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+          return Optional.of(new QuestObjectiveModel(
+              rs.getInt("id"),
+              rs.getInt("quest_id"),
+              rs.getString("type"),
+              rs.getString("str_value"),
+              rs.getFloat("num_value")
+          ));
+        } else {
+          return Optional.empty();
+        }
+
+      } catch (SQLException e) {
+        logger.severe(
+            String.format("Error while finding %s with id %d! Caused by: %s", tableName, id,
+                e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
   }
 
   @Override
@@ -98,7 +129,25 @@ public class QuestObjectivesRepository extends AbstractDataRepository<QuestObjec
 
   @Override
   public CompletableFuture<Void> delete(Integer id) {
-    return null;
+    return concurrencyHandler.run(() -> dataSource.apply(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "DELETE FROM quest_objective WHERE id = ?;");
+
+        ps.setInt(1, id);
+
+        ps.execute();
+
+      } catch (SQLException e) {
+        logger.severe(
+            String.format("Error while deleting %s with id %d! Caused by: %s", tableName, id,
+                e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
   }
 
   public CompletableFuture<List<QuestObjectiveModel>> findAllByQuestId(Integer questId) {
@@ -129,8 +178,10 @@ public class QuestObjectivesRepository extends AbstractDataRepository<QuestObjec
         return objectives;
 
       } catch (SQLException e) {
-        logger.severe(String.format("Error while finding objectives for quest with id %d! Caused by: %s", questId,
-            e.getMessage()));
+        logger.severe(
+            String.format("Error while finding objectives for quest with id %d! Caused by: %s",
+                questId,
+                e.getMessage()));
         throw new RuntimeException(e);
       }
 

@@ -6,12 +6,13 @@ import dev.hugog.minecraft.wonderquests.data.models.DataModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import lombok.Getter;
 
-public abstract class AbstractDataRepository<T extends DataModel, C> {
+public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
   @Getter
   protected String tableName;
@@ -69,6 +70,28 @@ public abstract class AbstractDataRepository<T extends DataModel, C> {
 
     }), true);
 
+  }
+
+  public CompletableFuture<Void> deleteTable() {
+    return concurrencyHandler.run(() -> dataSource.apply(con -> {
+
+      try {
+
+        Statement statement = con.createStatement();
+        // In this context, concatenating the table name is safe as the table name is not user input
+        statement.execute(String.format("DROP TABLE IF EXISTS %s;", tableName));
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while deleting the %s table! Caused by: %s", tableName,
+            e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true).whenComplete((value, throwable) -> {
+      if (throwable == null) {
+        logger.warning(String.format("%s table deleted!", tableName));
+      }
+    });
   }
 
   public abstract CompletableFuture<Void> createTable();

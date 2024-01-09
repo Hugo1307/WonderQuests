@@ -49,6 +49,7 @@ class QuestsRepositoryTest {
 
   @AfterEach
   void tearDown() {
+    questsRepository.deleteTable().join();
     dataSource.closeDataSource();
   }
 

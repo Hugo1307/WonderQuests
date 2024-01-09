@@ -65,6 +65,7 @@ public class CompletedQuestRepositoryIT {
 
   @AfterEach
   void tearDown() {
+    completedQuestRepository.deleteTable().join();
     dataSource.closeDataSource();
   }
 

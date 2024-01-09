@@ -52,6 +52,7 @@ class PlayersRepositoryIT {
 
   @AfterEach
   void tearDown() {
+    playersRepository.deleteTable().join();
     dataSource.closeDataSource();
   }
 

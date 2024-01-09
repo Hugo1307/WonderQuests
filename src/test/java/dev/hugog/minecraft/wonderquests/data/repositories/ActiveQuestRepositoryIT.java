@@ -62,6 +62,12 @@ public class ActiveQuestRepositoryIT {
 
   }
 
+  @AfterEach
+  void tearDown() {
+    activeQuestRepository.deleteTable().join();
+    dataSource.closeDataSource();
+  }
+
   @Test
   @DisplayName("createTable() creates active_quest table")
   public void testCreateTable() {
@@ -153,12 +159,6 @@ public class ActiveQuestRepositoryIT {
 
     activeQuestRepository.findById(id)
         .thenAccept(activeQuest -> Assertions.assertFalse(activeQuest.isPresent())).join();
-  }
-
-
-  @AfterEach
-  void tearDown() {
-    dataSource.closeDataSource();
   }
 
 }
