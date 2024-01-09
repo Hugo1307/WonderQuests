@@ -2,3 +2,4 @@ name: WonderQuests
 version: '${project.version}'
 main: dev.hugog.minecraft.wonderquests.WonderQuests
 api-version: '1.20'
+prefix: 'WonderQuests'
