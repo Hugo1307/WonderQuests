@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-class QuestsRepositoryTest {
+class QuestsRepositoryIT {
 
   private DataSource dataSource;
 

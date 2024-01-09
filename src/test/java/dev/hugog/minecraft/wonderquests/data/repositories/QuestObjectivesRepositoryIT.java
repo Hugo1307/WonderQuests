@@ -4,6 +4,7 @@ import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
+import java.util.List;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -164,16 +165,20 @@ class QuestObjectivesRepositoryIT {
 
     int questId = 1;
 
-    questObjectivesRepository.insert(
-        new QuestObjectiveModel(1, questId, "Test Type", "Test Value", 1.0f)).join();
-    questObjectivesRepository.insert(
-        new QuestObjectiveModel(2, questId, "Test Type 2", "Test Value 2", 2.0f)).join();
+    QuestObjectiveModel questObjectiveModel1 = new QuestObjectiveModel(1, questId, "Test Type",
+        "Test Value", 1.0f);
+
+    QuestObjectiveModel questObjectiveModel2 = new QuestObjectiveModel(2, questId, "Test Type 2",
+        "Test Value 2", 2.0f);
+
+    questObjectivesRepository.insert(questObjectiveModel1).join();
+    questObjectivesRepository.insert(questObjectiveModel2).join();
 
     questObjectivesRepository.findAllByQuestId(questId)
         .thenAccept(questObjectives -> {
           Assertions.assertEquals(2, questObjectives.size());
-          Assertions.assertEquals(questId, questObjectives.get(0).questId());
-          Assertions.assertEquals(questId, questObjectives.get(1).questId());
+          org.assertj.core.api.Assertions.assertThat(questObjectives)
+              .containsAll(List.of(questObjectiveModel1, questObjectiveModel2));
         }).join();
 
   }

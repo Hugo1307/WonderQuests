@@ -16,7 +16,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import java.util.List;
 import java.util.logging.Logger;
 
-class QuestRewardsRepositoryTest {
+class QuestRewardsRepositoryIT {
 
   private DataSource dataSource;
   private QuestRewardsRepository questRewardsRepository;
