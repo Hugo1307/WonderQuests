@@ -27,7 +27,11 @@ public class InteractiveSession {
 
   }
 
-  public void start() {
+  public boolean start() {
+
+    if (interactiveSessionManager.hasActiveSession(targetPlayer)) {
+      return false;
+    }
 
     interactiveSessionManager.addSession(this);
     interactiveSessionFormatter.sendDescriptionMessages();
@@ -35,6 +39,8 @@ public class InteractiveSession {
     interactiveSessionFormatter.formatStepMessages(interactionSteps);
 
     interactionSteps.get(currentStepIdx).run(targetPlayer);
+
+    return true;
 
   }
 

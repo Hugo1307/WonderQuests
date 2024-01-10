@@ -89,7 +89,14 @@ public class CreateQuestCommand extends AbstractPluginCommand {
         .withStep(questTimeLimitStep)
         .build();
 
-    interactiveSession.start();
+    boolean couldStartSession = interactiveSession.start();
+
+    if (!couldStartSession) {
+      sender.sendMessage(messaging.getLocalizedChatWithPrefix("interaction.error.already_in_progress"));
+      return false;
+    }
+
+    // TODO: Add a callback to the session to be executed in the final step and create the quest
 
     return true;
 
