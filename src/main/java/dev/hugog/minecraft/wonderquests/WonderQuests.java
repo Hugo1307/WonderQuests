@@ -3,12 +3,15 @@ package dev.hugog.minecraft.wonderquests;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import dev.hugog.minecraft.wonderquests.commands.BukkitCommandExecutor;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.injection.BasicBinderModule;
+import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.concurrent.CompletableFuture;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class WonderQuests extends JavaPlugin {
@@ -24,6 +27,12 @@ public final class WonderQuests extends JavaPlugin {
 
   @Inject
   private ConcurrencyHandler concurrencyHandler;
+
+  @Inject
+  private Messaging messaging;
+
+  @Inject
+  private BukkitCommandExecutor bukkitCommandExecutor;
 
   @Override
   public void onEnable() {
@@ -41,18 +50,22 @@ public final class WonderQuests extends JavaPlugin {
 
     // Check the state of the database. Correct the state if necessary.
     CompletableFuture<Void> databaseCheckFuture = dbInitializer.checkDatabase();
-    CompletableFuture<?>[] futuresToWaitFor = concurrencyHandler.getListOfFutures(databaseCheckFuture);
+    CompletableFuture<?>[] futuresToWaitFor = concurrencyHandler.getListOfFutures(
+        databaseCheckFuture);
 
-    // Sync Logic
-
+    // Wait for the database check to finish before continuing.
     concurrencyHandler.runAfterMultiple(futuresToWaitFor, () -> {
 
-      // Optional<QuestDto> questDto = questsService.getQuestById(22312).join();
-      // getLogger().info("Quest: " + questDto);
+      getLogger().info("Database check finished! Enabling plugin...");
+
+      // Sync Logic
+      registerCommands();
+
+      messaging.loadBundles();
 
       getLogger().info("Plugin successfully enabled!");
 
-    }, true);
+    }, false);
 
   }
 
@@ -69,6 +82,18 @@ public final class WonderQuests extends JavaPlugin {
     BasicBinderModule guiceBinderModule = new BasicBinderModule(this);
     Injector injector = Guice.createInjector(guiceBinderModule);
     injector.injectMembers(this);
+  }
+
+  private void registerCommands() {
+
+    PluginCommand command = getCommand("quests");
+
+    if (command != null) {
+      command.setExecutor(bukkitCommandExecutor);
+    } else {
+      getLogger().warning("Default plugin's command not not found!");
+    }
+
   }
 
 }
