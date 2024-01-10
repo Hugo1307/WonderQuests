@@ -13,10 +13,11 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
   private Integer questId;
   private Integer completedGoals;
   private Float progress;
+  private Long startedAt;
 
   @Override
   public ActiveQuestModel toModel() {
-    return new ActiveQuestModel(playerId, questId, completedGoals, progress);
+    return new ActiveQuestModel(playerId, questId, completedGoals, progress, startedAt);
   }
 
 }

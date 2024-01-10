@@ -34,6 +34,7 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
                 + "quest_id INTEGER REFERENCES quest(id) NOT NULL,"
                 + "completed_goals INTEGER NOT NULL DEFAULT 0,"
                 + "progress REAL NOT NULL DEFAULT 0,"
+                + "started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                 + "PRIMARY KEY (player_id, quest_id)"
                 + ");");
 
@@ -72,7 +73,8 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
               rs.getObject("player_id", UUID.class),
               rs.getInt("quest_id"),
               rs.getInt("completed_goals"),
-              rs.getFloat("progress")
+              rs.getFloat("progress"),
+              rs.getTimestamp("started_at").getTime()
           ));
         }
 
@@ -93,6 +95,7 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
 
       try {
 
+        // The timestamp will be completed with the current timestamp
         PreparedStatement ps = con.prepareStatement(
             "INSERT INTO active_quest (player_id, quest_id, completed_goals, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
 

@@ -35,7 +35,8 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 + "description VARCHAR(511),"
                 + "opening_msg VARCHAR(255),"
                 + "closing_msg VARCHAR(255),"
-                + "item VARCHAR(31)"
+                + "item VARCHAR(31),"
+                + "time_limit INTEGER"
                 + ");");
 
         ps.execute();
@@ -74,7 +75,8 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
               rs.getString("description"),
               rs.getString("opening_msg"),
               rs.getString("closing_msg"),
-              rs.getString("item")
+              rs.getString("item"),
+              rs.getInt("time_limit")
           ));
         }
 

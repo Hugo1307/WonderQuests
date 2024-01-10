@@ -21,6 +21,8 @@ public class QuestDto implements Dto<QuestModel> {
 
   private String item;
 
+  private Integer timeLimit;
+
   private List<QuestObjectiveDto> objectives;
 
   private List<QuestRequirementDto> requirements;
@@ -28,7 +30,7 @@ public class QuestDto implements Dto<QuestModel> {
   private List<QuestRewardDto> rewards;
 
   public QuestDto(Integer id, String name, String description, String openingMsg, String closingMsg,
-      String item) {
+      String item, Integer timeLimit) {
 
     this.id = id;
     this.name = name;
@@ -36,6 +38,7 @@ public class QuestDto implements Dto<QuestModel> {
     this.openingMsg = openingMsg;
     this.closingMsg = closingMsg;
     this.item = item;
+    this.timeLimit = timeLimit;
 
   }
 
@@ -47,7 +50,8 @@ public class QuestDto implements Dto<QuestModel> {
         description,
         openingMsg,
         closingMsg,
-        item
+        item,
+        timeLimit
     );
   }
 

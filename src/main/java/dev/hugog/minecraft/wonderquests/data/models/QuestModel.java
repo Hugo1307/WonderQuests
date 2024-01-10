@@ -8,13 +8,13 @@ public record QuestModel(
     String description,
     String openingMsg,
     String closingMsg,
-    String item
-
+    String item,
+    Integer timeLimit
 ) implements DataModel<QuestDto> {
 
   @Override
   public QuestDto toDto() {
-    return new QuestDto(id, name, description, openingMsg, closingMsg, item);
+    return new QuestDto(id, name, description, openingMsg, closingMsg, item, timeLimit);
   }
 
 }
