@@ -2,6 +2,7 @@ package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
+import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionManager;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
 
@@ -12,17 +13,20 @@ import org.bukkit.command.CommandSender;
  * <p>The {@link CommandInvoker} is part of the <strong>Commander Pattern</strong> and is used to
  * invoke a {@link PluginCommand} based on the command label.</p>
  *
- * <p>Depending on the command, this class can also inject the necessary command's dependencies.</p>
+ * <p>Depending on the command, this class can also inject the necessary command's
+ * dependencies.</p>
  */
 public class CommandInvoker {
 
   private PluginCommand pluginCommand;
 
   private final Messaging messaging;
+  private final InteractiveSessionManager interactiveSessionManager;
 
   @Inject
-  public CommandInvoker(Messaging messaging) {
+  public CommandInvoker(Messaging messaging, InteractiveSessionManager interactiveSessionManager) {
     this.messaging = messaging;
+    this.interactiveSessionManager = interactiveSessionManager;
   }
 
   public boolean executeCommand() {
@@ -41,7 +45,7 @@ public class CommandInvoker {
    */
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
     if (commandLabel.equals("create")) {
-      this.pluginCommand = new CreateQuestCommand(sender, args, messaging);
+      this.pluginCommand = new CreateQuestCommand(sender, args, messaging, interactiveSessionManager);
     } else {
       this.pluginCommand = null;
     }

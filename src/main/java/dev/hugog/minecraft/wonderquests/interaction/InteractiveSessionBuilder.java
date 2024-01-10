@@ -2,7 +2,6 @@ package dev.hugog.minecraft.wonderquests.interaction;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public class InteractiveSessionBuilder {
@@ -10,7 +9,7 @@ public class InteractiveSessionBuilder {
   private final InteractiveSessionManager interactiveSessionManager;
   private final Player targetPlayer;
   private final List<InteractiveStep> interactionSteps;
-  private Component cancelMessage;
+  private InteractiveSessionFormatter interactiveSessionFormatter;
 
   public InteractiveSessionBuilder(Player targetPlayer, InteractiveSessionManager interactiveSessionManager) {
     this.interactiveSessionManager = interactiveSessionManager;
@@ -23,12 +22,12 @@ public class InteractiveSessionBuilder {
     return this;
   }
 
-  public InteractiveSessionBuilder withCancelMessage(Component cancelMessage) {
-    this.cancelMessage = cancelMessage;
+  public InteractiveSessionBuilder withSessionFormatter(InteractiveSessionFormatter interactiveSessionFormatter) {
+    this.interactiveSessionFormatter = interactiveSessionFormatter;
     return this;
   }
 
   public InteractiveSession build() {
-    return new InteractiveSession(targetPlayer, interactiveSessionManager, interactionSteps, cancelMessage);
+    return new InteractiveSession(targetPlayer, interactiveSessionManager, interactionSteps, interactiveSessionFormatter);
   }
 }

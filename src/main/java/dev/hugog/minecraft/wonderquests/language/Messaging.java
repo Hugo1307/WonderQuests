@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.util.UTF8ResourceBundleControl;
@@ -37,11 +38,44 @@ public class Messaging {
 
   }
 
-  public Component getLocalMessage(String key, Component... args) {
+  public Component getLocalizedChatWithPrefix(String key, Component... args) {
+    return Component.text()
+        .append(Component.text("[", NamedTextColor.GRAY))
+        .append(Component.text("WonderQuests", NamedTextColor.GREEN))
+        .append(Component.text("] ", NamedTextColor.GRAY))
+        .color(NamedTextColor.GRAY)
+        .append(Component.translatable(key, args))
+        .build();
+  }
+
+  public Component getLocalizedChatNoPrefix(String key, Component... args) {
+    return Component.text()
+        .color(NamedTextColor.GRAY)
+        .append(Component.translatable(key, args))
+        .build();
+  }
+
+  public Component getLocalizedChatInfo(String key, Component... args) {
+    return Component.text()
+        .color(NamedTextColor.GREEN)
+        .content("[!] ")
+        .color(NamedTextColor.GRAY)
+        .append(Component.translatable(key, args))
+        .build();
+  }
+
+  public Component getChatSeparator() {
+    return Component.text()
+        .color(NamedTextColor.GRAY)
+        .content("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+        .build();
+  }
+
+  public Component getLocalizedRawMessage(String key, Component... args) {
     return Component.translatable(key, args);
   }
 
-  public Component getLocalMessage(PluginMessage key, Component... args) {
+  public Component getLocalizedRawMessage(PluginMessage key, Component... args) {
     return Component.translatable(key.getKey(), args);
   }
 

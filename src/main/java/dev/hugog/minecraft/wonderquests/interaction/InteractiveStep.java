@@ -3,12 +3,18 @@ package dev.hugog.minecraft.wonderquests.interaction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 @Builder
 public class InteractiveStep {
 
-  private final String message;
+  @Getter
+  @Setter
+  private Component message;
+
   private Predicate<String> inputVerification;
   private Consumer<String> onValidInput;
   private Consumer<String> onInvalidInput;

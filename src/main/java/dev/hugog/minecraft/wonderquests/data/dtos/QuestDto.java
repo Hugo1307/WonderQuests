@@ -4,8 +4,10 @@ import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class QuestDto implements Dto<QuestModel> {
 
