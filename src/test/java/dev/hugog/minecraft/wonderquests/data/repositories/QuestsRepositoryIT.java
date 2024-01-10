@@ -65,7 +65,7 @@ class QuestsRepositoryIT {
 
     int id = 1;
 
-    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "");
+    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0);
 
     questsRepository.insert(questModel)
         .join();
@@ -95,7 +95,7 @@ class QuestsRepositoryIT {
   public void insert_SuccessfullyInsertsQuestIntoDatabase() {
     int id = 1;
 
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", ""))
+    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
         .join();
 
     questsRepository.findById(id)
@@ -110,7 +110,7 @@ class QuestsRepositoryIT {
     int id = 1;
 
     // Insert a quest to avoid foreign key errors
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", ""))
+    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
         .join();
 
     questsRepository.delete(id).join();

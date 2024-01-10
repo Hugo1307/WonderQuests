@@ -8,12 +8,13 @@ public record ActiveQuestModel(
     UUID playerId,
     Integer questId,
     Integer completedGoals,
-    Float progress
+    Float progress,
+    Long startedAt
 ) implements DataModel<ActiveQuestDto> {
 
   @Override
   public ActiveQuestDto toDto() {
-    return new ActiveQuestDto(playerId, questId, completedGoals, progress);
+    return new ActiveQuestDto(playerId, questId, completedGoals, progress, startedAt);
   }
 
 }
