@@ -10,6 +10,7 @@ import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.injection.BasicBinderModule;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import dev.hugog.minecraft.wonderquests.listeners.InteractiveChatListener;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,6 +35,9 @@ public final class WonderQuests extends JavaPlugin {
   @Inject
   private BukkitCommandExecutor bukkitCommandExecutor;
 
+  @Inject
+  private InteractiveChatListener interactiveChatListener;
+
   @Override
   public void onEnable() {
 
@@ -56,12 +60,16 @@ public final class WonderQuests extends JavaPlugin {
     // Wait for the database check to finish before continuing.
     concurrencyHandler.runAfterMultiple(futuresToWaitFor, () -> {
 
+      // Sync Logic
+
       getLogger().info("Database check finished! Enabling plugin...");
 
-      // Sync Logic
       registerCommands();
 
       messaging.loadBundles();
+
+      // Register Listener
+      getServer().getPluginManager().registerEvents(interactiveChatListener, this);
 
       getLogger().info("Plugin successfully enabled!");
 
