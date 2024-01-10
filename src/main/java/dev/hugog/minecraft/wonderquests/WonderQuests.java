@@ -30,7 +30,14 @@ public final class WonderQuests extends JavaPlugin {
 
     initDependencyInjectionModule();
 
-    dataSource.initDataSource("localhost", "5432", "wonder_quests", "postgres", "admin");
+    boolean connectedToDb = dataSource.initDataSource("localhost", "5432", "wonder_quests",
+        "postgres", "admin");
+
+    if (!connectedToDb) {
+      getLogger().severe("Error while connecting to the database! Disabling plugin...");
+      getServer().getPluginManager().disablePlugin(this);
+      return;
+    }
 
     // Check the state of the database. Correct the state if necessary.
     CompletableFuture<Void> databaseCheckFuture = dbInitializer.checkDatabase();

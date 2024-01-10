@@ -34,7 +34,7 @@ public class DataSource {
     this.logger = logger;
   }
 
-  public void initDataSource(String host, String port, String databaseName, String username,
+  public boolean initDataSource(String host, String port, String databaseName, String username,
       String password) {
 
     try {
@@ -49,7 +49,6 @@ public class DataSource {
 
     config.setPoolName("WonderQuests-HikariCPPool");
     config.setMaximumPoolSize(5);
-    config.setMinimumIdle(1);
 
     config.setUsername(username);
     config.setPassword(password);
@@ -65,10 +64,13 @@ public class DataSource {
       if (e instanceof PoolInitializationException) {
         logger.warning("[Hint] Maybe you forgot to create the database?");
       }
+      return false;
     }
 
     this.databaseName = databaseName;
     this.databaseUser = username;
+
+    return true;
 
   }
 
