@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.data.repositories.AbstractDataRepository;
@@ -12,6 +13,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesReposit
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
+import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,6 +27,9 @@ public class BasicBinderModule extends AbstractModule {
 
   @Override
   protected void configure() {
+
+    FactoryModuleBuilder factoryModuleBuilder = new FactoryModuleBuilder();
+    install(factoryModuleBuilder.build(ActionsFactory.class));
 
     this.bind(WonderQuests.class).toInstance(plugin);
     this.bind(Logger.class).annotatedWith(Names.named("bukkitLogger"))
