@@ -107,8 +107,19 @@ public class QuestRequirementsRepository extends
 
         ps.setInt(1, model.questId());
         ps.setString(2, model.type());
-        ps.setFloat(3, model.numericValue());
-        ps.setString(4, model.stringValue());
+
+        if (model.numericValue() != null) {
+          ps.setFloat(3, model.numericValue());
+        } else {
+          ps.setNull(3, java.sql.Types.FLOAT);
+        }
+
+        if (model.stringValue() != null) {
+          ps.setString(4, model.stringValue());
+        } else {
+          ps.setNull(4, java.sql.Types.VARCHAR);
+
+        }
 
         ResultSet rs = ps.executeQuery();
 

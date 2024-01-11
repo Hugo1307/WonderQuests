@@ -2,6 +2,8 @@ package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
+import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -42,6 +44,11 @@ public class CommandResolver {
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
     if (commandLabel.equals("create")) {
       this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
+    } else if (commandLabel.equals("requirement")) {
+      if (args[0].equalsIgnoreCase("create")) {
+        this.pluginCommand = new CreateRequirementCommand(sender,
+            Arrays.copyOfRange(args, 1, args.length), dependencies);
+      }
     } else {
       this.pluginCommand = null;
     }
