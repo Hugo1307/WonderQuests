@@ -24,6 +24,16 @@ public class InteractiveSessionBuilder {
     return this;
   }
 
+  public InteractiveSessionBuilder withSteps(InteractiveStep... interactionSteps) {
+    this.interactionSteps.addAll(List.of(interactionSteps));
+    return this;
+  }
+
+  public InteractiveSessionBuilder withSteps(List<InteractiveStep> interactionSteps) {
+    this.interactionSteps.addAll(interactionSteps);
+    return this;
+  }
+
   public InteractiveSessionBuilder withSessionFormatter(
       InteractiveSessionFormatter interactiveSessionFormatter) {
     this.interactiveSessionFormatter = interactiveSessionFormatter;

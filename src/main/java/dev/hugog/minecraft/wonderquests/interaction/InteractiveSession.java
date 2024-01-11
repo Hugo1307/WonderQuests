@@ -39,7 +39,12 @@ public class InteractiveSession {
     interactiveSessionManager.addSession(this);
     interactiveSessionFormatter.sendDescriptionMessages();
 
-    interactiveSessionFormatter.formatStepMessages(interactionSteps);
+    // If the steps don't have a formatter, we set the one added to this session
+    interactionSteps.forEach(step -> {
+      if (step.getFormatter() == null) {
+        step.setFormatter(interactiveSessionFormatter);
+      }
+    });
 
     InteractiveStep firstStep = interactionSteps.get(0);
     firstStep.run(targetPlayer);
@@ -73,6 +78,12 @@ public class InteractiveSession {
       return;
     }
 
+    // If the current step is terminal, we finish the session
+    if (currentStep.isTerminalStep()) {
+      this.finishSession();
+      return;
+    }
+
     InteractiveStep nextStep = this.getNextStep(currentStep, playerInput);
     if (nextStep != null) {
       currentStepIdx = interactionSteps.indexOf(nextStep);
@@ -86,15 +97,16 @@ public class InteractiveSession {
   private InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
 
     // If there is no branching condition, we just go to the next step
-    if (currentStep.getBranchingCondition() == null) {
-      return interactionSteps.get(currentStepIdx+1);
+    if (currentStep.getCustomNextStep() == null) {
+      return interactionSteps.get(currentStepIdx + 1);
     }
 
     // Otherwise, we apply the branching condition to get the next step id
-    String nextStepId = currentStep.getBranchingCondition().apply(playerInput);
+    String nextStepId = currentStep.getCustomNextStep().apply(playerInput);
 
     // We get the next step based on the id
     return interactionSteps.stream()
+        .filter(step -> step.getId() != null)
         .filter(step -> step.getId().equals(nextStepId))
         .findFirst()
         .orElse(null);

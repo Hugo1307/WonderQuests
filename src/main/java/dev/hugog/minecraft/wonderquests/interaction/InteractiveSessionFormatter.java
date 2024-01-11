@@ -1,7 +1,6 @@
 package dev.hugog.minecraft.wonderquests.interaction;
 
 import dev.hugog.minecraft.wonderquests.language.Messaging;
-import java.util.List;
 import lombok.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -141,19 +140,35 @@ public class InteractiveSessionFormatter {
 
   }
 
-  public void formatStepMessages(List<InteractiveStep> steps) {
-    for (InteractiveStep step : steps) {
-      Component stepMessageComponent = Component.text()
-          .appendSpace()
-          .appendSpace()
-          .append(Component.text("• ", NamedTextColor.GREEN))
-          .color(NamedTextColor.GREEN)
-          .append(step.getMessage())
-          .appendNewline()
-          .build();
+  public Component getFormattedStepMessage(Component message) {
 
-      step.setMessage(stepMessageComponent);
-    }
+    return Component.text()
+        .appendSpace()
+        .appendSpace()
+        .append(Component.text("• ", NamedTextColor.GREEN))
+        .color(NamedTextColor.GREEN)
+        .append(message)
+        .appendNewline()
+        .build();
+
+  }
+
+  public Component getFormattedStepMessage(Component message, Component hint) {
+
+    return Component.text()
+        .appendSpace()
+        .appendSpace()
+        .append(Component.text("• ", NamedTextColor.GREEN))
+        .color(NamedTextColor.GREEN)
+        .append(message)
+        .appendSpace()
+        .append(
+            Component.text("[?]", NamedTextColor.BLUE)
+                .hoverEvent(Component.text().append(hint).build())
+        )
+        .appendNewline()
+        .build();
+
   }
 
 }
