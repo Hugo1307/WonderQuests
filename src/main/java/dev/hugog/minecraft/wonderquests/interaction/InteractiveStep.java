@@ -5,7 +5,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -15,8 +14,6 @@ public class InteractiveStep {
   @Getter
   private String id;
 
-  @Getter
-  @Setter
   private Component message;
   private Component hint;
 

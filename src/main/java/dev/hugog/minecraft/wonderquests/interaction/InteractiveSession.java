@@ -71,6 +71,12 @@ public class InteractiveSession {
       return;
     }
 
+    // If the current step is terminal, we finish the session
+    if (currentStep.isTerminalStep()) {
+      this.finishSession();
+      return;
+    }
+
     InteractiveStep nextStep = this.getNextStep(currentStep, playerInput);
     if (nextStep != null) {
       currentStepIdx = interactionSteps.indexOf(nextStep);
@@ -93,6 +99,7 @@ public class InteractiveSession {
 
     // We get the next step based on the id
     return interactionSteps.stream()
+        .filter(step -> step.getId() != null)
         .filter(step -> step.getId().equals(nextStepId))
         .findFirst()
         .orElse(null);
