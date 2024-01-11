@@ -18,6 +18,7 @@ public class InteractiveStep {
   @Getter
   @Setter
   private Component message;
+  private Component hint;
 
   private Predicate<String> inputVerification;
   private Consumer<String> onValidInput;
@@ -25,9 +26,23 @@ public class InteractiveStep {
 
   @Getter
   private Function<String, String> branchingCondition;
+  @Getter
+  private boolean isTerminalStep;
+
+  private InteractiveSessionFormatter formatter;
 
   public void run(Player player) {
-    player.sendMessage(message);
+
+    if (message != null) {
+
+      if (hint != null) {
+        player.sendMessage(formatter != null ? formatter.getFormattedStepMessage(message, hint) : message);
+      } else {
+        player.sendMessage(formatter != null ? formatter.getFormattedStepMessage(message) : message);
+      }
+
+    }
+
   }
 
   public boolean submitStep(String input) {

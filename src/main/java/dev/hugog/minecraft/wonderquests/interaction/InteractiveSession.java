@@ -39,8 +39,6 @@ public class InteractiveSession {
     interactiveSessionManager.addSession(this);
     interactiveSessionFormatter.sendDescriptionMessages();
 
-    interactiveSessionFormatter.formatStepMessages(interactionSteps);
-
     InteractiveStep firstStep = interactionSteps.get(0);
     firstStep.run(targetPlayer);
 
