@@ -101,4 +101,9 @@ public class QuestsService {
         });
   }
 
+  public CompletableFuture<Boolean> checkIfQuestExists(Integer id) {
+    return questsRepository.findById(id)
+        .thenApply(Optional::isPresent);
+  }
+
 }

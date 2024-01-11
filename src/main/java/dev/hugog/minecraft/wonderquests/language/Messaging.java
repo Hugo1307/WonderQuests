@@ -75,8 +75,4 @@ public class Messaging {
     return Component.translatable(key, args);
   }
 
-  public Component getLocalizedRawMessage(PluginMessage key, Component... args) {
-    return Component.translatable(key.getKey(), args);
-  }
-
 }
