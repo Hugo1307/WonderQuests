@@ -23,7 +23,7 @@ public class InteractiveStep {
   private Consumer<String> onInvalidInput;
 
   @Getter
-  private Function<String, String> branchingCondition;
+  private Function<String, String> customNextStep;
   @Getter
   private boolean isTerminalStep;
 

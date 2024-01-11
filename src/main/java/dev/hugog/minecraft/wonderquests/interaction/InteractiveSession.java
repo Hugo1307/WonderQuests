@@ -97,12 +97,12 @@ public class InteractiveSession {
   private InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
 
     // If there is no branching condition, we just go to the next step
-    if (currentStep.getBranchingCondition() == null) {
+    if (currentStep.getCustomNextStep() == null) {
       return interactionSteps.get(currentStepIdx + 1);
     }
 
     // Otherwise, we apply the branching condition to get the next step id
-    String nextStepId = currentStep.getBranchingCondition().apply(playerInput);
+    String nextStepId = currentStep.getCustomNextStep().apply(playerInput);
 
     // We get the next step based on the id
     return interactionSteps.stream()
