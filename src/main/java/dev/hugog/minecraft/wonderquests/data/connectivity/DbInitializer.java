@@ -41,12 +41,14 @@ public class DbInitializer {
     // After all tables were checked, we create the ones that do not exist
     // We take the priority into account to avoid creating tables that depend on other tables
     return CompletableFuture.allOf(tableExistFutureList.toArray(CompletableFuture[]::new))
-        .thenRunAsync(() -> {
+        .thenRun(() -> {
 
           // For each table, check if it does not exist (by checking the corresponding future)
           // If it does not exist, create it
           tablesSortedByPriority.forEach(table -> {
             if (!tableExistFutureList.get(dataRepositories.indexOf(table)).join()) {
+              // We wait for the table to be created before continuing because tables need to be
+              // created in a specific order to avoid foreign key constraint errors
               table.createTable().join();
             } else {
               logger.info(String.format("Table '%s' checked. Good to go!", table.getTableName()));
