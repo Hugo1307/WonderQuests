@@ -2,6 +2,7 @@ package dev.hugog.minecraft.wonderquests.commands.concrete;
 
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
+import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSession;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionBuilder;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionFormatter;
@@ -21,11 +22,13 @@ import org.bukkit.entity.Player;
 public class CreateQuestCommand extends AbstractPluginCommand {
 
   private final InteractiveSessionManager sessionManager;
+  private final QuestsService questsService;
 
   public CreateQuestCommand(CommandSender sender, String[] args, Messaging messaging,
       Object... dependencies) {
     super(sender, args, messaging, dependencies);
     this.sessionManager = (InteractiveSessionManager) dependencies[0];
+    this.questsService = (QuestsService) dependencies[1];
   }
 
   @Override
@@ -75,7 +78,7 @@ public class CreateQuestCommand extends AbstractPluginCommand {
 
     InteractiveStep questTimeLimitStep = InteractiveStep.builder()
         .message(messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.time_limit"))
-        .inputVerification(input -> input.length() > 3)
+        .inputVerification(input -> input.matches("\\d+") && Integer.parseInt(input) >= 0)
         .onValidInput(input -> System.out.println("Valid input: " + input))
         .onInvalidInput(input -> System.out.println("Invalid input: " + input))
         .build();
@@ -87,16 +90,15 @@ public class CreateQuestCommand extends AbstractPluginCommand {
         .withStep(questOpeningMessageStep)
         .withStep(questClosingMessageStep)
         .withStep(questTimeLimitStep)
+        .withSessionEndCallback(() -> questsService.createNewQuest(questDto))
         .build();
 
-    boolean couldStartSession = interactiveSession.start();
+    boolean couldStartSession = interactiveSession.startSession();
 
     if (!couldStartSession) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("interaction.error.already_in_progress"));
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("interaction.error.already_in_progress"));
       return false;
     }
-
-    // TODO: Add a callback to the session to be executed in the final step and create the quest
 
     return true;
 
