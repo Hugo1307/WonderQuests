@@ -2,6 +2,7 @@ package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
+import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionManager;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
@@ -22,11 +23,13 @@ public class CommandInvoker {
 
   private final Messaging messaging;
   private final InteractiveSessionManager interactiveSessionManager;
+  private final QuestsService questsService;
 
   @Inject
-  public CommandInvoker(Messaging messaging, InteractiveSessionManager interactiveSessionManager) {
+  public CommandInvoker(Messaging messaging, InteractiveSessionManager interactiveSessionManager, QuestsService questsService) {
     this.messaging = messaging;
     this.interactiveSessionManager = interactiveSessionManager;
+    this.questsService = questsService;
   }
 
   public boolean executeCommand() {
@@ -45,7 +48,7 @@ public class CommandInvoker {
    */
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
     if (commandLabel.equals("create")) {
-      this.pluginCommand = new CreateQuestCommand(sender, args, messaging, interactiveSessionManager);
+      this.pluginCommand = new CreateQuestCommand(sender, args, messaging, interactiveSessionManager, questsService);
     } else {
       this.pluginCommand = null;
     }

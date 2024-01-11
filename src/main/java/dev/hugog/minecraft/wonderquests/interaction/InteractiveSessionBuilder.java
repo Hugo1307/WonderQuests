@@ -10,8 +10,10 @@ public class InteractiveSessionBuilder {
   private final Player targetPlayer;
   private final List<InteractiveStep> interactionSteps;
   private InteractiveSessionFormatter interactiveSessionFormatter;
+  private Runnable onSessionEnd;
 
-  public InteractiveSessionBuilder(Player targetPlayer, InteractiveSessionManager interactiveSessionManager) {
+  public InteractiveSessionBuilder(Player targetPlayer,
+      InteractiveSessionManager interactiveSessionManager) {
     this.interactiveSessionManager = interactiveSessionManager;
     this.targetPlayer = targetPlayer;
     this.interactionSteps = new ArrayList<>();
@@ -22,12 +24,19 @@ public class InteractiveSessionBuilder {
     return this;
   }
 
-  public InteractiveSessionBuilder withSessionFormatter(InteractiveSessionFormatter interactiveSessionFormatter) {
+  public InteractiveSessionBuilder withSessionFormatter(
+      InteractiveSessionFormatter interactiveSessionFormatter) {
     this.interactiveSessionFormatter = interactiveSessionFormatter;
     return this;
   }
 
+  public InteractiveSessionBuilder withSessionEndCallback(Runnable onSessionEnd) {
+    this.onSessionEnd = onSessionEnd;
+    return this;
+  }
+
   public InteractiveSession build() {
-    return new InteractiveSession(targetPlayer, interactiveSessionManager, interactionSteps, interactiveSessionFormatter);
+    return new InteractiveSession(targetPlayer, interactiveSessionManager, interactionSteps,
+        interactiveSessionFormatter, onSessionEnd);
   }
 }

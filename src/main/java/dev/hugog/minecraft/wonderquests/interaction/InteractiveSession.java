@@ -12,22 +12,25 @@ public class InteractiveSession {
   private final Player targetPlayer; // The player interacting with the chat
   private final List<InteractiveStep> interactionSteps;
   private final InteractiveSessionFormatter interactiveSessionFormatter;
+  private final Runnable onSessionEnd;
 
   private int currentStepIdx;
 
   InteractiveSession(Player targetPlayer, InteractiveSessionManager interactiveSessionManager,
-      List<InteractiveStep> interactionSteps, InteractiveSessionFormatter interactiveSessionFormatter) {
+      List<InteractiveStep> interactionSteps,
+      InteractiveSessionFormatter interactiveSessionFormatter, Runnable onSessionEnd) {
 
     this.targetPlayer = targetPlayer;
     this.interactiveSessionManager = interactiveSessionManager;
     this.interactionSteps = interactionSteps;
     this.interactiveSessionFormatter = interactiveSessionFormatter;
+    this.onSessionEnd = onSessionEnd;
 
     this.currentStepIdx = 0;
 
   }
 
-  public boolean start() {
+  public boolean startSession() {
 
     if (interactiveSessionManager.hasActiveSession(targetPlayer)) {
       return false;
@@ -47,8 +50,7 @@ public class InteractiveSession {
   public void receivePlayerInput(String playerInput) {
 
     if (playerInput.equalsIgnoreCase("!cancel")) {
-      interactiveSessionFormatter.sendCancelMessage();
-      interactiveSessionManager.removeSession(this);
+      this.cancelSession();
       return;
     }
 
@@ -62,14 +64,24 @@ public class InteractiveSession {
       if (++currentStepIdx < interactionSteps.size()) {
         interactionSteps.get(currentStepIdx).run(targetPlayer);
       } else {
-        interactiveSessionFormatter.sendFinishingMessage();
-        interactiveSessionManager.removeSession(this);
+        this.finishSession();
       }
 
     } else {
       interactiveSessionFormatter.sendInvalidInputMessage(playerInput);
     }
 
+  }
+
+  private void finishSession() {
+    interactiveSessionFormatter.sendFinishingMessage();
+    onSessionEnd.run();
+    interactiveSessionManager.removeSession(this);
+  }
+
+  private void cancelSession() {
+    interactiveSessionFormatter.sendCancelMessage();
+    interactiveSessionManager.removeSession(this);
   }
 
 }
