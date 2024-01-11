@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -26,6 +27,7 @@ public class InteractiveStep {
   @Getter
   private boolean isTerminalStep;
 
+  @Getter @Setter
   private InteractiveSessionFormatter formatter;
 
   public void run(Player player) {

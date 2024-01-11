@@ -1,7 +1,6 @@
 package dev.hugog.minecraft.wonderquests.interaction;
 
 import dev.hugog.minecraft.wonderquests.language.Messaging;
-import java.util.List;
 import lombok.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -150,7 +149,6 @@ public class InteractiveSessionFormatter {
         .color(NamedTextColor.GREEN)
         .append(message)
         .appendNewline()
-        .appendNewline()
         .build();
 
   }
@@ -168,7 +166,6 @@ public class InteractiveSessionFormatter {
             Component.text("[?]", NamedTextColor.BLUE)
                 .hoverEvent(Component.text().append(hint).build())
         )
-        .appendNewline()
         .appendNewline()
         .build();
 

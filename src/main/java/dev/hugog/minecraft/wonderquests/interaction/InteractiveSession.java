@@ -39,6 +39,13 @@ public class InteractiveSession {
     interactiveSessionManager.addSession(this);
     interactiveSessionFormatter.sendDescriptionMessages();
 
+    // If the steps don't have a formatter, we set the one added to this session
+    interactionSteps.forEach(step -> {
+      if (step.getFormatter() == null) {
+        step.setFormatter(interactiveSessionFormatter);
+      }
+    });
+
     InteractiveStep firstStep = interactionSteps.get(0);
     firstStep.run(targetPlayer);
 
@@ -91,7 +98,7 @@ public class InteractiveSession {
 
     // If there is no branching condition, we just go to the next step
     if (currentStep.getBranchingCondition() == null) {
-      return interactionSteps.get(currentStepIdx+1);
+      return interactionSteps.get(currentStepIdx + 1);
     }
 
     // Otherwise, we apply the branching condition to get the next step id
