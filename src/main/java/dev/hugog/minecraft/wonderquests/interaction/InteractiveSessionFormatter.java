@@ -142,25 +142,18 @@ public class InteractiveSessionFormatter {
   }
 
   public void formatStepMessages(List<InteractiveStep> steps) {
-    for (int i = 0; i < steps.size(); i++) {
-      formatSingleStepMessage(steps.get(i), i + 1);
+    for (InteractiveStep step : steps) {
+      Component stepMessageComponent = Component.text()
+          .appendSpace()
+          .appendSpace()
+          .append(Component.text("• ", NamedTextColor.GREEN))
+          .color(NamedTextColor.GREEN)
+          .append(step.getMessage())
+          .appendNewline()
+          .build();
+
+      step.setMessage(stepMessageComponent);
     }
-  }
-
-  private void formatSingleStepMessage(InteractiveStep step, int stepIdx) {
-
-    Component stepMessageComponent = Component.text()
-        .color(NamedTextColor.GREEN)
-        .appendSpace()
-        .appendSpace()
-        .append(Component.text(stepIdx))
-        .append(Component.text(") "))
-        .append(step.getMessage())
-        .appendNewline()
-        .build();
-
-    step.setMessage(stepMessageComponent);
-
   }
 
 }
