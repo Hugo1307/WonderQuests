@@ -10,21 +10,21 @@ import org.jetbrains.annotations.NotNull;
  * <h3>Bukkit Command Executor</h3>
  * <h4>Represents the default Bukkit command executor.</h4>
  * <br>
- * <p>The class receives commands from the chat and redirects them to the {@link CommandInvoker} if
+ * <p>The class receives commands from the chat and redirects them to the {@link CommandResolver} if
  * they are commands from this plugin.</p>
  *
- * <p>The {@link CommandInvoker}, part of the <strong>Commander Pattern</strong>, will create a new
+ * <p>The {@link CommandResolver}, part of the <strong>Commander Pattern</strong>, will create a new
  * {@link PluginCommand} instance based on the command's label and execute the command.</p>
  *
- * <p>See {@link CommandInvoker#setPluginCommand(String, CommandSender, String[])}.</p>
+ * <p>See {@link CommandResolver#setPluginCommand(String, CommandSender, String[])}.</p>
  */
 public class BukkitCommandExecutor implements CommandExecutor {
 
-  private final CommandInvoker commandInvoker;
+  private final CommandResolver commandResolver;
 
   @Inject
-  public BukkitCommandExecutor(CommandInvoker commandInvoker) {
-    this.commandInvoker = commandInvoker;
+  public BukkitCommandExecutor(CommandResolver commandResolver) {
+    this.commandResolver = commandResolver;
   }
 
   @Override
@@ -40,8 +40,8 @@ public class BukkitCommandExecutor implements CommandExecutor {
       return true;
     }
 
-    commandInvoker.setPluginCommand(args[0], commandSender, args);
-    return commandInvoker.executeCommand();
+    commandResolver.setPluginCommand(args[0], commandSender, args);
+    return commandResolver.executeCommand();
 
   }
 

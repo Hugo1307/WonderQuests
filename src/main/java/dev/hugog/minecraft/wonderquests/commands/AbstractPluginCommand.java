@@ -1,6 +1,5 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
-import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -14,15 +13,15 @@ public abstract class AbstractPluginCommand implements PluginCommand {
 
   protected CommandSender sender;
   protected String[] args;
-  protected Messaging messaging;
-  protected Object[] dependencies;
+  protected CommandDependencies dependencies;
+  protected Object[] extraDependencies;
 
-  public AbstractPluginCommand(CommandSender sender, String[] args, Messaging messaging,
-      Object... dependencies) {
+  public AbstractPluginCommand(CommandSender sender, String[] args,
+      CommandDependencies commandDependencies, Object... extraDependencies) {
     this.sender = sender;
     this.args = args;
-    this.messaging = messaging;
-    this.dependencies = dependencies;
+    this.dependencies = commandDependencies;
+    this.extraDependencies = extraDependencies;
   }
 
 }
