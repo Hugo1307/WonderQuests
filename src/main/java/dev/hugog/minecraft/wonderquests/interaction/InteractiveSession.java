@@ -41,7 +41,8 @@ public class InteractiveSession {
 
     interactiveSessionFormatter.formatStepMessages(interactionSteps);
 
-    interactionSteps.get(currentStepIdx).run(targetPlayer);
+    InteractiveStep firstStep = interactionSteps.get(0);
+    firstStep.run(targetPlayer);
 
     return true;
 
@@ -54,29 +55,62 @@ public class InteractiveSession {
       return;
     }
 
+    InteractiveStep currentStep = interactionSteps.get(currentStepIdx);
+
     // If the current step input was valid
-    boolean completedStep = interactionSteps.get(currentStepIdx).submitStep(playerInput);
+    boolean wasInputValid = currentStep.submitStep(playerInput);
 
-    if (completedStep) {
-
-      interactiveSessionFormatter.sendFormattedInput(playerInput);
-
-      if (++currentStepIdx < interactionSteps.size()) {
-        interactionSteps.get(currentStepIdx).run(targetPlayer);
-      } else {
-        this.finishSession();
-      }
-
-    } else {
+    if (!wasInputValid) {
       interactiveSessionFormatter.sendInvalidInputMessage(playerInput);
+      return;
+    }
+
+    interactiveSessionFormatter.sendFormattedInput(playerInput);
+
+    // We reached the end of the steps
+    if (currentStepIdx > interactionSteps.size()) {
+      this.finishSession();
+      return;
+    }
+
+    InteractiveStep nextStep = this.getNextStep(currentStep, playerInput);
+    if (nextStep != null) {
+      currentStepIdx = interactionSteps.indexOf(nextStep);
+      nextStep.run(targetPlayer);
+    } else { // If the next step could not be found, we finish the session
+      this.finishSession();
     }
 
   }
 
+  private InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
+
+    // If there is no branching condition, we just go to the next step
+    if (currentStep.getBranchingCondition() == null) {
+      return interactionSteps.get(currentStepIdx+1);
+    }
+
+    // Otherwise, we apply the branching condition to get the next step id
+    String nextStepId = currentStep.getBranchingCondition().apply(playerInput);
+
+    // We get the next step based on the id
+    return interactionSteps.stream()
+        .filter(step -> step.getId().equals(nextStepId))
+        .findFirst()
+        .orElse(null);
+
+  }
+
   private void finishSession() {
+
     interactiveSessionFormatter.sendFinishingMessage();
-    onSessionEnd.run();
+
+    if (onSessionEnd != null) {
+      onSessionEnd.run();
+    }
+
     interactiveSessionManager.removeSession(this);
+
   }
 
   private void cancelSession() {
