@@ -5,6 +5,8 @@ import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
@@ -51,11 +53,12 @@ class QuestsRepositoryIT {
 
     questsRepository = new QuestsRepository(Logger.getLogger(this.getClass().getName()), dataSource,
         concurrencyHandler);
-    questRequirementsRepository = new QuestRequirementsRepository(Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
-    questRewardsRepository = new QuestRewardsRepository(Logger.getLogger(this.getClass().getName()), dataSource,
-        concurrencyHandler);
-    questObjectivesRepository = new QuestObjectivesRepository(Logger.getLogger(this.getClass().getName()), dataSource,
-        concurrencyHandler);
+    questRequirementsRepository = new QuestRequirementsRepository(
+        Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
+    questRewardsRepository = new QuestRewardsRepository(Logger.getLogger(this.getClass().getName()),
+        dataSource, concurrencyHandler);
+    questObjectivesRepository = new QuestObjectivesRepository(
+        Logger.getLogger(this.getClass().getName()), dataSource, concurrencyHandler);
 
     questsRepository.createTable().join();
     questRequirementsRepository.createTable().join();
@@ -82,27 +85,83 @@ class QuestsRepositoryIT {
 
     int id = 1;
 
-    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-    QuestRequirementModel questRequirementModel = new QuestRequirementModel(null, id, "Test", "", 0F);
+    // Models that will be inserted into the database
+    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "",
+        0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    QuestRequirementModel questRequirementModel = new QuestRequirementModel(null, id, "Test", "",
+        0F);
     QuestRewardModel questRewardModel = new QuestRewardModel(null, id, "Test", "", 0F);
     QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(null, id, "Test", "", 0F);
 
-    questsRepository.insert(questModel)
-        .join();
+    questsRepository.insert(questModel).join();
 
-    questRequirementsRepository.insert(questRequirementModel)
-        .join();
+    int questRequirementId = questRequirementsRepository.insert(questRequirementModel).join();
+    int questRewardId = questRewardsRepository.insert(questRewardModel).join();
+    int questObjectiveId = questObjectivesRepository.insert(questObjectiveModel).join();
 
-    questRewardsRepository.insert(questRewardModel)
-        .join();
+    // Created expected models to compare with the ones returned by the repository
+    QuestRequirementModel expectedQuestRequirementModel = new QuestRequirementModel(
+        questRequirementId, questRequirementModel.questId(), questRequirementModel.type(),
+        questRequirementModel.stringValue(), questRequirementModel.numericValue());
 
-    questObjectivesRepository.insert(questObjectiveModel)
-        .join();
+    QuestRewardModel expectedQuestRewardModel = new QuestRewardModel(questRewardId,
+        questRewardModel.questId(), questRewardModel.type(), questRewardModel.stringValue(),
+        questRewardModel.numericValue());
+
+    QuestObjectiveModel expectedQuestObjectiveModel = new QuestObjectiveModel(questObjectiveId,
+        questObjectiveModel.questId(), questObjectiveModel.type(), questObjectiveModel.stringValue(),
+        questObjectiveModel.numericValue());
+
+    QuestModel expectedQuestModel = new QuestModel(questModel.id(), questModel.name(),
+        questModel.description(), questModel.openingMsg(), questModel.closingMsg(),
+        questModel.item(), questModel.timeLimit(), List.of(expectedQuestObjectiveModel),
+        List.of(expectedQuestRequirementModel), List.of(expectedQuestRewardModel));
 
     questsRepository.findById(id).thenAccept(quest -> {
       Assertions.assertTrue(quest.isPresent());
       Assertions.assertEquals(id, quest.get().id());
-      Assertions.assertEquals(quest.get(), questModel);
+      Assertions.assertEquals(expectedQuestModel, quest.get());
+    }).join();
+
+  }
+
+  @Test
+  @DisplayName("findById() returns empty list if no requirements exist")
+  public void findById_ReturnsEmptyListNoRequirements() {
+
+    int id = 1;
+
+    // Models that will be inserted into the database
+    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "",
+        0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    QuestRewardModel questRewardModel = new QuestRewardModel(null, id, "Test", "", 0F);
+    QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(null, id, "Test", "", 0F);
+
+    questsRepository.insert(questModel).join();
+
+    int questRewardId = questRewardsRepository.insert(questRewardModel).join();
+    int questObjectiveId = questObjectivesRepository.insert(questObjectiveModel).join();
+
+    // Created expected models to compare with the ones returned by the repository
+
+    QuestRewardModel expectedQuestRewardModel = new QuestRewardModel(questRewardId,
+        questRewardModel.questId(), questRewardModel.type(), questRewardModel.stringValue(),
+        questRewardModel.numericValue());
+
+    QuestObjectiveModel expectedQuestObjectiveModel = new QuestObjectiveModel(questObjectiveId,
+        questObjectiveModel.questId(), questObjectiveModel.type(), questObjectiveModel.stringValue(),
+        questObjectiveModel.numericValue());
+
+    // The expected requirements are an empty list
+    QuestModel expectedQuestModel = new QuestModel(questModel.id(), questModel.name(),
+        questModel.description(), questModel.openingMsg(), questModel.closingMsg(),
+        questModel.item(), questModel.timeLimit(), List.of(expectedQuestObjectiveModel),
+        Collections.emptyList(), List.of(expectedQuestRewardModel));
+
+    questsRepository.findById(id).thenAccept(quest -> {
+      Assertions.assertTrue(quest.isPresent());
+      Assertions.assertEquals(id, quest.get().id());
+      Assertions.assertEquals(expectedQuestModel, quest.get());
     }).join();
 
   }
@@ -113,8 +172,7 @@ class QuestsRepositoryIT {
 
     int id = 1;
 
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
+    questsRepository.findById(id).thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
         .join();
 
   }
@@ -124,11 +182,11 @@ class QuestsRepositoryIT {
   public void insert_SuccessfullyInsertsQuestIntoDatabase() {
     int id = 1;
 
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
+    questsRepository.insert(
+            new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertTrue(quest.isPresent()))
+    questsRepository.findById(id).thenAccept(quest -> Assertions.assertTrue(quest.isPresent()))
         .join();
 
   }
@@ -139,13 +197,13 @@ class QuestsRepositoryIT {
     int id = 1;
 
     // Insert a quest to avoid foreign key errors
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
+    questsRepository.insert(
+            new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
     questsRepository.delete(id).join();
 
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
+    questsRepository.findById(id).thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
         .join();
 
   }

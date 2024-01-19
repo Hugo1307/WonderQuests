@@ -16,4 +16,5 @@ public record QuestRequirementModel(
     return new QuestRequirementDto(id, questId, RequirementType.fromString(type), stringValue,
         numericValue);
   }
+
 }

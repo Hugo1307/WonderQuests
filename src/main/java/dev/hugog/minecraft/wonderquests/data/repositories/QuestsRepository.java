@@ -68,66 +68,91 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "SELECT * FROM quest AS quest " +
-                    "LEFT JOIN quest_objective ON quest.id = quest_objective.quest_id " +
-                    "LEFT JOIN quest_requirement ON quest.id = quest_requirement.quest_id " +
-                    "LEFT JOIN quest_reward ON quest.id = quest_reward.quest_id;");
+            "SELECT quest.id AS id, name, description, opening_msg, closing_msg, item, time_limit, "
+                + "quest_objective.id AS quest_objective_id, "
+                + "quest_objective.type AS quest_objective_type, "
+                + "quest_objective.str_value AS quest_objective_str_value, "
+                + "quest_objective.num_value AS quest_objective_num_value, "
+                + "quest_requirement.id AS quest_requirement_id, "
+                + "quest_requirement.type AS quest_requirement_type, "
+                + "quest_requirement.str_value AS quest_requirement_str_value, "
+                + "quest_requirement.num_value AS quest_requirement_num_value, "
+                + "quest_reward.id AS quest_reward_id, "
+                + "quest_reward.type AS quest_reward_type, "
+                + "quest_reward.str_value AS quest_reward_str_value, "
+                + "quest_reward.num_value AS quest_reward_num_value "
+                + "FROM quest "
+                + "LEFT JOIN quest_objective ON quest.id = quest_objective.quest_id "
+                + "LEFT JOIN quest_requirement ON quest.id = quest_requirement.quest_id "
+                + "LEFT JOIN quest_reward ON quest.id = quest_reward.quest_id "
+                + "WHERE quest.id = ?;");
 
-        // ps.setInt(1, id);
+        ps.setInt(1, id);
+
         ResultSet rs = ps.executeQuery();
-
         QuestModel questModel = null;
 
         while (rs.next()) {
           if (questModel == null) {
             questModel = new QuestModel(
-                    rs.getInt("quest.id"),
-                    rs.getString("quest.name"),
-                    rs.getString("quest.description"),
-                    rs.getString("quest.opening_msg"),
-                    rs.getString("quest.closing_msg"),
-                    rs.getString("quest.item"),
-                    rs.getInt("quest.time_limit"),
-                    new ArrayList<>(),
-                    new ArrayList<>(),
-                    new ArrayList<>()
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getString("opening_msg"),
+                rs.getString("closing_msg"),
+                rs.getString("item"),
+                rs.getInt("time_limit"),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
             );
-          } else {
+          }
+
+          rs.getInt("quest_objective_id");
+
+          if (!rs.wasNull()) {
             questModel.objectives().add(new QuestObjectiveModel(
-                    rs.getInt("quest_objective.id"),
-                    rs.getInt("quest_objective.quest_id"),
-                    rs.getString("quest_objective.type"),
-                    rs.getString("quest_objective.str_value"),
-                    rs.getFloat("quest_objective.num_value")
-            ));
-            questModel.requirements().add(new QuestRequirementModel(
-                    rs.getInt("quest_requirement.id"),
-                    rs.getInt("quest_requirement.quest_id"),
-                    rs.getString("quest_requirement.type"),
-                    rs.getString("quest_requirement.str_value"),
-                    rs.getFloat("quest_requirement.num_value")
-            ));
-            questModel.rewards().add(new QuestRewardModel(
-                    rs.getInt("quest_reward.id"),
-                    rs.getInt("quest_reward.quest_id"),
-                    rs.getString("quest_reward.type"),
-                    rs.getString("quest_reward.str_value"),
-                    rs.getFloat("quest_reward.num_value")
+                rs.getInt("quest_objective_id"),
+                rs.getInt("id"),
+                rs.getString("quest_objective_type"),
+                rs.getString("quest_objective_str_value"),
+                rs.getFloat("quest_objective_num_value")
             ));
           }
+
+          rs.getInt("quest_requirement_id");
+
+          if (!rs.wasNull()) {
+            questModel.requirements().add(new QuestRequirementModel(
+                rs.getInt("quest_requirement_id"),
+                rs.getInt("id"),
+                rs.getString("quest_requirement_type"),
+                rs.getString("quest_requirement_str_value"),
+                rs.getFloat("quest_requirement_num_value")
+            ));
+          }
+
+          rs.getInt("quest_reward_id");
+
+          if (!rs.wasNull()) {
+            questModel.rewards().add(new QuestRewardModel(
+                rs.getInt("quest_reward_id"),
+                rs.getInt("id"),
+                rs.getString("quest_reward_type"),
+                rs.getString("quest_reward_str_value"),
+                rs.getFloat("quest_reward_num_value")
+            ));
+          }
+
         }
 
-        if (questModel != null) {
-          return Optional.of(questModel);
-        }
+        return Optional.ofNullable(questModel);
 
       } catch (SQLException e) {
         logger.severe(String.format("Error while finding quest with id %d! Caused by: %s", id,
             e.getMessage()));
         throw new RuntimeException(e);
       }
-
-      return Optional.empty();
 
     }), true);
 
