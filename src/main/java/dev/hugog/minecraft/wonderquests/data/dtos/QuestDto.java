@@ -53,7 +53,10 @@ public class QuestDto implements Dto<QuestModel> {
         openingMsg,
         closingMsg,
         item,
-        timeLimit
+        timeLimit,
+        null,
+        null,
+        null
     );
   }
 

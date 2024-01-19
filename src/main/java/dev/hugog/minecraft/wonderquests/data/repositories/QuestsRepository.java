@@ -5,9 +5,14 @@ import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
@@ -63,21 +68,57 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "SELECT * FROM quest WHERE id = ?;");
+            "SELECT * FROM quest AS quest " +
+                    "LEFT JOIN quest_objective ON quest.id = quest_objective.quest_id " +
+                    "LEFT JOIN quest_requirement ON quest.id = quest_requirement.quest_id " +
+                    "LEFT JOIN quest_reward ON quest.id = quest_reward.quest_id;");
 
-        ps.setInt(1, id);
+        // ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-          return Optional.of(new QuestModel(
-              rs.getInt("id"),
-              rs.getString("name"),
-              rs.getString("description"),
-              rs.getString("opening_msg"),
-              rs.getString("closing_msg"),
-              rs.getString("item"),
-              rs.getInt("time_limit")
-          ));
+        QuestModel questModel = null;
+
+        while (rs.next()) {
+          if (questModel == null) {
+            questModel = new QuestModel(
+                    rs.getInt("quest.id"),
+                    rs.getString("quest.name"),
+                    rs.getString("quest.description"),
+                    rs.getString("quest.opening_msg"),
+                    rs.getString("quest.closing_msg"),
+                    rs.getString("quest.item"),
+                    rs.getInt("quest.time_limit"),
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    new ArrayList<>()
+            );
+          } else {
+            questModel.objectives().add(new QuestObjectiveModel(
+                    rs.getInt("quest_objective.id"),
+                    rs.getInt("quest_objective.quest_id"),
+                    rs.getString("quest_objective.type"),
+                    rs.getString("quest_objective.str_value"),
+                    rs.getFloat("quest_objective.num_value")
+            ));
+            questModel.requirements().add(new QuestRequirementModel(
+                    rs.getInt("quest_requirement.id"),
+                    rs.getInt("quest_requirement.quest_id"),
+                    rs.getString("quest_requirement.type"),
+                    rs.getString("quest_requirement.str_value"),
+                    rs.getFloat("quest_requirement.num_value")
+            ));
+            questModel.rewards().add(new QuestRewardModel(
+                    rs.getInt("quest_reward.id"),
+                    rs.getInt("quest_reward.quest_id"),
+                    rs.getString("quest_reward.type"),
+                    rs.getString("quest_reward.str_value"),
+                    rs.getFloat("quest_reward.num_value")
+            ));
+          }
+        }
+
+        if (questModel != null) {
+          return Optional.of(questModel);
         }
 
       } catch (SQLException e) {

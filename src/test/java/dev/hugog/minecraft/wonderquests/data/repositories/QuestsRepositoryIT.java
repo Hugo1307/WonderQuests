@@ -3,7 +3,13 @@ package dev.hugog.minecraft.wonderquests.data.repositories;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
+
+import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +24,9 @@ class QuestsRepositoryIT {
   private DataSource dataSource;
 
   private QuestsRepository questsRepository;
+  private QuestRewardsRepository questRewardsRepository;
+  private QuestRequirementsRepository questRequirementsRepository;
+  private QuestObjectivesRepository questObjectivesRepository;
 
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
 
@@ -42,14 +51,22 @@ class QuestsRepositoryIT {
 
     questsRepository = new QuestsRepository(Logger.getLogger(this.getClass().getName()), dataSource,
         concurrencyHandler);
+    questRequirementsRepository = new QuestRequirementsRepository(Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
+    questRewardsRepository = new QuestRewardsRepository(Logger.getLogger(this.getClass().getName()), dataSource,
+        concurrencyHandler);
+    questObjectivesRepository = new QuestObjectivesRepository(Logger.getLogger(this.getClass().getName()), dataSource,
+        concurrencyHandler);
 
     questsRepository.createTable().join();
+    questRequirementsRepository.createTable().join();
+    questRewardsRepository.createTable().join();
+    questObjectivesRepository.createTable().join();
 
   }
 
   @AfterEach
   void tearDown() {
-    questsRepository.deleteTable().join();
+    // questsRepository.deleteTable().join();
     dataSource.closeDataSource();
   }
 
@@ -65,9 +82,21 @@ class QuestsRepositoryIT {
 
     int id = 1;
 
-    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0);
+    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    QuestRequirementModel questRequirementModel = new QuestRequirementModel(null, id, "Test", "", 0F);
+    QuestRewardModel questRewardModel = new QuestRewardModel(null, id, "Test", "", 0F);
+    QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(null, id, "Test", "", 0F);
 
     questsRepository.insert(questModel)
+        .join();
+
+    questRequirementsRepository.insert(questRequirementModel)
+        .join();
+
+    questRewardsRepository.insert(questRewardModel)
+        .join();
+
+    questObjectivesRepository.insert(questObjectiveModel)
         .join();
 
     questsRepository.findById(id).thenAccept(quest -> {
@@ -95,7 +124,7 @@ class QuestsRepositoryIT {
   public void insert_SuccessfullyInsertsQuestIntoDatabase() {
     int id = 1;
 
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
     questsRepository.findById(id)
@@ -110,7 +139,7 @@ class QuestsRepositoryIT {
     int id = 1;
 
     // Insert a quest to avoid foreign key errors
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
     questsRepository.delete(id).join();

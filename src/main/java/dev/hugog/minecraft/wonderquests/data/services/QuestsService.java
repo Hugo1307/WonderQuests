@@ -106,4 +106,12 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
+  public CompletableFuture<List<QuestDto>> getAvailableQuests(String playerName) {
+//    return questsRepository.findAll()
+//        .thenApplyAsync(questModels -> questModels.stream()
+//            .map(QuestModel::toDto)
+//            .toList());
+      return null;
+  }
+
 }

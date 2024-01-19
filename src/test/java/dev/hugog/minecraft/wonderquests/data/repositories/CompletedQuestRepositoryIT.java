@@ -67,7 +67,7 @@ public class CompletedQuestRepositoryIT {
 
     // Insert a player, a quest and an active quest to avoid foreign key errors
     playersRepository.insert(new PlayerModel(id.playerId())).join();
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
   }

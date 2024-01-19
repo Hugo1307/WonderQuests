@@ -52,7 +52,7 @@ public class QuestRequirementsRepositoryIT {
     questRequirementsRepository.createTable().join();
 
     // Insert a quest to avoid foreign key errors in further tests
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
   }
