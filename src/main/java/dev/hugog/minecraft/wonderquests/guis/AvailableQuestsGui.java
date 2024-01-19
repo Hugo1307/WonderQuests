@@ -5,6 +5,7 @@ import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
+import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class AvailableQuestsGui implements Gui {
 
   private final Server server;
 
-  private final QuestsService questsService;
+  private final PlayerService playerService;
   private final GuiManager guiManager;
 
   private final ConcurrencyHandler concurrencyHandler;
@@ -39,11 +40,11 @@ public class AvailableQuestsGui implements Gui {
 
   @Inject
   public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin,
-      QuestsService questsService, Server server, GuiManager guiManager,
+      PlayerService playerService, Server server, GuiManager guiManager,
       ConcurrencyHandler concurrencyHandler) {
     this.player = player;
     this.plugin = plugin;
-    this.questsService = questsService;
+    this.playerService = playerService;
     this.server = server;
     this.guiManager = guiManager;
     this.concurrencyHandler = concurrencyHandler;
@@ -54,9 +55,8 @@ public class AvailableQuestsGui implements Gui {
 
     this.inventory = server.createInventory(player, 9, Component.text("Available Quests"));
 
-    return questsService.getAvailableQuests(player.getUniqueId())
+    return playerService.getAvailableQuests(player.getUniqueId())
         .thenAccept((quests) -> {
-          System.out.println("Available quests: " + quests.size());
           quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
         });
 
@@ -82,23 +82,37 @@ public class AvailableQuestsGui implements Gui {
         .getPersistentDataContainer();
 
     if (itemPersistentContainer.has(getQuestIdKey(), PersistentDataType.INTEGER)) {
-      Integer questId = itemPersistentContainer.get(getQuestIdKey(), PersistentDataType.INTEGER);
-      questsService.startQuest(player.getUniqueId(), questId)
-          .whenComplete((success, throwable) -> {
 
-            if (throwable != null) {
-              player.sendMessage("An error occurred while starting the quest!");
+      Integer questId = itemPersistentContainer.get(getQuestIdKey(), PersistentDataType.INTEGER);
+
+      playerService.alreadyStartedQuest(player.getUniqueId(), questId)
+          .thenAccept((alreadyStarted) -> {
+
+            if (alreadyStarted) {
+              player.sendMessage("You have already started this quest!");
               return;
             }
 
-            if (success) {
-              player.sendMessage("Quest started!");
-            } else {
-              player.sendMessage("Quest could not be started!");
-            }
+            playerService.startQuest(player.getUniqueId(), questId)
+                .whenComplete((success, throwable) -> {
+
+                  if (throwable != null) {
+                    player.sendMessage("An error occurred while starting the quest!");
+                    return;
+                  }
+
+                  if (success) {
+                    player.sendMessage("Quest started!");
+                  } else {
+                    player.sendMessage("Quest could not be started!");
+                  }
+
+                });
 
           });
+
       close();
+
     } else {
       System.out.println("Quest id is null!");
     }

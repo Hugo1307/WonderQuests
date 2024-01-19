@@ -74,19 +74,4 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
-  public CompletableFuture<Set<QuestDto>> getAvailableQuests(UUID playerId) {
-      return questsRepository.findAll().thenApply(
-              questModels -> questModels.stream()
-              .map(QuestModel::toDto)
-              .collect(Collectors.toSet())
-      );
-  }
-
-  public CompletableFuture<Boolean> startQuest(UUID playerId, Integer questId) {
-
-    ActiveQuestDto activeQuestDto = ActiveQuestDto.startQuest(playerId, questId);
-    return activeQuestRepository.insert(activeQuestDto.toModel()).thenApply(Objects::nonNull);
-
-  }
-
 }
