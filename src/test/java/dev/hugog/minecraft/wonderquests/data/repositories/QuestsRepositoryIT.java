@@ -220,4 +220,54 @@ class QuestsRepositoryIT {
 
   }
 
+  @Test
+  @DisplayName("findAll() returns all quests when quests exist in the database")
+  public void findAll_ReturnsAllQuestsWhenExists() {
+    // Insert some quests into the database
+    QuestModel questModel1 = new QuestModel(1, "Test Quest 1", "Test Quest Description 1", "", "", "", 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    QuestModel questModel2 = new QuestModel(2, "Test Quest 2", "Test Quest Description 2", "", "", "", 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    questsRepository.insert(questModel1).join();
+    questsRepository.insert(questModel2).join();
+
+    // Call findAll and check that it returns all inserted quests
+    questsRepository.findAll().thenAccept(quests -> {
+      Assertions.assertEquals(2, quests.size());
+      Assertions.assertTrue(quests.contains(questModel1));
+      Assertions.assertTrue(quests.contains(questModel2));
+    }).join();
+  }
+
+  @Test
+  @DisplayName("findAll() returns empty set when no quests exist in the database")
+  public void findAll_ReturnsEmptySetWhenNoQuestsExist() {
+    // Call findAll and check that it returns an empty set
+    questsRepository.findAll().thenAccept(quests -> {
+      Assertions.assertTrue(quests.isEmpty());
+    }).join();
+  }
+
+  @Test
+  @DisplayName("findAll() returns quests with all related entities when quests exist in the database")
+  public void findAll_ReturnsQuestsWithAllRelatedEntitiesWhenExists() {
+    // Insert a quest with related entities into the database
+    QuestModel questModel = new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    QuestRequirementModel questRequirementModel = new QuestRequirementModel(null, 1, "Test", "", 0F);
+    QuestRewardModel questRewardModel = new QuestRewardModel(null, 1, "Test", "", 0F);
+    QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(null, 1, "Test", "", 0F);
+
+    questsRepository.insert(questModel).join();
+    questRequirementsRepository.insert(questRequirementModel).join();
+    questRewardsRepository.insert(questRewardModel).join();
+    questObjectivesRepository.insert(questObjectiveModel).join();
+
+    // Call findAll and check that it returns the quest with all related entities
+    questsRepository.findAll().thenAccept(quests -> {
+      Assertions.assertEquals(1, quests.size());
+      QuestModel returnedQuest = quests.iterator().next();
+      Assertions.assertEquals(1, returnedQuest.requirements().size());
+      Assertions.assertEquals(1, returnedQuest.rewards().size());
+      Assertions.assertEquals(1, returnedQuest.objectives().size());
+    }).join();
+  }
+
 }
