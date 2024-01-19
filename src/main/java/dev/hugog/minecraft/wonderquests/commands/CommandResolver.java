@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
@@ -53,6 +54,7 @@ public class CommandResolver {
       }
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
+      case "status" -> this.pluginCommand = new CurrentQuestsCommand(sender, args, dependencies);
       default -> this.pluginCommand = null;
     }
   }

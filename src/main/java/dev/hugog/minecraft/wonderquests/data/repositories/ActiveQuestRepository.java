@@ -6,15 +6,20 @@ import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.models.ActiveQuestModel;
+import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestModel, PlayerQuestKey> {
+public class ActiveQuestRepository extends
+    AbstractDataRepository<ActiveQuestModel, PlayerQuestKey> {
 
   @Inject
   public ActiveQuestRepository(@Named("bukkitLogger") Logger logger,
@@ -63,7 +68,7 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "SELECT * FROM active_quest WHERE player_id = ? AND quest_id = ?;");
+            "SELECT * FROM active_quest JOIN quest ON active_quest.quest_id = quest.id WHERE player_id = ? AND quest_id = ?;");
 
         ps.setObject(1, id.playerId());
         ps.setInt(2, id.questId());
@@ -71,18 +76,32 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
+
           return Optional.of(new ActiveQuestModel(
               rs.getObject("player_id", UUID.class),
               rs.getInt("quest_id"),
               rs.getInt("completed_goals"),
               rs.getFloat("progress"),
-              rs.getTimestamp("started_at").getTime()
+              rs.getTimestamp("started_at").getTime(),
+              new QuestModel(
+                  rs.getInt("id"),
+                  rs.getString("name"),
+                  rs.getString("description"),
+                  rs.getString("opening_msg"),
+                  rs.getString("closing_msg"),
+                  rs.getString("item"),
+                  rs.getInt("time_limit"),
+                  Collections.emptyList(),
+                  Collections.emptyList(),
+                  Collections.emptyList()
+              )
           ));
         }
 
       } catch (SQLException e) {
-        logger.severe(String.format("Error while finding %s with id %s! Caused by: %s", tableName, id,
-            e.getMessage()));
+        logger.severe(
+            String.format("Error while finding %s with id %s! Caused by: %s", tableName, id,
+                e.getMessage()));
         throw new RuntimeException(e);
       }
 
@@ -148,4 +167,53 @@ public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestMod
     }), true);
 
   }
+
+  public CompletableFuture<Set<ActiveQuestModel>> findAllByPlayerId(UUID playerId) {
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT * FROM active_quest JOIN quest ON active_quest.quest_id = quest.id WHERE player_id = ?;");
+
+        ps.setObject(1, playerId);
+
+        ResultSet rs = ps.executeQuery();
+        Set<ActiveQuestModel> activeQuests = new HashSet<>();
+
+        while (rs.next()) {
+          activeQuests.add(new ActiveQuestModel(
+              rs.getObject("player_id", UUID.class),
+              rs.getInt("quest_id"),
+              rs.getInt("completed_goals"),
+              rs.getFloat("progress"),
+              rs.getTimestamp("started_at").getTime(),
+              new QuestModel(
+                  rs.getInt("id"),
+                  rs.getString("name"),
+                  rs.getString("description"),
+                  rs.getString("opening_msg"),
+                  rs.getString("closing_msg"),
+                  rs.getString("item"),
+                  rs.getInt("time_limit"),
+                  Collections.emptyList(),
+                  Collections.emptyList(),
+                  Collections.emptyList()
+              )
+          ));
+        }
+
+        return activeQuests;
+
+      } catch (SQLException e) {
+        logger.severe(
+            String.format("Error while finding all quests for player %s! Caused by: %s", playerId,
+                e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
+  }
+
+
 }
