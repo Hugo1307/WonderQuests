@@ -8,6 +8,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.data.repositories.AbstractDataRepository;
+import dev.hugog.minecraft.wonderquests.data.repositories.ActiveQuestRepository;
+import dev.hugog.minecraft.wonderquests.data.repositories.CompletedQuestRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.PlayersRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
@@ -50,14 +52,18 @@ public class BasicBinderModule extends AbstractModule {
       PlayersRepository playersRepository,
       QuestsRepository questsRepository, QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository
+      QuestRewardsRepository questRewardsRepository,
+      ActiveQuestRepository activeQuestRepository,
+      CompletedQuestRepository completedQuestRepository
   ) {
     return List.of(
         playersRepository,
         questsRepository,
         questObjectivesRepository,
         questRequirementsRepository,
-        questRewardsRepository
+        questRewardsRepository,
+        activeQuestRepository,
+        completedQuestRepository
     );
 
   }
