@@ -2,10 +2,13 @@ package dev.hugog.minecraft.wonderquests.guis;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -16,40 +19,57 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class AvailableQuestsGui implements Gui {
 
-    private final Server server;
     private final Player player;
 
+    private final Server server;
+
     private final QuestsService questsService;
+    private final GuiManager guiManager;
+
+    private final ConcurrencyHandler concurrencyHandler;
+
+    @Getter
+    private Inventory inventory;
 
     @Inject
-    public AvailableQuestsGui(@Assisted Player player, QuestsService questsService, Server server) {
+    public AvailableQuestsGui(@Assisted Player player, QuestsService questsService, Server server, GuiManager guiManager, ConcurrencyHandler concurrencyHandler) {
         this.player = player;
         this.questsService = questsService;
         this.server = server;
+        this.guiManager = guiManager;
+        this.concurrencyHandler = concurrencyHandler;
     }
 
     @Override
-    public Inventory build() {
+    public CompletableFuture<Void> build() {
 
-        Inventory inventory = server.createInventory(player, 9, Component.text("Available Quests"));
+        this.inventory = server.createInventory(player, 9, Component.text("Available Quests"));
 
-        questsService.getAvailableQuests(player.getUniqueId())
+        return questsService.getAvailableQuests(player.getUniqueId())
             .thenAccept((quests) -> {
+                System.out.println("Available quests: " + quests.size() );
                 quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
             });
-
-        return inventory;
 
     }
 
     @Override
     public void open() {
-        player.openInventory(build());
+        build().thenRun(() -> concurrencyHandler.runOnMainThread(() -> player.openInventory(inventory)));
+        guiManager.registerGui(this);
     }
 
     @Override
     public void close() {
+        guiManager.unregisterGui(this);
         player.closeInventory();
+    }
+
+    @Override
+    public void onClick(ItemStack clickedItem) {
+
+
+
     }
 
     private ItemStack buildItemFromQuest(QuestDto quest) {

@@ -16,6 +16,9 @@ public class QuestObjectiveDto implements Dto<QuestObjectiveModel> {
   private Float numericValue;
 
   public String obtainRepresentation() {
+    if (type == null) {
+      return "Unknown";
+    }
     return switch (type) {
       case KILL_MOBS -> String.format("Kill %d %s", numericValue.intValue(), stringValue);
       case BREAK_BLOCK -> String.format("Break %d %s blocks", numericValue.intValue(), stringValue);

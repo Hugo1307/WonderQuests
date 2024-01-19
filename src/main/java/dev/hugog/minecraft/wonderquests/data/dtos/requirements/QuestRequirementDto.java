@@ -19,6 +19,9 @@ public class QuestRequirementDto implements Dto<QuestRequirementModel> {
   private Float numericValue;
 
   public String obtainRepresentation() {
+    if (type == null) {
+      return "Unknown";
+    }
     return switch (type) {
       case PERMISSION -> "Permission: " + stringValue;
       case ITEM -> "Item: " + stringValue;

@@ -16,6 +16,9 @@ public class QuestRewardDto implements Dto<QuestRewardModel> {
   private Float numericValue;
 
   public String obtainRepresentation() {
+    if (type == null) {
+      return "Unknown";
+    }
     return switch (type) {
       case MONEY -> String.format("%f money", numericValue);
       case ITEMS -> String.format("%d %s", numericValue.intValue(), stringValue);
