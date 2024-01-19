@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.injection.factories;
 
+import dev.hugog.minecraft.wonderquests.actions.concrete.CheckCurrentQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestRequirementAction;
 import dev.hugog.minecraft.wonderquests.actions.concrete.ShowAvailableQuestsAction;
@@ -12,5 +13,7 @@ public interface ActionsFactory {
   CreateQuestRequirementAction buildCreateQuestRequirementAction(CommandSender sender, int questId);
 
   ShowAvailableQuestsAction buildShowAvailableQuestsAction(CommandSender sender);
+
+  CheckCurrentQuestAction buildCheckCurrentQuestAction(CommandSender sender);
 
 }

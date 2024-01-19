@@ -6,7 +6,6 @@ import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
-import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -113,8 +112,6 @@ public class AvailableQuestsGui implements Gui {
 
       close();
 
-    } else {
-      System.out.println("Quest id is null!");
     }
 
   }

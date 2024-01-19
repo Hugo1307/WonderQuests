@@ -5,6 +5,7 @@ import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.PlayerDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
+import dev.hugog.minecraft.wonderquests.data.models.ActiveQuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.repositories.ActiveQuestRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.PlayersRepository;
@@ -23,7 +24,8 @@ public class PlayerService {
   private final ActiveQuestRepository activeQuestRepository;
 
   @Inject
-  public PlayerService(PlayersRepository playersRepository, QuestsRepository questsRepository, ActiveQuestRepository activeQuestRepository) {
+  public PlayerService(PlayersRepository playersRepository, QuestsRepository questsRepository,
+      ActiveQuestRepository activeQuestRepository) {
     this.playersRepository = playersRepository;
     this.questsRepository = questsRepository;
     this.activeQuestRepository = activeQuestRepository;
@@ -62,6 +64,16 @@ public class PlayerService {
 
     PlayerQuestKey playerQuestKey = new PlayerQuestKey(playerId, questId);
     return activeQuestRepository.findById(playerQuestKey).thenApply(Optional::isPresent);
+
+  }
+
+  public CompletableFuture<Set<ActiveQuestDto>> getCurrentActiveQuest(UUID playerId) {
+
+    return activeQuestRepository.findAllByPlayerId(playerId)
+        .thenApply(questModels -> questModels.stream()
+            .map(ActiveQuestModel::toDto)
+            .collect(Collectors.toSet())
+        );
 
   }
 
