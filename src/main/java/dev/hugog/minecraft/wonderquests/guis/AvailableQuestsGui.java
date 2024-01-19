@@ -53,6 +53,7 @@ public class AvailableQuestsGui implements Gui {
     }
 
     private ItemStack buildItemFromQuest(QuestDto quest) {
+
         ItemStack questItem = new ItemStack(Material.EMERALD_BLOCK);
         List<Component> itemLore = new ArrayList<>();
 
@@ -71,13 +72,13 @@ public class AvailableQuestsGui implements Gui {
         itemLore.add(Component.text("Rewards:"));
         itemLore.add(Component.text(""));
         quest.getRewards().forEach((reward) -> {
-            itemLore.add(Component.text(reward.getType()));
+            itemLore.add(Component.text(reward.obtainRepresentation()));
         });
         itemLore.add(Component.text(""));
         itemLore.add(Component.text("Objectives:"));
         itemLore.add(Component.text(""));
         quest.getObjectives().forEach((objective) -> {
-            itemLore.add(Component.text(objective.getType()));
+            itemLore.add(Component.text(objective.obtainRepresentation()));
         });
         itemLore.add(Component.text(""));
         questItemMeta.lore(itemLore);

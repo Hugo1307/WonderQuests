@@ -30,7 +30,7 @@ public class QuestRequirementDto implements Dto<QuestRequirementModel> {
 
   @Override
   public QuestRequirementModel toModel() {
-    return new QuestRequirementModel(id, questId, type.toString(), stringValue, numericValue);
+    return new QuestRequirementModel(id, questId, type.name(), stringValue, numericValue);
   }
 
 }
