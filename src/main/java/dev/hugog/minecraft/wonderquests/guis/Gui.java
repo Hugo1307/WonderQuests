@@ -1,12 +1,10 @@
 package dev.hugog.minecraft.wonderquests.guis;
 
-import org.bukkit.entity.Player;
-
-import java.util.List;
+import org.bukkit.inventory.Inventory;
 
 public interface Gui {
 
-    void build();
+    Inventory build();
 
     void open();
 

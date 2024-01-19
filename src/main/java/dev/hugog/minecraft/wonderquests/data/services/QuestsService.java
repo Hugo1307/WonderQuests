@@ -3,7 +3,7 @@ package dev.hugog.minecraft.wonderquests.data.services;
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
@@ -15,7 +15,10 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class QuestsService {
 
@@ -106,12 +109,12 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
-  public CompletableFuture<List<QuestDto>> getAvailableQuests(String playerName) {
-//    return questsRepository.findAll()
-//        .thenApplyAsync(questModels -> questModels.stream()
-//            .map(QuestModel::toDto)
-//            .toList());
-      return null;
+  public CompletableFuture<Set<QuestDto>> getAvailableQuests(UUID playerId) {
+      return questsRepository.findAll().thenApply(
+              questModels -> questModels.stream()
+              .map(QuestModel::toDto)
+              .collect(Collectors.toSet())
+      );
   }
 
 }

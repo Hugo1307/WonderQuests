@@ -98,6 +98,10 @@ public class InteractiveSession {
 
     // If there is no branching condition, we just go to the next step
     if (currentStep.getCustomNextStep() == null) {
+      // If we reached the end of the steps, we return null so the session is ended
+      if (currentStepIdx + 1 >= interactionSteps.size()) {
+        return null;
+      }
       return interactionSteps.get(currentStepIdx + 1);
     }
 

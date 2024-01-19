@@ -1,5 +1,6 @@
-package dev.hugog.minecraft.wonderquests.data.dtos;
+package dev.hugog.minecraft.wonderquests.data.dtos.requirements;
 
+import dev.hugog.minecraft.wonderquests.data.dtos.Dto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
 import dev.hugog.minecraft.wonderquests.data.types.RequirementType;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,16 @@ public class QuestRequirementDto implements Dto<QuestRequirementModel> {
   private RequirementType type;
   private String stringValue;
   private Float numericValue;
+
+  public String obtainRepresentation() {
+    return switch (type) {
+      case PERMISSION -> "Permission: " + stringValue;
+      case ITEM -> "Item: " + stringValue;
+      case MONEY -> "Money: " + numericValue;
+      case QUEST_COMPLETED -> "Quest Completed: " + numericValue;
+      case QUEST_NOT_COMPLETED -> "Quest Not Completed: " + numericValue;
+    };
+  }
 
   @Override
   public QuestRequirementModel toModel() {

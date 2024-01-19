@@ -19,7 +19,11 @@ public record QuestModel(
 
   @Override
   public QuestDto toDto() {
-    return new QuestDto(id, name, description, openingMsg, closingMsg, item, timeLimit);
+    return new QuestDto(id, name, description, openingMsg, closingMsg, item, timeLimit,
+        objectives.stream().map(QuestObjectiveModel::toDto).toList(),
+        requirements.stream().map(QuestRequirementModel::toDto).toList(),
+        rewards.stream().map(QuestRewardModel::toDto).toList()
+    );
   }
 
 }

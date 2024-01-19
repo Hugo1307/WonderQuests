@@ -14,6 +14,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepos
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
+import dev.hugog.minecraft.wonderquests.injection.factories.GuiFactory;
 import org.bukkit.Server;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class BasicBinderModule extends AbstractModule {
 
     FactoryModuleBuilder factoryModuleBuilder = new FactoryModuleBuilder();
     install(factoryModuleBuilder.build(ActionsFactory.class));
+    install(factoryModuleBuilder.build(GuiFactory.class));
 
     this.bind(WonderQuests.class).toInstance(plugin);
     this.bind(Logger.class).annotatedWith(Names.named("bukkitLogger"))

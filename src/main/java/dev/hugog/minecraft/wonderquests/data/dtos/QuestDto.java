@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.data.dtos;
 
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,19 +31,6 @@ public class QuestDto implements Dto<QuestModel> {
   private List<QuestRequirementDto> requirements;
 
   private List<QuestRewardDto> rewards;
-
-  public QuestDto(Integer id, String name, String description, String openingMsg, String closingMsg,
-      String item, Integer timeLimit) {
-
-    this.id = id;
-    this.name = name;
-    this.description = description;
-    this.openingMsg = openingMsg;
-    this.closingMsg = closingMsg;
-    this.item = item;
-    this.timeLimit = timeLimit;
-
-  }
 
   @Override
   public QuestModel toModel() {
