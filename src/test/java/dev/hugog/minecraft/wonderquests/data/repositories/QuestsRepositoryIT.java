@@ -69,7 +69,10 @@ class QuestsRepositoryIT {
 
   @AfterEach
   void tearDown() {
-    // questsRepository.deleteTable().join();
+    questObjectivesRepository.deleteTable().join();
+    questRewardsRepository.deleteTable().join();
+    questRequirementsRepository.deleteTable().join();
+    questsRepository.deleteTable().join();
     dataSource.closeDataSource();
   }
 

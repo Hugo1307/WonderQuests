@@ -33,7 +33,7 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
         PreparedStatement ps = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_reward ("
                 + "id SERIAL PRIMARY KEY,"
-                + "quest_id INT4 REFERENCES quest (id),"
+                + "quest_id INT4 REFERENCES quest (id) ON DELETE CASCADE,"
                 + "type VARCHAR(31) NOT NULL,"
                 + "num_value FLOAT8,"
                 + "str_value VARCHAR(255)"
