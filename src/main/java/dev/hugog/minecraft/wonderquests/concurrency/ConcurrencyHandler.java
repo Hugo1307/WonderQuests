@@ -1,7 +1,9 @@
 package dev.hugog.minecraft.wonderquests.concurrency;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import dev.hugog.minecraft.wonderquests.WonderQuests;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -10,20 +12,29 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.bukkit.plugin.Plugin;
 
 @Singleton
 public class ConcurrencyHandler {
 
   public Executor executorPool;
 
-  public ConcurrencyHandler() {
+  private final WonderQuests plugin;
+
+  @Inject
+  public ConcurrencyHandler(WonderQuests plugin) {
 
     ThreadFactory threadFactory = new ThreadFactoryBuilder()
         .setNameFormat("WonderQuests-Thread-%d")
         .build();
 
     this.executorPool = Executors.newFixedThreadPool(5, threadFactory);
+    this.plugin = plugin;
 
+  }
+
+  public ConcurrencyHandler() {
+    this(null);
   }
 
   public CompletableFuture<Void> run(Runnable runnable, boolean async) {
@@ -88,6 +99,10 @@ public class ConcurrencyHandler {
 
   public CompletableFuture<?>[] getListOfFutures(CompletableFuture<?>... futures) {
     return futures;
+  }
+
+  public void runOnMainThread(Runnable runnable) {
+    plugin.getServer().getScheduler().runTask(plugin, runnable);
   }
 
 }

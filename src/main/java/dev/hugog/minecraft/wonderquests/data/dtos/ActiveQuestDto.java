@@ -15,6 +15,10 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
   private Float progress;
   private Long startedAt;
 
+  public static ActiveQuestDto startQuest(UUID playerId, Integer questId) {
+    return new ActiveQuestDto(playerId, questId, 0, 0f, System.currentTimeMillis());
+  }
+
   @Override
   public ActiveQuestModel toModel() {
     return new ActiveQuestModel(playerId, questId, completedGoals, progress, startedAt);

@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.models;
 
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
+import dev.hugog.minecraft.wonderquests.data.types.RewardType;
 
 public record QuestRewardModel(
     Integer id,
@@ -12,7 +13,7 @@ public record QuestRewardModel(
 
   @Override
   public QuestRewardDto toDto() {
-    return new QuestRewardDto(id, questId, type, stringValue, numericValue);
+    return new QuestRewardDto(id, questId, RewardType.fromString(type), stringValue, numericValue);
   }
 
 }

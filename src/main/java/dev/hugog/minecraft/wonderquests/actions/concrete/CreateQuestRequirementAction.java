@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.RequirementType;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSession;

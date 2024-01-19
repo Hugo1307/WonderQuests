@@ -34,7 +34,7 @@ public class QuestObjectivesRepository extends
         PreparedStatement createTablePs = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_objective ("
                 + "id SERIAL PRIMARY KEY,"
-                + "quest_id INT4 REFERENCES quest (id),"
+                + "quest_id INT4 REFERENCES quest (id) ON DELETE CASCADE,"
                 + "type VARCHAR(31) NOT NULL,"
                 + "num_value FLOAT8,"
                 + "str_value VARCHAR(255)"

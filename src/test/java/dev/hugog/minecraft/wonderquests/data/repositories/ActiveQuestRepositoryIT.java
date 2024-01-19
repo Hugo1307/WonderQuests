@@ -71,7 +71,7 @@ public class ActiveQuestRepositoryIT {
     ).join();
     questsRepository.insert(
         new QuestModel(1, "Test Quest", "Test Quest Description", "",
-            "", "", 0)
+            "", "", 0, null, null, null)
     ).join();
 
   }

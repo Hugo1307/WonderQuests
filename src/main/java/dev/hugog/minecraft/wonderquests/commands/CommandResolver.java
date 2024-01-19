@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import java.util.Arrays;
@@ -42,15 +43,17 @@ public class CommandResolver {
    * @param commandLabel the command string, i.e., command name.
    */
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
-    if (commandLabel.equals("create")) {
-      this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
-    } else if (commandLabel.equals("requirement")) {
-      if (args[0].equalsIgnoreCase("create")) {
-        this.pluginCommand = new CreateRequirementCommand(sender,
-            Arrays.copyOfRange(args, 1, args.length), dependencies);
+    switch (commandLabel) {
+      case "create" -> this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
+      case "requirement" -> {
+        if (args[0].equalsIgnoreCase("create")) {
+          this.pluginCommand = new CreateRequirementCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        }
       }
-    } else {
-      this.pluginCommand = null;
+      case "available" ->
+          this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
+      default -> this.pluginCommand = null;
     }
   }
 

@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.models;
 
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
+import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 
 public record QuestObjectiveModel(
     Integer id,
@@ -12,6 +13,6 @@ public record QuestObjectiveModel(
 
   @Override
   public QuestObjectiveDto toDto() {
-    return new QuestObjectiveDto(id, questId, type, stringValue, numericValue);
+    return new QuestObjectiveDto(id, questId, ObjectiveType.fromString(type), stringValue, numericValue);
   }
 }

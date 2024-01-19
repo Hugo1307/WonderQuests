@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.data.repositories;
 
+import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 
 public class ActiveQuestRepository extends AbstractDataRepository<ActiveQuestModel, PlayerQuestKey> {
 
+  @Inject
   public ActiveQuestRepository(@Named("bukkitLogger") Logger logger,
       DataSource dataSource,
       ConcurrencyHandler concurrencyHandler) {

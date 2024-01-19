@@ -10,7 +10,9 @@ import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.injection.BasicBinderModule;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import dev.hugog.minecraft.wonderquests.listeners.GuiClickListener;
 import dev.hugog.minecraft.wonderquests.listeners.InteractiveChatListener;
+import dev.hugog.minecraft.wonderquests.listeners.PlayerJoinListener;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,6 +39,10 @@ public final class WonderQuests extends JavaPlugin {
 
   @Inject
   private InteractiveChatListener interactiveChatListener;
+  @Inject
+  private GuiClickListener guiClickListener;
+  @Inject
+  private PlayerJoinListener playerJoinListener;
 
   @Override
   public void onEnable() {
@@ -70,6 +76,8 @@ public final class WonderQuests extends JavaPlugin {
 
       // Register Listener
       getServer().getPluginManager().registerEvents(interactiveChatListener, this);
+      getServer().getPluginManager().registerEvents(guiClickListener, this);
+      getServer().getPluginManager().registerEvents(playerJoinListener, this);
 
       getLogger().info("Plugin successfully enabled!");
 

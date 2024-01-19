@@ -1,21 +1,26 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
+import dev.hugog.minecraft.wonderquests.data.repositories.ActiveQuestRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class QuestsService {
 
@@ -23,17 +28,20 @@ public class QuestsService {
   private final QuestObjectivesRepository questObjectivesRepository;
   private final QuestRequirementsRepository questRequirementsRepository;
   private final QuestRewardsRepository questRewardsRepository;
+  private final ActiveQuestRepository activeQuestRepository;
 
   @Inject
   public QuestsService(QuestsRepository questsRepository,
       QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository) {
+      QuestRewardsRepository questRewardsRepository,
+      ActiveQuestRepository activeQuestRepository) {
 
     this.questsRepository = questsRepository;
     this.questObjectivesRepository = questObjectivesRepository;
     this.questRequirementsRepository = questRequirementsRepository;
     this.questRewardsRepository = questRewardsRepository;
+    this.activeQuestRepository = activeQuestRepository;
 
   }
 
@@ -58,47 +66,7 @@ public class QuestsService {
   }
 
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
-
-    return questsRepository.findById(id)
-        .thenApplyAsync(questModel -> {
-
-          Optional<QuestDto> questDto = questModel.map(QuestModel::toDto);
-
-          CompletableFuture<?> completableFuture1 = questObjectivesRepository.findAllByQuestId(id).thenAccept(
-              questObjectiveModels -> {
-                List<QuestObjectiveDto> questObjectiveDtos = questObjectiveModels.stream()
-                    .map(QuestObjectiveModel::toDto)
-                    .toList();
-
-                questDto.ifPresent(dto -> dto.setObjectives(questObjectiveDtos));
-
-              });
-
-          CompletableFuture<?> completableFuture2 = questRequirementsRepository.findAllByQuestId(id).thenAccept(
-              questRequirementModels -> {
-                List<QuestRequirementDto> questRequirementDtos = questRequirementModels.stream()
-                    .map(QuestRequirementModel::toDto)
-                    .toList();
-
-                questDto.ifPresent(dto -> dto.setRequirements(questRequirementDtos));
-
-              });
-
-          CompletableFuture<?> completableFuture3 = questRewardsRepository.findAllByQuestId(id).thenAccept(
-              questRewardModels -> {
-                List<QuestRewardDto> questRewardDtos = questRewardModels.stream()
-                    .map(QuestRewardModel::toDto)
-                    .toList();
-
-                questDto.ifPresent(dto -> dto.setRewards(questRewardDtos));
-
-              });
-
-          return CompletableFuture.allOf(completableFuture1, completableFuture2, completableFuture3)
-              .thenApply(aVoid -> questDto)
-              .join();
-
-        });
+    return questsRepository.findById(id).thenApply(questModel -> questModel.map(QuestModel::toDto));
   }
 
   public CompletableFuture<Boolean> checkIfQuestExists(Integer id) {

@@ -79,7 +79,7 @@ public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
         Statement statement = con.createStatement();
         // In this context, concatenating the table name is safe as the table name is not user input
-        statement.execute(String.format("DROP TABLE IF EXISTS %s;", tableName));
+        statement.execute(String.format("DROP TABLE IF EXISTS %s CASCADE;", tableName));
 
       } catch (SQLException e) {
         logger.severe(String.format("Error while deleting the %s table! Caused by: %s", tableName,
