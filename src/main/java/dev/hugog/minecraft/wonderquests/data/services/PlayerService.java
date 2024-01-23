@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.cache.ActiveQuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.PlayerDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
@@ -23,12 +24,15 @@ public class PlayerService {
   private final QuestsRepository questsRepository;
   private final ActiveQuestRepository activeQuestRepository;
 
+  private final ActiveQuestsCache activeQuestsCache;
+
   @Inject
   public PlayerService(PlayersRepository playersRepository, QuestsRepository questsRepository,
-      ActiveQuestRepository activeQuestRepository) {
+      ActiveQuestRepository activeQuestRepository, ActiveQuestsCache activeQuestsCache) {
     this.playersRepository = playersRepository;
     this.questsRepository = questsRepository;
     this.activeQuestRepository = activeQuestRepository;
+    this.activeQuestsCache = activeQuestsCache;
   }
 
   public CompletableFuture<Boolean> checkPlayer(UUID uuid) {
@@ -53,9 +57,9 @@ public class PlayerService {
     );
   }
 
-  public CompletableFuture<Boolean> startQuest(UUID playerId, Integer questId) {
+  public CompletableFuture<Boolean> startQuest(UUID playerId, Integer questId, Float objectiveTarget) {
 
-    ActiveQuestDto activeQuestDto = ActiveQuestDto.startQuest(playerId, questId);
+    ActiveQuestDto activeQuestDto = ActiveQuestDto.startQuest(playerId, questId, objectiveTarget);
     return activeQuestRepository.insert(activeQuestDto.toModel()).thenApply(Objects::nonNull);
 
   }
@@ -67,12 +71,22 @@ public class PlayerService {
 
   }
 
-  public CompletableFuture<Set<ActiveQuestDto>> getCurrentActiveQuest(UUID playerId) {
+  public CompletableFuture<Set<ActiveQuestDto>> getCurrentActiveQuests(UUID playerId) {
+
+    if (activeQuestsCache.has(playerId)) {
+      return CompletableFuture.completedFuture(activeQuestsCache.get(playerId));
+    }
 
     return activeQuestRepository.findAllByPlayerId(playerId)
-        .thenApply(questModels -> questModels.stream()
-            .map(ActiveQuestModel::toDto)
-            .collect(Collectors.toSet())
+        .thenApply(questModels -> {
+              Set<ActiveQuestDto> activeQuests = questModels.stream()
+                  .map(ActiveQuestModel::toDto)
+                  .collect(Collectors.toSet());
+
+              activeQuestsCache.put(playerId, activeQuests);
+
+              return activeQuests;
+            }
         );
 
   }
