@@ -103,22 +103,16 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 rs.getString("closing_msg"),
                 rs.getString("item"),
                 rs.getInt("time_limit"),
-                new ArrayList<>(),
+                new QuestObjectiveModel(
+                    rs.getInt("quest_objective_id"),
+                    rs.getInt("id"),
+                    rs.getString("quest_objective_type"),
+                    rs.getString("quest_objective_str_value"),
+                    rs.getFloat("quest_objective_num_value")
+                ),
                 new ArrayList<>(),
                 new ArrayList<>()
             );
-          }
-
-          rs.getInt("quest_objective_id");
-
-          if (!rs.wasNull()) {
-            questModel.objectives().add(new QuestObjectiveModel(
-                rs.getInt("quest_objective_id"),
-                rs.getInt("id"),
-                rs.getString("quest_objective_type"),
-                rs.getString("quest_objective_str_value"),
-                rs.getFloat("quest_objective_num_value")
-            ));
           }
 
           rs.getInt("quest_requirement_id");
@@ -256,7 +250,13 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 rs.getString("closing_msg"),
                 rs.getString("item"),
                 rs.getInt("time_limit"),
-                new ArrayList<>(),
+                new QuestObjectiveModel(
+                    rs.getInt("quest_objective_id"),
+                    rs.getInt("id"),
+                    rs.getString("quest_objective_type"),
+                    rs.getString("quest_objective_str_value"),
+                    rs.getFloat("quest_objective_num_value")
+                ),
                 new ArrayList<>(),
                 new ArrayList<>()
             ));
@@ -270,18 +270,6 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
           }
 
           QuestModel ownerQuestModel = questModelOptional.get();
-
-          rs.getInt("quest_objective_id");
-
-          if (!rs.wasNull()) {
-            ownerQuestModel.objectives().add(new QuestObjectiveModel(
-                rs.getInt("quest_objective_id"),
-                rs.getInt("id"),
-                rs.getString("quest_objective_type"),
-                rs.getString("quest_objective_str_value"),
-                rs.getFloat("quest_objective_num_value")
-            ));
-          }
 
           rs.getInt("quest_requirement_id");
 

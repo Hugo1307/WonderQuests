@@ -13,6 +13,7 @@ import dev.hugog.minecraft.wonderquests.language.Messaging;
 import dev.hugog.minecraft.wonderquests.listeners.GuiClickListener;
 import dev.hugog.minecraft.wonderquests.listeners.InteractiveChatListener;
 import dev.hugog.minecraft.wonderquests.listeners.PlayerJoinListener;
+import dev.hugog.minecraft.wonderquests.listeners.QuestGoalsListener;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,6 +44,9 @@ public final class WonderQuests extends JavaPlugin {
   private GuiClickListener guiClickListener;
   @Inject
   private PlayerJoinListener playerJoinListener;
+
+  @Inject
+  private QuestGoalsListener questGoalsListener;
 
   @Override
   public void onEnable() {
@@ -78,6 +82,7 @@ public final class WonderQuests extends JavaPlugin {
       getServer().getPluginManager().registerEvents(interactiveChatListener, this);
       getServer().getPluginManager().registerEvents(guiClickListener, this);
       getServer().getPluginManager().registerEvents(playerJoinListener, this);
+      getServer().getPluginManager().registerEvents(questGoalsListener, this);
 
       getLogger().info("Plugin successfully enabled!");
 

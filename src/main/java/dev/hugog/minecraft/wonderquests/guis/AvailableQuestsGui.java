@@ -6,6 +6,7 @@ import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
+import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -29,6 +30,7 @@ public class AvailableQuestsGui implements Gui {
 
   private final Server server;
 
+  private final QuestsService questsService;
   private final PlayerService playerService;
   private final GuiManager guiManager;
 
@@ -40,13 +42,14 @@ public class AvailableQuestsGui implements Gui {
   @Inject
   public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin,
       PlayerService playerService, Server server, GuiManager guiManager,
-      ConcurrencyHandler concurrencyHandler) {
+      ConcurrencyHandler concurrencyHandler, QuestsService questsService) {
     this.player = player;
     this.plugin = plugin;
     this.playerService = playerService;
     this.server = server;
     this.guiManager = guiManager;
     this.concurrencyHandler = concurrencyHandler;
+    this.questsService = questsService;
   }
 
   @Override
@@ -92,21 +95,31 @@ public class AvailableQuestsGui implements Gui {
               return;
             }
 
-            playerService.startQuest(player.getUniqueId(), questId)
-                .whenComplete((success, throwable) -> {
-
-                  if (throwable != null) {
-                    player.sendMessage("An error occurred while starting the quest!");
+            questsService.getQuestById(questId)
+                .thenAccept((quest) -> {
+                  if (quest.isEmpty()) {
+                    player.sendMessage("Quest not found!");
                     return;
                   }
 
-                  if (success) {
-                    player.sendMessage("Quest started!");
-                  } else {
-                    player.sendMessage("Quest could not be started!");
-                  }
+                  playerService.startQuest(player.getUniqueId(), questId, quest.get().getObjective().getNumericValue())
+                      .whenComplete((success, throwable) -> {
+
+                        if (throwable != null) {
+                          player.sendMessage("An error occurred while starting the quest!");
+                          return;
+                        }
+
+                        if (success) {
+                          player.sendMessage("Quest started!");
+                        } else {
+                          player.sendMessage("Quest could not be started!");
+                        }
+
+                      });
 
                 });
+
 
           });
 
@@ -143,11 +156,9 @@ public class AvailableQuestsGui implements Gui {
       itemLore.add(Component.text(reward.obtainRepresentation()));
     });
     itemLore.add(Component.text(""));
-    itemLore.add(Component.text("Objectives:"));
+    itemLore.add(Component.text("Objective:"));
     itemLore.add(Component.text(""));
-    quest.getObjectives().forEach((objective) -> {
-      itemLore.add(Component.text(objective.obtainRepresentation()));
-    });
+    itemLore.add(Component.text(quest.getObjective().obtainRepresentation()));
 
     itemLore.add(Component.text(""));
 
