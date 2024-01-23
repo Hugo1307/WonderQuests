@@ -20,7 +20,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CreateQuestRequirementAction extends AbstractAction {
+public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
 
   private final int questId;
 
@@ -46,7 +46,7 @@ public class CreateQuestRequirementAction extends AbstractAction {
   }
 
   @Override
-  public boolean execute() {
+  public Boolean execute() {
 
     if (!(sender instanceof Player player)) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("actions.general.players_only"));

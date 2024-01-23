@@ -7,7 +7,7 @@ import dev.hugog.minecraft.wonderquests.injection.factories.GuiFactory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ShowAvailableQuestsAction extends AbstractAction {
+public class ShowAvailableQuestsAction extends AbstractAction<Boolean> {
 
   private final GuiFactory guiFactory;
 
@@ -18,7 +18,7 @@ public class ShowAvailableQuestsAction extends AbstractAction {
   }
 
   @Override
-  public boolean execute() {
+  public Boolean execute() {
     guiFactory.buildAvailableQuestsGui((Player) sender).open();
     return false;
   }
