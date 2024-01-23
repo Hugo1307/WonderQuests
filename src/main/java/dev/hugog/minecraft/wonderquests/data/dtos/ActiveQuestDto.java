@@ -22,7 +22,7 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
 
   @Override
   public ActiveQuestModel toModel() {
-    return new ActiveQuestModel(playerId, questId, target, progress, startedAt, questDetails.toModel());
+    return new ActiveQuestModel(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toModel() : null);
   }
 
 }

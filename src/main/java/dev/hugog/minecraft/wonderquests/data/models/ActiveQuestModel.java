@@ -16,7 +16,7 @@ public record ActiveQuestModel(
 
   @Override
   public ActiveQuestDto toDto() {
-    return new ActiveQuestDto(playerId, questId, target, progress, startedAt, questDetails.toDto());
+    return new ActiveQuestDto(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toDto() : null);
   }
 
 }
