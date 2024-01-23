@@ -2,6 +2,7 @@ package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CreateObjectiveCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
@@ -49,6 +50,14 @@ public class CommandResolver {
       case "requirement" -> {
         if (args[0].equalsIgnoreCase("create")) {
           this.pluginCommand = new CreateRequirementCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        }
+      }
+      case "objective" -> {
+        System.out.println("Objective command");
+        if (args[0].equalsIgnoreCase("create")) {
+          System.out.println("Objective create command");
+          this.pluginCommand = new CreateObjectiveCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.bukkit.command.CommandSender;
 
 @AllArgsConstructor
-public abstract class AbstractAction implements Action {
+public abstract class AbstractAction<T> implements Action<T> {
 
   protected CommandSender sender;
 

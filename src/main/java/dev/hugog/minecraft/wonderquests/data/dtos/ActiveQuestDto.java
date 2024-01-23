@@ -11,18 +11,18 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
 
   private UUID playerId;
   private Integer questId;
-  private Integer completedGoals;
+  private Float target;
   private Float progress;
   private Long startedAt;
   private QuestDto questDetails;
 
-  public static ActiveQuestDto startQuest(UUID playerId, Integer questId) {
-    return new ActiveQuestDto(playerId, questId, 0, 0f, System.currentTimeMillis(), null);
+  public static ActiveQuestDto startQuest(UUID playerId, Integer questId, Float objectiveTarget) {
+    return new ActiveQuestDto(playerId, questId, objectiveTarget, 0f, System.currentTimeMillis(), null);
   }
 
   @Override
   public ActiveQuestModel toModel() {
-    return new ActiveQuestModel(playerId, questId, completedGoals, progress, startedAt, questDetails.toModel());
+    return new ActiveQuestModel(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toModel() : null);
   }
 
 }

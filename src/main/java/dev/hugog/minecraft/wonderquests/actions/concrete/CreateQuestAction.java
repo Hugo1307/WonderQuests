@@ -14,7 +14,7 @@ import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CreateQuestAction extends AbstractAction {
+public class CreateQuestAction extends AbstractAction<Boolean> {
 
   private final Messaging messaging;
   private final InteractiveSessionManager sessionManager;
@@ -30,7 +30,7 @@ public class CreateQuestAction extends AbstractAction {
   }
 
   @Override
-  public boolean execute() {
+  public Boolean execute() {
 
     if (!(sender instanceof Player player)) {
       sender.sendMessage("Only players can create quests.");

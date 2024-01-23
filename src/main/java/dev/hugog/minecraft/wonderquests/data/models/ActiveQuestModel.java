@@ -7,7 +7,7 @@ import java.util.UUID;
 public record ActiveQuestModel(
     UUID playerId,
     Integer questId,
-    Integer completedGoals,
+    Float target,
     Float progress,
     Long startedAt,
     QuestModel questDetails
@@ -16,7 +16,7 @@ public record ActiveQuestModel(
 
   @Override
   public ActiveQuestDto toDto() {
-    return new ActiveQuestDto(playerId, questId, completedGoals, progress, startedAt, questDetails.toDto());
+    return new ActiveQuestDto(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toDto() : null);
   }
 
 }

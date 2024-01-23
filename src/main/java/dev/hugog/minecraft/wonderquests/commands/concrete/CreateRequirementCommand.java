@@ -1,6 +1,6 @@
 package dev.hugog.minecraft.wonderquests.commands.concrete;
 
-import dev.hugog.minecraft.wonderquests.actions.Action;
+import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestRequirementAction;
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.commands.CommandDependencies;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
@@ -19,7 +19,7 @@ public class CreateRequirementCommand extends AbstractPluginCommand {
 
     ActionsFactory actionFactory = dependencies.getActionsFactory();
 
-    Action requirementCreateAction = actionFactory.buildCreateQuestRequirementAction(sender,
+    CreateQuestRequirementAction requirementCreateAction = actionFactory.buildCreateQuestRequirementAction(sender,
         Integer.parseInt(args[0]));
     return requirementCreateAction.execute();
 

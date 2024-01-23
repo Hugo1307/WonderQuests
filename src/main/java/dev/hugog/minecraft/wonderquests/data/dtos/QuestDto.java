@@ -26,7 +26,7 @@ public class QuestDto implements Dto<QuestModel> {
 
   private Integer timeLimit;
 
-  private List<QuestObjectiveDto> objectives;
+  private QuestObjectiveDto objective;
 
   private List<QuestRequirementDto> requirements;
 

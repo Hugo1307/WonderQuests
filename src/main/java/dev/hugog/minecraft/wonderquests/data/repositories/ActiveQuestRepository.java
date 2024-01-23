@@ -39,7 +39,7 @@ public class ActiveQuestRepository extends
             "CREATE TABLE IF NOT EXISTS active_quest ("
                 + "player_id UUID REFERENCES player(id) NOT NULL,"
                 + "quest_id INTEGER REFERENCES quest(id) NOT NULL,"
-                + "completed_goals INTEGER NOT NULL DEFAULT 0,"
+                + "target REAL NOT NULL DEFAULT 0,"
                 + "progress REAL NOT NULL DEFAULT 0,"
                 + "started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                 + "PRIMARY KEY (player_id, quest_id)"
@@ -80,7 +80,7 @@ public class ActiveQuestRepository extends
           return Optional.of(new ActiveQuestModel(
               rs.getObject("player_id", UUID.class),
               rs.getInt("quest_id"),
-              rs.getInt("completed_goals"),
+              rs.getFloat("target"),
               rs.getFloat("progress"),
               rs.getTimestamp("started_at").getTime(),
               new QuestModel(
@@ -91,7 +91,7 @@ public class ActiveQuestRepository extends
                   rs.getString("closing_msg"),
                   rs.getString("item"),
                   rs.getInt("time_limit"),
-                  Collections.emptyList(),
+                  null,
                   Collections.emptyList(),
                   Collections.emptyList()
               )
@@ -118,11 +118,11 @@ public class ActiveQuestRepository extends
 
         // The timestamp will be completed with the current timestamp
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO active_quest (player_id, quest_id, completed_goals, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
+            "INSERT INTO active_quest (player_id, quest_id, target, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
 
         ps.setObject(1, model.playerId());
         ps.setInt(2, model.questId());
-        ps.setInt(3, model.completedGoals());
+        ps.setFloat(3, model.target());
         ps.setFloat(4, model.progress());
 
         ResultSet rs = ps.executeQuery();
@@ -185,7 +185,7 @@ public class ActiveQuestRepository extends
           activeQuests.add(new ActiveQuestModel(
               rs.getObject("player_id", UUID.class),
               rs.getInt("quest_id"),
-              rs.getInt("completed_goals"),
+              rs.getFloat("target"),
               rs.getFloat("progress"),
               rs.getTimestamp("started_at").getTime(),
               new QuestModel(
@@ -196,7 +196,7 @@ public class ActiveQuestRepository extends
                   rs.getString("closing_msg"),
                   rs.getString("item"),
                   rs.getInt("time_limit"),
-                  Collections.emptyList(),
+                  null,
                   Collections.emptyList(),
                   Collections.emptyList()
               )
@@ -209,6 +209,30 @@ public class ActiveQuestRepository extends
         logger.severe(
             String.format("Error while finding all quests for player %s! Caused by: %s", playerId,
                 e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
+  }
+
+  public CompletableFuture<Boolean> save(ActiveQuestModel model) {
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "UPDATE active_quest SET target = ?, progress = ? WHERE player_id = ? AND quest_id = ?;");
+
+        ps.setFloat(1, model.target());
+        ps.setFloat(2, model.progress());
+        ps.setObject(3, model.playerId());
+        ps.setInt(4, model.questId());
+
+        return ps.executeUpdate() > 0;
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while updating %s with id %s! Caused by: %s", tableName,
+            model, e.getMessage()));
         throw new RuntimeException(e);
       }
 

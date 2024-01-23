@@ -34,7 +34,7 @@ public class QuestObjectivesRepository extends
         PreparedStatement createTablePs = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_objective ("
                 + "id SERIAL PRIMARY KEY,"
-                + "quest_id INT4 REFERENCES quest (id) ON DELETE CASCADE,"
+                + "quest_id INT4 UNIQUE REFERENCES quest (id) ON DELETE CASCADE,"
                 + "type VARCHAR(31) NOT NULL,"
                 + "num_value FLOAT8,"
                 + "str_value VARCHAR(255)"
@@ -150,7 +150,7 @@ public class QuestObjectivesRepository extends
     }), true);
   }
 
-  public CompletableFuture<List<QuestObjectiveModel>> findAllByQuestId(Integer questId) {
+  public CompletableFuture<Optional<QuestObjectiveModel>> findByQuestId(Integer questId) {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
@@ -165,8 +165,8 @@ public class QuestObjectivesRepository extends
 
         List<QuestObjectiveModel> objectives = new ArrayList<>();
 
-        while (rs.next()) {
-          objectives.add(new QuestObjectiveModel(
+        if (rs.next()) {
+          return Optional.of(new QuestObjectiveModel(
               rs.getInt("id"),
               rs.getInt("quest_id"),
               rs.getString("type"),
@@ -175,15 +175,17 @@ public class QuestObjectivesRepository extends
           ));
         }
 
-        return objectives;
-
       } catch (SQLException e) {
         logger.severe(
             String.format("Error while finding objectives for quest with id %d! Caused by: %s",
                 questId,
-                e.getMessage()));
+                e.getMessage()
+            )
+        );
         throw new RuntimeException(e);
       }
+
+      return Optional.empty();
 
     }), true);
 

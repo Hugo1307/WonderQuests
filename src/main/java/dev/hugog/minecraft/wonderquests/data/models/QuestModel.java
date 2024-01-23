@@ -12,7 +12,7 @@ public record QuestModel(
     String closingMsg,
     String item,
     Integer timeLimit,
-    List<QuestObjectiveModel> objectives,
+    QuestObjectiveModel objective,
     List<QuestRequirementModel> requirements,
     List<QuestRewardModel> rewards
 ) implements DataModel<QuestDto> {
@@ -20,7 +20,7 @@ public record QuestModel(
   @Override
   public QuestDto toDto() {
     return new QuestDto(id, name, description, openingMsg, closingMsg, item, timeLimit,
-        objectives.stream().map(QuestObjectiveModel::toDto).toList(),
+        objective != null ? objective.toDto() : null,
         requirements.stream().map(QuestRequirementModel::toDto).toList(),
         rewards.stream().map(QuestRewardModel::toDto).toList()
     );
