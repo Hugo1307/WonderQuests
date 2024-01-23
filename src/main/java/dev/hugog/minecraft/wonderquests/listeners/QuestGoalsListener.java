@@ -1,10 +1,11 @@
 package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
-import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
+import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 import net.kyori.adventure.text.Component;
@@ -16,18 +17,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.inventory.CraftItemEvent;
 
 public class QuestGoalsListener implements Listener {
 
-  private final PlayerService playerService;
+  private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
+  private final WonderQuests plugin;
 
   @Inject
-  public QuestGoalsListener(PlayerService playerService, QuestsService questsService) {
-    this.playerService = playerService;
+  public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService, WonderQuests plugin) {
+    this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
+    this.plugin = plugin;
   }
 
   @EventHandler
@@ -38,7 +39,7 @@ public class QuestGoalsListener implements Listener {
 
     Material brokenBlockMaterial = block.getType();
 
-    playerService.getCurrentActiveQuests(player.getUniqueId())
+    activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
         .thenAccept((activeQuests) -> {
 
           // The player doesn't have any active quests - no need to continue
@@ -60,7 +61,8 @@ public class QuestGoalsListener implements Listener {
               if (objective.getType() == ObjectiveType.BREAK_BLOCK && objective.getStringValue()
                   .equals(brokenBlockMaterial.toString())) {
 
-                if (playerService.isQuestCompleted(activeQuest)) {
+                if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
+                    activeQuest.getQuestId())) {
                   handleQuestCompletion(player, activeQuest);
                   return;
                 }
@@ -83,7 +85,7 @@ public class QuestGoalsListener implements Listener {
     Player player = event.getPlayer();
     Block block = event.getBlock();
 
-    playerService.getCurrentActiveQuests(player.getUniqueId())
+    activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
         .thenAccept((activeQuests) -> {
 
           // The player doesn't have any active quests - no need to continue
@@ -103,7 +105,7 @@ public class QuestGoalsListener implements Listener {
               if (objective.getStringValue().equals(block.getType().toString())
                   && objective.getType() == ObjectiveType.PLACE_BLOCK) {
 
-                if (playerService.isQuestCompleted(activeQuest)) {
+                if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(), activeQuest.getQuestId())) {
                   handleQuestCompletion(player, activeQuest);
                   return;
                 }
@@ -120,122 +122,124 @@ public class QuestGoalsListener implements Listener {
 
   }
 
-  @EventHandler
-  public void onItemCraft(CraftItemEvent event) {
-
-    Player player = (Player) event.getWhoClicked();
-
-    playerService.getCurrentActiveQuests(player.getUniqueId())
-        .thenAccept((activeQuests) -> {
-
-          // The player doesn't have any active quests - no need to continue
-          if (activeQuests.isEmpty()) {
-            return;
-          }
-
-          activeQuests.forEach((activeQuest) -> {
-            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
-
-              // The quest doesn't exist
-              if (quest.isEmpty()) {
-                return;
-              }
-
-              QuestObjectiveDto objective = quest.get().getObjective();
-              if (objective.getType() == ObjectiveType.CRAFT_ITEM) {
-                activeQuest.setProgress(activeQuest.getProgress() + 1);
-              }
-
-            });
-          });
-        });
-
-  }
-
-  @EventHandler
-  public void onMobKill(EntityDeathEvent event) {
-
-    Player player = event.getEntity().getKiller();
-
-    // If the player didn't kill the mob, we don't need to handle this event
-    if (player == null) {
-      return;
-    }
-
-    playerService.getCurrentActiveQuests(player.getUniqueId())
-        .thenAccept((activeQuests) -> {
-
-          // The player doesn't have any active quests - no need to continue
-          if (activeQuests.isEmpty()) {
-            return;
-          }
-
-          activeQuests.forEach((activeQuest) -> {
-            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
-
-              // The quest doesn't exist
-              if (quest.isEmpty()) {
-                return;
-              }
-
-              QuestObjectiveDto objective = quest.get().getObjective();
-              if (objective.getType() == ObjectiveType.KILL_MOBS) {
-                activeQuest.setProgress(activeQuest.getProgress() + 1);
-              }
-
-            });
-          });
-        });
-
-  }
-
-  @EventHandler
-  public void onPlayerKill(EntityDeathEvent event) {
-
-    Player player = event.getEntity().getKiller();
-
-    // If the player didn't kill the mob, we don't need to handle this event
-    if (player == null) {
-      return;
-    }
-
-    // If the player killed another entity that was not a player, we don't need to handle this event
-    if (!(event.getEntity() instanceof Player)) {
-      return;
-    }
-
-    playerService.getCurrentActiveQuests(player.getUniqueId())
-        .thenAccept((activeQuests) -> {
-
-          // The player doesn't have any active quests - no need to continue
-          if (activeQuests.isEmpty()) {
-            return;
-          }
-
-          activeQuests.forEach((activeQuest) -> {
-            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
-
-              // The quest doesn't exist
-              if (quest.isEmpty()) {
-                return;
-              }
-
-              QuestObjectiveDto objective = quest.get().getObjective();
-              if (objective.getType() == ObjectiveType.KILL_PLAYERS) {
-                activeQuest.setProgress(activeQuest.getProgress() + 1);
-              }
-
-            });
-
-          });
-
-        });
-
-  }
+//  @EventHandler
+//  public void onItemCraft(CraftItemEvent event) {
+//
+//    Player player = (Player) event.getWhoClicked();
+//
+//    playerService.getCurrentActiveQuests(player.getUniqueId())
+//        .thenAccept((activeQuests) -> {
+//
+//          // The player doesn't have any active quests - no need to continue
+//          if (activeQuests.isEmpty()) {
+//            return;
+//          }
+//
+//          activeQuests.forEach((activeQuest) -> {
+//            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+//
+//              // The quest doesn't exist
+//              if (quest.isEmpty()) {
+//                return;
+//              }
+//
+//              QuestObjectiveDto objective = quest.get().getObjective();
+//              if (objective.getType() == ObjectiveType.CRAFT_ITEM) {
+//                activeQuest.setProgress(activeQuest.getProgress() + 1);
+//              }
+//
+//            });
+//          });
+//        });
+//
+//  }
+//
+//  @EventHandler
+//  public void onMobKill(EntityDeathEvent event) {
+//
+//    Player player = event.getEntity().getKiller();
+//
+//    // If the player didn't kill the mob, we don't need to handle this event
+//    if (player == null) {
+//      return;
+//    }
+//
+//    playerService.getCurrentActiveQuests(player.getUniqueId())
+//        .thenAccept((activeQuests) -> {
+//
+//          // The player doesn't have any active quests - no need to continue
+//          if (activeQuests.isEmpty()) {
+//            return;
+//          }
+//
+//          activeQuests.forEach((activeQuest) -> {
+//            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+//
+//              // The quest doesn't exist
+//              if (quest.isEmpty()) {
+//                return;
+//              }
+//
+//              QuestObjectiveDto objective = quest.get().getObjective();
+//              if (objective.getType() == ObjectiveType.KILL_MOBS) {
+//                activeQuest.setProgress(activeQuest.getProgress() + 1);
+//              }
+//
+//            });
+//          });
+//        });
+//
+//  }
+//
+//  @EventHandler
+//  public void onPlayerKill(EntityDeathEvent event) {
+//
+//    Player player = event.getEntity().getKiller();
+//
+//    // If the player didn't kill the mob, we don't need to handle this event
+//    if (player == null) {
+//      return;
+//    }
+//
+//    // If the player killed another entity that was not a player, we don't need to handle this event
+//    if (!(event.getEntity() instanceof Player)) {
+//      return;
+//    }
+//
+//    playerService.getCurrentActiveQuests(player.getUniqueId())
+//        .thenAccept((activeQuests) -> {
+//
+//          // The player doesn't have any active quests - no need to continue
+//          if (activeQuests.isEmpty()) {
+//            return;
+//          }
+//
+//          activeQuests.forEach((activeQuest) -> {
+//            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+//
+//              // The quest doesn't exist
+//              if (quest.isEmpty()) {
+//                return;
+//              }
+//
+//              QuestObjectiveDto objective = quest.get().getObjective();
+//              if (objective.getType() == ObjectiveType.KILL_PLAYERS) {
+//                activeQuest.setProgress(activeQuest.getProgress() + 1);
+//              }
+//
+//            });
+//
+//          });
+//
+//        });
+//
+//  }
 
   private void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
-    playerService.completeQuest(activeQuest).thenRun(() -> {
+    activeQuestsService.completeQuest(activeQuest).thenRun(() -> {
+
+      questsService.giveQuestRewardsToPlayer(player, activeQuest.getQuestId(), plugin);
 
       questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 

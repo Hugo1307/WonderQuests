@@ -55,9 +55,7 @@ public class CommandResolver {
         }
       }
       case "objective" -> {
-        System.out.println("Objective command");
         if (args[0].equalsIgnoreCase("create")) {
-          System.out.println("Objective create command");
           this.pluginCommand = new CreateObjectiveCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }

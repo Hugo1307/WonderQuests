@@ -18,7 +18,12 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepos
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class QuestsService {
 
@@ -97,6 +102,44 @@ public class QuestsService {
   public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
     ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
     return activeQuestRepository.save(activeQuestModel);
+  }
+
+  public CompletableFuture<Set<QuestDto>> getAvailableQuests(UUID playerId) {
+    return questsRepository.findAll().thenApply(questModels -> questModels.stream()
+        .map(QuestModel::toDto)
+        .collect(Collectors.toSet()));
+  }
+
+  public void giveQuestRewardsToPlayer(Player player, Integer questId, Plugin plugin) {
+
+    // TODO: If the quest does not exist, we need to handle this case
+    // TODO: Fix the command reward type
+
+    // TODO: Instead of use quests repository use the service -> the service automatically caches
+    //  the quests. If necessary, we can create a new service on top of PlayersService and QuestsService
+
+    // TODO: Add messages to the player when the rewards are granted
+    getQuestById(questId).thenAccept(questOptional -> {
+
+      if (questOptional.isEmpty()) {
+        return;
+      }
+
+      QuestDto quest = questOptional.get();
+
+      quest.getRewards().forEach(reward -> {
+
+        switch (reward.getType()) {
+          case EXPERIENCE -> player.giveExp(reward.getNumericValue().intValue());
+          case MONEY, ITEMS -> {}
+          case COMMAND -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+              reward.getStringValue().replace("%player%", player.getName())
+          );
+        }
+      });
+
+    });
+
   }
 
 }
