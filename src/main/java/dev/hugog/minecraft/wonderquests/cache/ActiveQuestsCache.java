@@ -19,8 +19,9 @@ public class ActiveQuestsCache {
   @Inject
   public ActiveQuestsCache(QuestsService questsService) {
 
+    // TODO: Change after debug is finished.
     this.activeQuestsCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(30, TimeUnit.SECONDS)
+        .expireAfterWrite(1, TimeUnit.SECONDS)
         .removalListener(
             (RemovalListener<UUID, Set<ActiveQuestDto>>) notification -> notification.getValue()
                 .forEach(questsService::saveActiveQuest))
