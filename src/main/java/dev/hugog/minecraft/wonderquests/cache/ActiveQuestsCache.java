@@ -21,7 +21,7 @@ public class ActiveQuestsCache {
 
     // TODO: Change after debug is finished.
     this.activeQuestsCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(1, TimeUnit.SECONDS)
+        .expireAfterWrite(5, TimeUnit.SECONDS)
         .removalListener(
             (RemovalListener<UUID, Set<ActiveQuestDto>>) notification -> notification.getValue()
                 .forEach(questsService::saveActiveQuest))
@@ -34,12 +34,15 @@ public class ActiveQuestsCache {
   }
 
   public Set<ActiveQuestDto> get(UUID uuid) {
-    System.out.println("Getting active quests for " + uuid);
     return activeQuestsCache.getIfPresent(uuid);
   }
 
   public void put(UUID uuid, Set<ActiveQuestDto> activeQuests) {
     activeQuestsCache.put(uuid, activeQuests);
+  }
+
+  public void invalidate(UUID uuid) {
+    activeQuestsCache.invalidate(uuid);
   }
 
 }

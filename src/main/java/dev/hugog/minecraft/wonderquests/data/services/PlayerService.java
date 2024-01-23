@@ -91,4 +91,18 @@ public class PlayerService {
 
   }
 
+  public CompletableFuture<Void> completeQuest(ActiveQuestDto activeQuestDto) {
+
+    UUID playerId = activeQuestDto.getPlayerId();
+    if (activeQuestsCache.has(playerId)) {
+      activeQuestsCache.invalidate(playerId);
+    }
+    return activeQuestRepository.delete(new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
+
+  }
+
+  public boolean isQuestCompleted(ActiveQuestDto activeQuest) {
+    return activeQuest.getProgress() >= activeQuest.getTarget();
+  }
+
 }

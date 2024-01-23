@@ -1,10 +1,16 @@
 package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,6 +34,9 @@ public class QuestGoalsListener implements Listener {
   public void onBlockBreak(BlockBreakEvent event) {
 
     Player player = event.getPlayer();
+    Block block = event.getBlock();
+
+    Material brokenBlockMaterial = block.getType();
 
     playerService.getCurrentActiveQuests(player.getUniqueId())
         .thenAccept((activeQuests) -> {
@@ -46,8 +55,20 @@ public class QuestGoalsListener implements Listener {
               }
 
               QuestObjectiveDto objective = quest.get().getObjective();
-              if (objective.getType() == ObjectiveType.BREAK_BLOCK) {
+
+              // If the broken block is the one we're looking for, we increase the progress
+              if (objective.getType() == ObjectiveType.BREAK_BLOCK && objective.getStringValue()
+                  .equals(brokenBlockMaterial.toString())) {
+
+                if (playerService.isQuestCompleted(activeQuest)) {
+                  handleQuestCompletion(player, activeQuest);
+                  return;
+                }
+
                 activeQuest.setProgress(activeQuest.getProgress() + 1);
+                // TODO: Improve this message
+                player.sendMessage("+1");
+
               }
 
             });
@@ -60,6 +81,7 @@ public class QuestGoalsListener implements Listener {
   public void onBlockPlace(BlockPlaceEvent event) {
 
     Player player = event.getPlayer();
+    Block block = event.getBlock();
 
     playerService.getCurrentActiveQuests(player.getUniqueId())
         .thenAccept((activeQuests) -> {
@@ -78,8 +100,18 @@ public class QuestGoalsListener implements Listener {
               }
 
               QuestObjectiveDto objective = quest.get().getObjective();
-              if (objective.getType() == ObjectiveType.PLACE_BLOCK) {
+              if (objective.getStringValue().equals(block.getType().toString())
+                  && objective.getType() == ObjectiveType.PLACE_BLOCK) {
+
+                if (playerService.isQuestCompleted(activeQuest)) {
+                  handleQuestCompletion(player, activeQuest);
+                  return;
+                }
+
                 activeQuest.setProgress(activeQuest.getProgress() + 1);
+                // TODO: Improve this message
+                player.sendMessage("+1");
+
               }
 
             });
@@ -198,6 +230,28 @@ public class QuestGoalsListener implements Listener {
           });
 
         });
+
+  }
+
+  private void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
+
+    playerService.completeQuest(activeQuest);
+
+    questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+
+      // The quest doesn't exist
+      if (quest.isEmpty()) {
+        return;
+      }
+
+      QuestDto questDto = quest.get();
+
+      player.sendMessage("Quest completed!");
+
+
+      player.showTitle(Title.title(Component.text("Quest completed!"),
+          Component.text(questDto.getName() + " completed!")));
+    });
 
   }
 
