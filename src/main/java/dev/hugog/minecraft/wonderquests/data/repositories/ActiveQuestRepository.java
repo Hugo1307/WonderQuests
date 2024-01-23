@@ -118,7 +118,7 @@ public class ActiveQuestRepository extends
 
         // The timestamp will be completed with the current timestamp
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO active_quest (player_id, quest_id, completed_goals, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
+            "INSERT INTO active_quest (player_id, quest_id, target, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
 
         ps.setObject(1, model.playerId());
         ps.setInt(2, model.questId());
@@ -209,6 +209,30 @@ public class ActiveQuestRepository extends
         logger.severe(
             String.format("Error while finding all quests for player %s! Caused by: %s", playerId,
                 e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
+  }
+
+  public CompletableFuture<Boolean> save(ActiveQuestModel model) {
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "UPDATE active_quest SET target = ?, progress = ? WHERE player_id = ? AND quest_id = ?;");
+
+        ps.setFloat(1, model.target());
+        ps.setFloat(2, model.progress());
+        ps.setObject(3, model.playerId());
+        ps.setInt(4, model.questId());
+
+        return ps.executeUpdate() > 0;
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while updating %s with id %s! Caused by: %s", tableName,
+            model, e.getMessage()));
         throw new RuntimeException(e);
       }
 
