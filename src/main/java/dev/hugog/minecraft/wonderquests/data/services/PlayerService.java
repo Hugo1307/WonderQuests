@@ -57,7 +57,8 @@ public class PlayerService {
     );
   }
 
-  public CompletableFuture<Boolean> startQuest(UUID playerId, Integer questId, Float objectiveTarget) {
+  public CompletableFuture<Boolean> startQuest(UUID playerId, Integer questId,
+      Float objectiveTarget) {
 
     ActiveQuestDto activeQuestDto = ActiveQuestDto.startQuest(playerId, questId, objectiveTarget);
     return activeQuestRepository.insert(activeQuestDto.toModel()).thenApply(Objects::nonNull);
@@ -97,7 +98,8 @@ public class PlayerService {
     if (activeQuestsCache.has(playerId)) {
       activeQuestsCache.invalidate(playerId);
     }
-    return activeQuestRepository.delete(new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
+    return activeQuestRepository.delete(
+        new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
 
   }
 

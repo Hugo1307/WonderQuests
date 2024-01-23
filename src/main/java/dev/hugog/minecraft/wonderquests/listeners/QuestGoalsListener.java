@@ -235,22 +235,22 @@ public class QuestGoalsListener implements Listener {
 
   private void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
-    playerService.completeQuest(activeQuest);
+    playerService.completeQuest(activeQuest).thenRun(() -> {
 
-    questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+      questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 
-      // The quest doesn't exist
-      if (quest.isEmpty()) {
-        return;
-      }
+        // The quest doesn't exist
+        if (quest.isEmpty()) {
+          return;
+        }
 
-      QuestDto questDto = quest.get();
+        QuestDto questDto = quest.get();
 
-      player.sendMessage("Quest completed!");
+        player.sendMessage("Quest completed!");
+        player.showTitle(Title.title(Component.text("Quest completed!"),
+            Component.text(questDto.getName() + " completed!")));
+      });
 
-
-      player.showTitle(Title.title(Component.text("Quest completed!"),
-          Component.text(questDto.getName() + " completed!")));
     });
 
   }
