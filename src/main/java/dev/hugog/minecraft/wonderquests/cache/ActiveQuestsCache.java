@@ -2,8 +2,11 @@ package dev.hugog.minecraft.wonderquests.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
+import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -13,10 +16,16 @@ public class ActiveQuestsCache {
 
   private final Cache<UUID, Set<ActiveQuestDto>> activeQuestsCache;
 
-  public ActiveQuestsCache() {
+  @Inject
+  public ActiveQuestsCache(QuestsService questsService) {
+
     this.activeQuestsCache = CacheBuilder.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .expireAfterWrite(30, TimeUnit.SECONDS)
+        .removalListener(
+            (RemovalListener<UUID, Set<ActiveQuestDto>>) notification -> notification.getValue()
+                .forEach(questsService::saveActiveQuest))
         .build();
+
   }
 
   public boolean has(UUID key) {
