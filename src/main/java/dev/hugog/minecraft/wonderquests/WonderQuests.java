@@ -15,6 +15,7 @@ import dev.hugog.minecraft.wonderquests.listeners.GuiClickListener;
 import dev.hugog.minecraft.wonderquests.listeners.InteractiveChatListener;
 import dev.hugog.minecraft.wonderquests.listeners.PlayerJoinListener;
 import dev.hugog.minecraft.wonderquests.listeners.QuestGoalsListener;
+import dev.hugog.minecraft.wonderquests.listeners.SignUpdateListener;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,6 +49,9 @@ public final class WonderQuests extends JavaPlugin {
 
   @Inject
   private QuestGoalsListener questGoalsListener;
+
+  @Inject
+  private SignUpdateListener signUpdateListener;
 
   @Inject
   private CacheScheduler cacheScheduler;
@@ -87,6 +91,7 @@ public final class WonderQuests extends JavaPlugin {
       getServer().getPluginManager().registerEvents(guiClickListener, this);
       getServer().getPluginManager().registerEvents(playerJoinListener, this);
       getServer().getPluginManager().registerEvents(questGoalsListener, this);
+      getServer().getPluginManager().registerEvents(signUpdateListener, this);
 
       // Start cache scheduler
       cacheScheduler.runTaskTimerAsynchronously(this, 10*20L, 10*20L);
