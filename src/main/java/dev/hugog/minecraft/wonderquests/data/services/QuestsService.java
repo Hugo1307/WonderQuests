@@ -110,36 +110,4 @@ public class QuestsService {
         .collect(Collectors.toSet()));
   }
 
-  public void giveQuestRewardsToPlayer(Player player, Integer questId, Plugin plugin) {
-
-    // TODO: If the quest does not exist, we need to handle this case
-    // TODO: Fix the command reward type
-
-    // TODO: Instead of use quests repository use the service -> the service automatically caches
-    //  the quests. If necessary, we can create a new service on top of PlayersService and QuestsService
-
-    // TODO: Add messages to the player when the rewards are granted
-    getQuestById(questId).thenAccept(questOptional -> {
-
-      if (questOptional.isEmpty()) {
-        return;
-      }
-
-      QuestDto quest = questOptional.get();
-
-      quest.getRewards().forEach(reward -> {
-
-        switch (reward.getType()) {
-          case EXPERIENCE -> player.giveExp(reward.getNumericValue().intValue());
-          case MONEY, ITEMS -> {}
-          case COMMAND -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-              reward.getStringValue().replace("%player%", player.getName())
-          );
-        }
-      });
-
-    });
-
-  }
-
 }

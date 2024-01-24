@@ -146,8 +146,8 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
     InteractiveStep commandStep = InteractiveStep.builder()
         .id("commandStep")
         .message(Component.text("Please enter the command to execute as reward:"))
-        .inputVerification(input -> input.matches("[a-zA-Z0-9]+]"))
-        .onValidInput(input -> rewardDto.setNumericValue(Float.parseFloat(input)))
+        .inputVerification(input -> true)
+        .onValidInput(rewardDto::setStringValue)
         .isTerminalStep(true)
         .build();
 

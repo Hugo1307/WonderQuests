@@ -8,6 +8,7 @@ import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
+import dev.hugog.minecraft.wonderquests.mediators.QuestRewardsMediator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
@@ -22,13 +23,13 @@ public class QuestGoalsListener implements Listener {
 
   private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
-  private final WonderQuests plugin;
+  private final QuestRewardsMediator questRewardsMediator;
 
   @Inject
-  public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService, WonderQuests plugin) {
+  public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService, QuestRewardsMediator questRewardsMediator) {
     this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
-    this.plugin = plugin;
+    this.questRewardsMediator = questRewardsMediator;
   }
 
   @EventHandler
@@ -239,7 +240,7 @@ public class QuestGoalsListener implements Listener {
 
     activeQuestsService.completeQuest(activeQuest).thenRun(() -> {
 
-      questsService.giveQuestRewardsToPlayer(player, activeQuest.getQuestId(), plugin);
+      questRewardsMediator.giveQuestRewardsToPlayer(player, activeQuest.getQuestId());
 
       questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 
