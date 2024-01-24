@@ -1,9 +1,9 @@
 package dev.hugog.minecraft.wonderquests.cache;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public abstract class AbstractCache<K, V> implements Cache<K, V> {
@@ -16,29 +16,29 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     this.expirationTime = expirationTime;
 
-    this.cache = new HashMap<>();
-    this.writeTimestamps = new HashMap<>();
+    this.cache = new ConcurrentHashMap<>();
+    this.writeTimestamps = new ConcurrentHashMap<>();
 
   }
 
   @Override
-  public boolean has(K key) {
+  public synchronized boolean has(K key) {
     return cache.containsKey(key);
   }
 
   @Override
-  public V get(K key) {
+  public synchronized V get(K key) {
     return cache.get(key);
   }
 
   @Override
-  public void put(K key, V value) {
+  public synchronized void put(K key, V value) {
     writeTimestamps.put(key, System.currentTimeMillis());
     cache.put(key, value);
   }
 
   @Override
-  public void invalidate(K key) {
+  public synchronized void invalidate(K key) {
     writeTimestamps.remove(key);
     cache.remove(key);
   }

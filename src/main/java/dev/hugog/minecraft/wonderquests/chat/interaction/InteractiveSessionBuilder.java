@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.interaction;
+package dev.hugog.minecraft.wonderquests.chat.interaction;
 
 import java.util.ArrayList;
 import java.util.List;

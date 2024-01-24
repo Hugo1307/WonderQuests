@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.interaction;
+package dev.hugog.minecraft.wonderquests.chat.interaction;
 
 import com.google.inject.Singleton;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.interaction;
+package dev.hugog.minecraft.wonderquests.chat.interaction;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

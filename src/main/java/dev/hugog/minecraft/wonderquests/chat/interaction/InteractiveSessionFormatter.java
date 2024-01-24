@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.interaction;
+package dev.hugog.minecraft.wonderquests.chat.interaction;
 
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import lombok.Builder;

@@ -17,12 +17,23 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
   private QuestDto questDetails;
 
   public static ActiveQuestDto startQuest(UUID playerId, Integer questId, Float objectiveTarget) {
-    return new ActiveQuestDto(playerId, questId, objectiveTarget, 0f, System.currentTimeMillis(), null);
+    return new ActiveQuestDto(playerId, questId, objectiveTarget, 0f, System.currentTimeMillis(),
+        null);
+  }
+
+  public int getProgressPercentage() {
+    return (int) ((progress / target) * 100);
+  }
+
+  public int getSecondsLeft() {
+    return (int) (questDetails.getTimeLimit() * 1000 - (System.currentTimeMillis() - startedAt))
+        / 1000;
   }
 
   @Override
   public ActiveQuestModel toModel() {
-    return new ActiveQuestModel(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toModel() : null);
+    return new ActiveQuestModel(playerId, questId, target, progress, startedAt,
+        questDetails != null ? questDetails.toModel() : null);
   }
 
 }
