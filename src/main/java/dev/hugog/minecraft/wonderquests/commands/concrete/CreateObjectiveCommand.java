@@ -1,6 +1,6 @@
 package dev.hugog.minecraft.wonderquests.commands.concrete;
 
-import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestObjectiveAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestObjectiveAction;
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.commands.CommandDependencies;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;

@@ -1,7 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.cache.ActiveQuestsCache;
+import dev.hugog.minecraft.wonderquests.cache.implementation.ActiveQuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.PlayerDto;
 import dev.hugog.minecraft.wonderquests.data.repositories.ActiveQuestRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.PlayersRepository;

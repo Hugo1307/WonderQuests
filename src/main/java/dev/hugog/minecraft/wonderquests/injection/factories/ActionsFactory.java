@@ -1,11 +1,11 @@
 package dev.hugog.minecraft.wonderquests.injection.factories;
 
-import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestAction;
-import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestObjectiveAction;
-import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestRequirementAction;
-import dev.hugog.minecraft.wonderquests.actions.concrete.CreateQuestRewardAction;
-import dev.hugog.minecraft.wonderquests.actions.concrete.ObtainPlayerActiveQuestsAction;
-import dev.hugog.minecraft.wonderquests.actions.concrete.ShowAvailableQuestsAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestObjectiveAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRequirementAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRewardAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.ObtainPlayerActiveQuestsAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAvailableQuestsAction;
 import org.bukkit.command.CommandSender;
 
 public interface ActionsFactory {

@@ -1,7 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.cache.ActiveQuestsCache;
+import dev.hugog.minecraft.wonderquests.cache.implementation.ActiveQuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.models.ActiveQuestModel;
@@ -62,10 +62,13 @@ public class ActiveQuestsService {
 
   public CompletableFuture<Void> completeQuest(ActiveQuestDto activeQuestDto) {
 
-    UUID playerId = activeQuestDto.getPlayerId();
-    if (activeQuestsCache.has(playerId)) {
-      activeQuestsCache.invalidate(playerId);
+    PlayerQuestKey playerQuestKey = new PlayerQuestKey(activeQuestDto.getPlayerId(),
+        activeQuestDto.getQuestId());
+
+    if (activeQuestsCache.has(playerQuestKey)) {
+      activeQuestsCache.invalidate(playerQuestKey);
     }
+
     return activeQuestRepository.delete(
         new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
 
@@ -87,6 +90,28 @@ public class ActiveQuestsService {
             activeQuestDto.getQuestDetails().getTimeLimit() * 1000 -
                 (System.currentTimeMillis() - activeQuestDto.getStartedAt()) < 0)
         .orElse(false);
+  }
+
+  public void incrementQuestProgress(UUID playerId, Integer questId) {
+
+    getActiveQuestsForPlayer(playerId)
+        .thenAccept((activeQuests) -> {
+          activeQuests.stream()
+              .filter(activeQuestDto -> activeQuestDto.getQuestId().equals(questId))
+              .findFirst()
+              .ifPresent(
+                  activeQuestDto -> activeQuestDto.setProgress(activeQuestDto.getProgress() + 1));
+        });
+
+  }
+
+  public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
+
+    ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
+
+    return activeQuestRepository.save(activeQuestModel)
+        .thenApply(Objects::nonNull);
+
   }
 
 }

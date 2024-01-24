@@ -1,6 +1,6 @@
 package dev.hugog.minecraft.wonderquests.commands.concrete;
 
-import dev.hugog.minecraft.wonderquests.actions.concrete.ObtainPlayerActiveQuestsAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.ObtainPlayerActiveQuestsAction;
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.commands.CommandDependencies;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
