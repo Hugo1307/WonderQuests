@@ -179,26 +179,30 @@ public class SignsRepository extends AbstractDataRepository<SignModel, Integer> 
 
   }
 
-  public CompletableFuture<Void> deleteByLocation(
+  public CompletableFuture<Integer> deleteByLocation(
       String worldName,
       Integer x,
       Integer y,
       Integer z
   ) {
 
-    return concurrencyHandler.run(() -> dataSource.apply(con -> {
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "DELETE FROM sign WHERE world_name = ? AND x = ? AND y = ? AND z = ?;");
+            "DELETE FROM sign WHERE world_name = ? AND x = ? AND y = ? AND z = ? RETURNING id;");
 
         ps.setString(1, worldName);
         ps.setInt(2, x);
         ps.setInt(3, y);
         ps.setInt(4, z);
 
-        ps.execute();
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+          return rs.getInt("id");
+        }
 
       } catch (SQLException e) {
         logger.severe(String.format("Error while deleting sign by location %s! Caused by: %s",
@@ -206,6 +210,8 @@ public class SignsRepository extends AbstractDataRepository<SignModel, Integer> 
             e.getMessage()));
         throw new RuntimeException(e);
       }
+
+      return null;
 
     }), true);
 

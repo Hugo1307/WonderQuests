@@ -23,7 +23,7 @@ public class SignService {
 
   }
 
-  public CompletableFuture<Void> unregisterSign(Location location) {
+  public CompletableFuture<Integer> unregisterSign(Location location) {
     return signRepository.deleteByLocation(
         location.getWorld().getName(),
         location.getBlockX(),
