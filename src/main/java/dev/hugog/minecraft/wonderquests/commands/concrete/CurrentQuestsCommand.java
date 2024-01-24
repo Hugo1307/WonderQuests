@@ -1,13 +1,10 @@
 package dev.hugog.minecraft.wonderquests.commands.concrete;
 
-import dev.hugog.minecraft.wonderquests.actions.implementation.ObtainPlayerActiveQuestsAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.ShowActiveQuestsAction;
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.commands.CommandDependencies;
-import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
-import java.util.Set;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class CurrentQuestsCommand extends AbstractPluginCommand {
 
@@ -22,45 +19,11 @@ public class CurrentQuestsCommand extends AbstractPluginCommand {
 
     ActionsFactory actionFactory = dependencies.getActionsFactory();
 
-    ObtainPlayerActiveQuestsAction obtainPlayerActiveQuestsAction = actionFactory.buildObtainPlayerActiveQuestsAction(
-        sender);
-    obtainPlayerActiveQuestsAction.execute().thenAccept((activeQuests) -> {
+    ShowActiveQuestsAction showActiveQuestsAction = actionFactory
+        .buildShowActiveQuestsAction(sender);
 
-      if (activeQuests.isEmpty()) {
-        // TODO: Add message to messages.yml
-        sender.sendMessage("You don't have any active quests!");
-        return;
-      }
+    return showActiveQuestsAction.execute();
 
-      sendQuestsToPlayer((Player) sender, activeQuests);
-
-    });
-
-    return true;
-
-  }
-
-  private void sendQuestsToPlayer(Player player, Set<ActiveQuestDto> activeQuests) {
-    activeQuests.forEach((activeQuest) -> {
-
-      double progressInPercentage = 100d;
-
-      if (activeQuest.getTarget() != 0) {
-        progressInPercentage = activeQuest.getProgress() * 100 / activeQuest.getTarget();
-      }
-
-      long timeLeft = (activeQuest.getQuestDetails().getTimeLimit()*1000 - (System.currentTimeMillis()
-          - activeQuest.getStartedAt())) / 1000;
-
-      player.sendMessage("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
-      player.sendMessage(activeQuest.getQuestDetails().getName());
-      player.sendMessage(activeQuest.getQuestDetails().getDescription());
-      player.sendMessage("");
-      player.sendMessage("Progress: " + progressInPercentage + " %");
-      player.sendMessage("Time Left: " + (timeLeft > 0 ? timeLeft + "s" : "Expired"));
-      player.sendMessage("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
-
-    });
   }
 
 }
