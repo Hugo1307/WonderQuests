@@ -26,7 +26,8 @@ public class QuestGoalsListener implements Listener {
   private final QuestRewardsMediator questRewardsMediator;
 
   @Inject
-  public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService, QuestRewardsMediator questRewardsMediator) {
+  public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService,
+      QuestRewardsMediator questRewardsMediator) {
     this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
     this.questRewardsMediator = questRewardsMediator;
@@ -49,6 +50,13 @@ public class QuestGoalsListener implements Listener {
           }
 
           activeQuests.forEach((activeQuest) -> {
+
+            // If the quest is expired, we don't need to do anything with this event
+            if (activeQuestsService.isQuestExpired(activeQuest.getPlayerId(),
+                activeQuest.getQuestId())) {
+              return;
+            }
+
             questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 
               // The quest doesn't exist
@@ -75,7 +83,9 @@ public class QuestGoalsListener implements Listener {
               }
 
             });
+
           });
+
         });
 
   }
@@ -95,6 +105,13 @@ public class QuestGoalsListener implements Listener {
           }
 
           activeQuests.forEach((activeQuest) -> {
+
+            // If the quest is expired, we don't need to do anything with this event
+            if (activeQuestsService.isQuestExpired(activeQuest.getPlayerId(),
+                activeQuest.getQuestId())) {
+              return;
+            }
+
             questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 
               // The quest doesn't exist
@@ -106,7 +123,8 @@ public class QuestGoalsListener implements Listener {
               if (objective.getStringValue().equals(block.getType().toString())
                   && objective.getType() == ObjectiveType.PLACE_BLOCK) {
 
-                if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(), activeQuest.getQuestId())) {
+                if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
+                    activeQuest.getQuestId())) {
                   handleQuestCompletion(player, activeQuest);
                   return;
                 }
@@ -118,7 +136,9 @@ public class QuestGoalsListener implements Listener {
               }
 
             });
+
           });
+
         });
 
   }

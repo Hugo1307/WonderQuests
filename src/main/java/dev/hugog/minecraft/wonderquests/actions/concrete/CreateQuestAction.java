@@ -50,7 +50,6 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
         .message(messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.name"))
         .inputVerification(input -> input.length() > 3)
         .onValidInput(questDto::setName)
-        .onInvalidInput(input -> System.out.println("Invalid input: " + input))
         .build();
 
     InteractiveStep questDescriptionStep = InteractiveStep.builder()
@@ -58,7 +57,6 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
             messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.description"))
         .inputVerification(input -> input.length() > 3)
         .onValidInput(questDto::setDescription)
-        .onInvalidInput(input -> System.out.println("Invalid input: " + input))
         .build();
 
     InteractiveStep questOpeningMessageStep = InteractiveStep.builder()
@@ -66,7 +64,6 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
             messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.opening_message"))
         .inputVerification(input -> input.length() > 3)
         .onValidInput(questDto::setOpeningMsg)
-        .onInvalidInput(input -> System.out.println("Invalid input: " + input))
         .build();
 
     InteractiveStep questClosingMessageStep = InteractiveStep.builder()
@@ -74,14 +71,12 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
             messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.closing_message"))
         .inputVerification(input -> input.length() > 3)
         .onValidInput(questDto::setClosingMsg)
-        .onInvalidInput(input -> System.out.println("Invalid input: " + input))
         .build();
 
     InteractiveStep questTimeLimitStep = InteractiveStep.builder()
         .message(messaging.getLocalizedChatNoPrefix("commands.quest.create.interaction.time_limit"))
         .inputVerification(input -> input.matches("\\d+") && Integer.parseInt(input) >= 0)
-        .onValidInput(input -> System.out.println("Valid input: " + input))
-        .onInvalidInput(input -> System.out.println("Invalid input: " + input))
+        .onValidInput(input -> questDto.setTimeLimit(Integer.parseInt(input)))
         .build();
 
     InteractiveSession interactiveSession = new InteractiveSessionBuilder(player, sessionManager)
