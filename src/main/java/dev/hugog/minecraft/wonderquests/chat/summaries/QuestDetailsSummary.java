@@ -40,12 +40,12 @@ public class QuestDetailsSummary implements PluginChatSummary {
           player.sendMessage(Component.empty()
               .append(messaging.getChatSeparator())
               .appendNewline()
+              .appendNewline()
               .append(Component.text(quest.getName(), NamedTextColor.GREEN)
                   .decorate(TextDecoration.BOLD))
               .appendNewline()
               .appendNewline()
               .append(Component.text(quest.getDescription(), NamedTextColor.GRAY))
-              .appendNewline()
               .appendNewline()
           );
 
@@ -53,50 +53,79 @@ public class QuestDetailsSummary implements PluginChatSummary {
           player.sendMessage(Component.empty()
               .appendSpace()
               .appendSpace()
-              .append(messaging.getLocalizedRawMessage("summary.quest_details.objective.title"))
+              .append(messaging.getLocalizedChatNoPrefix("summary.quest_details.objective.title")
+                  .color(NamedTextColor.GREEN))
+              .appendSpace()
+              .append(quest.getObjective() != null
+                  ? Component.text(quest.getObjective().obtainRepresentation(), NamedTextColor.GRAY)
+                  : messaging.getLocalizedChatNoPrefix("summary.quest_details.objective.none"))
               .appendNewline()
-              .appendSpace()
-              .appendSpace()
-              .appendSpace()
-              .append(
-                  Component.text(quest.getObjective().obtainRepresentation(), NamedTextColor.GRAY))
           );
+
 
           // Reward
           player.sendMessage(Component.empty()
               .appendSpace()
               .appendSpace()
-              .append(messaging.getLocalizedRawMessage("summary.quest_details.reward.title"))
+              .append(messaging.getLocalizedChatNoPrefix("summary.quest_details.reward.title")
+                  .color(NamedTextColor.GREEN))
               .appendNewline()
           );
 
-          quest.getRewards().forEach((reward) -> {
+          if (quest.getRewards().isEmpty()) {
             player.sendMessage(Component.empty()
                 .appendSpace()
                 .appendSpace()
                 .appendSpace()
-                .append(Component.text("• ", NamedTextColor.GREEN))
-                .append(Component.text(reward.obtainRepresentation(), NamedTextColor.GRAY))
+                .append(
+                    messaging.getLocalizedChatNoPrefix("summary.quest_details.reward.none"))
             );
-          });
+          } else {
+            quest.getRewards().forEach((reward) -> {
+              player.sendMessage(Component.empty()
+                  .appendSpace()
+                  .appendSpace()
+                  .appendSpace()
+                  .append(Component.text("• ", NamedTextColor.GREEN))
+                  .append(Component.text(reward.obtainRepresentation(), NamedTextColor.GRAY))
+              );
+            });
+          }
+
+          player.sendMessage(Component.empty());
 
           // Requirements
           player.sendMessage(Component.empty()
               .appendSpace()
               .appendSpace()
-              .append(messaging.getLocalizedRawMessage("summary.quest_details.requirements.title"))
+              .append(
+                  messaging.getLocalizedChatNoPrefix("summary.quest_details.requirements.title")
+                      .color(NamedTextColor.GREEN))
               .appendNewline()
           );
 
-          quest.getRequirements().forEach((requirement) -> {
+          if (quest.getRequirements().isEmpty()) {
             player.sendMessage(Component.empty()
                 .appendSpace()
                 .appendSpace()
                 .appendSpace()
-                .append(Component.text("• ", NamedTextColor.GREEN))
-                .append(Component.text(requirement.obtainRepresentation(), NamedTextColor.GRAY))
+                .append(messaging.getLocalizedChatNoPrefix(
+                    "summary.quest_details.requirements.none"))
             );
-          });
+          } else {
+            quest.getRequirements().forEach((requirement) -> {
+              player.sendMessage(Component.empty()
+                  .appendSpace()
+                  .appendSpace()
+                  .appendSpace()
+                  .append(Component.text("• ", NamedTextColor.GREEN))
+                  .append(Component.text(requirement.obtainRepresentation(), NamedTextColor.GRAY))
+              );
+            });
+          }
+
+          player.sendMessage(Component.empty());
+          player.sendMessage(messaging.getChatSeparator());
 
         });
 

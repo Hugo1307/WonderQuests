@@ -75,7 +75,7 @@ public class AvailableQuestsStatusSummary implements PluginChatSummary {
                 .append(
                     Component.text(activeQuest.getQuestDetails().getName(), NamedTextColor.GREEN)
                         .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
-                            "/quests info " + activeQuest.getQuestDetails().getId()))
+                            "/quests details " + activeQuest.getQuestDetails().getId()))
                         .hoverEvent(
                             HoverEvent.showText(Component.text("Click to see more details"))))
                 .append(Component.text(" ("))
