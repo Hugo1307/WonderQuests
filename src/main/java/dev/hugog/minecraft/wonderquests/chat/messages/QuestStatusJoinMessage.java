@@ -72,12 +72,24 @@ public class QuestStatusJoinMessage {
                 .appendSpace()
                 .append(Component.text("• ", NamedTextColor.GREEN))
                 .append(
-                    Component.text(activeQuest.getQuestDetails().getName(), NamedTextColor.GREEN))
-                      .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND, "/quests info " + activeQuest.getQuestDetails().getId()))
-                      .hoverEvent(HoverEvent.showText(Component.text("Click to see more details")))
+                    Component.text(activeQuest.getQuestDetails().getName(), NamedTextColor.GREEN)
+                        .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
+                            "/quests info " + activeQuest.getQuestDetails().getId()))
+                        .hoverEvent(
+                            HoverEvent.showText(Component.text("Click to see more details"))))
                 .append(Component.text(" ("))
                 .append(questTimeLeft)
                 .append(Component.text(")"))
+                .appendSpace()
+                .appendSpace()
+                .append(Component.text("[", NamedTextColor.RED))
+                .append(messaging.getLocalizedRawMessage("join.quest.summary.cancel")
+                    .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
+                        "/quests cancel " + activeQuest.getQuestDetails().getId()))
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to cancel this quest")))
+                    .color(NamedTextColor.RED)
+                )
+                .append(Component.text("]", NamedTextColor.RED))
                 .appendNewline()
                 .appendSpace()
                 .appendSpace()
@@ -89,6 +101,7 @@ public class QuestStatusJoinMessage {
                     Component.text(activeQuest.getProgress()),
                     Component.text(activeQuest.getTarget())))
                 .appendNewline();
+
             player.sendMessage(questSummary);
           });
 
