@@ -60,17 +60,13 @@ public class ActiveQuestsService {
 
   }
 
-  public CompletableFuture<Void> completeQuest(ActiveQuestDto activeQuestDto) {
+  public CompletableFuture<Void> removeQuest(PlayerQuestKey activeQuestKey) {
 
-    PlayerQuestKey playerQuestKey = new PlayerQuestKey(activeQuestDto.getPlayerId(),
-        activeQuestDto.getQuestId());
-
-    if (activeQuestsCache.has(playerQuestKey)) {
-      activeQuestsCache.invalidate(playerQuestKey);
+    if (activeQuestsCache.has(activeQuestKey)) {
+      activeQuestsCache.invalidate(activeQuestKey);
     }
 
-    return activeQuestRepository.delete(
-        new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
+    return activeQuestRepository.delete(activeQuestKey);
 
   }
 

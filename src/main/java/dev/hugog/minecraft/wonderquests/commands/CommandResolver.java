@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CancelQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateObjectiveCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
@@ -66,6 +67,7 @@ public class CommandResolver {
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }
+      case "cancel" -> this.pluginCommand = new CancelQuestCommand(sender, args, dependencies);
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
       case "status" -> this.pluginCommand = new CurrentQuestsCommand(sender, args, dependencies);

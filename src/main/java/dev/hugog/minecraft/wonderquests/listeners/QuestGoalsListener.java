@@ -1,10 +1,10 @@
 package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
+import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
@@ -260,7 +260,8 @@ public class QuestGoalsListener implements Listener {
 
   private void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
-    activeQuestsService.completeQuest(activeQuest).thenRun(() -> {
+    activeQuestsService.removeQuest(
+        new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId())).thenRun(() -> {
 
       questRewardsMediator.giveQuestRewardsToPlayer(player, activeQuest.getQuestId());
 

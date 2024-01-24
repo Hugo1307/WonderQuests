@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.injection.factories;
 
+import dev.hugog.minecraft.wonderquests.actions.implementation.CancelQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestObjectiveAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRequirementAction;
@@ -22,6 +23,6 @@ public interface ActionsFactory {
 
   ObtainPlayerActiveQuestsAction buildObtainPlayerActiveQuestsAction(CommandSender sender);
 
-
+  CancelQuestAction buildCancelQuestAction(CommandSender sender, int questId);
 
 }
