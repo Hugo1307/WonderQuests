@@ -10,6 +10,7 @@ import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 import dev.hugog.minecraft.wonderquests.mediators.QuestRewardsMediator;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -79,7 +80,7 @@ public class QuestGoalsListener implements Listener {
                 activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
                     activeQuest.getQuestId());
                 // TODO: Improve this message
-                player.sendMessage("+1");
+                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
@@ -133,7 +134,7 @@ public class QuestGoalsListener implements Listener {
                 activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
                     activeQuest.getQuestId());
                 // TODO: Improve this message
-                player.sendMessage("+1");
+                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
