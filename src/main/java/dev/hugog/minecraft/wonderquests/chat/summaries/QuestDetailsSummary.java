@@ -43,6 +43,7 @@ public class QuestDetailsSummary implements PluginChatSummary {
               .appendNewline()
               .append(Component.text(quest.getName(), NamedTextColor.GREEN)
                   .decorate(TextDecoration.BOLD))
+              .append(Component.text(" (ID: " + quest.getId() + ")", NamedTextColor.GRAY))
               .appendNewline()
               .appendNewline()
               .append(Component.text(quest.getDescription(), NamedTextColor.GRAY))
@@ -61,7 +62,6 @@ public class QuestDetailsSummary implements PluginChatSummary {
                   : messaging.getLocalizedChatNoPrefix("summary.quest_details.objective.none"))
               .appendNewline()
           );
-
 
           // Reward
           player.sendMessage(Component.empty()

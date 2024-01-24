@@ -30,7 +30,6 @@ public class QuestDetailsCommand extends AbstractPluginCommand {
     ActionsFactory actionsFactory = dependencies.getActionsFactory();
 
     // TODO: Check arguments
-    System.out.println(Arrays.toString(args));
 
     // Build and call the action
     ShowQuestDetailsAction action = actionsFactory.buildShowQuestDetailsAction(sender,
