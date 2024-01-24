@@ -160,13 +160,14 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO quest (name, description, opening_msg, closing_msg, item) VALUES (?, ?, ?, ?, ?) RETURNING id;");
+            "INSERT INTO quest (name, description, opening_msg, closing_msg, item, time_limit) VALUES (?, ?, ?, ?, ?, ?) RETURNING id;");
 
         ps.setString(1, model.name());
         ps.setString(2, model.description());
         ps.setString(3, model.openingMsg());
         ps.setString(4, model.closingMsg());
         ps.setString(5, model.item());
+        ps.setInt(6, model.timeLimit());
 
         ResultSet resultSet = ps.executeQuery();
 
