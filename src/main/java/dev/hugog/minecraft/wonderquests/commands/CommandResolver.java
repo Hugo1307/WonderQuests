@@ -8,6 +8,7 @@ import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
@@ -49,6 +50,7 @@ public class CommandResolver {
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
     switch (commandLabel) {
       case "create" -> this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
+      case "details" -> this.pluginCommand = new QuestDetailsCommand(sender, args, dependencies);
       case "requirement" -> {
         if (args[0].equalsIgnoreCase("create")) {
           this.pluginCommand = new CreateRequirementCommand(sender,

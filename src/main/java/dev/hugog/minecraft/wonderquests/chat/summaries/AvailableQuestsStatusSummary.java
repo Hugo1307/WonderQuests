@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.chat.messages;
+package dev.hugog.minecraft.wonderquests.chat.summaries;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
@@ -13,18 +13,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-public class QuestStatusJoinMessage {
+public class AvailableQuestsStatusSummary implements PluginChatSummary {
 
   private final ActiveQuestsService activeQuestsService;
   private final Messaging messaging;
 
   @Inject
-  public QuestStatusJoinMessage(ActiveQuestsService activeQuestsService, Messaging messaging) {
+  public AvailableQuestsStatusSummary(ActiveQuestsService activeQuestsService, Messaging messaging) {
     this.activeQuestsService = activeQuestsService;
     this.messaging = messaging;
   }
 
-  public void displayActiveQuestsSummary(Player player) {
+  @Override
+  public void showToPlayer(Player player, Object... args) {
 
     activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
         .thenAccept((activeQuestsSet) -> {
@@ -38,7 +39,7 @@ public class QuestStatusJoinMessage {
                 .append(messaging.getChatSeparator())
                 .appendNewline()
                 .appendNewline()
-                .append(messaging.getLocalizedChatNoPrefix("join.quest.summary.no_quests"))
+                .append(messaging.getLocalizedChatNoPrefix("summary.active_quests.no_quests"))
                 .appendNewline()
                 .appendNewline()
                 .append(messaging.getChatSeparator()));
@@ -49,13 +50,13 @@ public class QuestStatusJoinMessage {
               .append(messaging.getChatSeparator())
               .appendNewline()
               .appendNewline()
-              .append(messaging.getLocalizedRawMessage("join.quest.summary.title").style(style -> {
+              .append(messaging.getLocalizedRawMessage("summary.active_quests.title").style(style -> {
                 style.color(NamedTextColor.GREEN);
                 style.decoration(TextDecoration.BOLD, true);
               }))
               .appendNewline()
               .appendNewline()
-              .append(messaging.getLocalizedChatNoPrefix("join.quest.summary.description",
+              .append(messaging.getLocalizedChatNoPrefix("summary.active_quests.description",
                   Component.text(activeQuests.size(), NamedTextColor.GREEN)))
               .appendNewline());
 
@@ -63,8 +64,8 @@ public class QuestStatusJoinMessage {
 
             Component questTimeLeft =
                 activeQuest.getSecondsLeft() >= 0 ? messaging.getLocalizedChatNoPrefix(
-                    "join.quest.summary.time_left", Component.text(activeQuest.getSecondsLeft()))
-                    : messaging.getLocalizedChatNoPrefix("join.quest.summary.time_left.expired")
+                    "summary.active_quests.time_left", Component.text(activeQuest.getSecondsLeft()))
+                    : messaging.getLocalizedChatNoPrefix("summary.active_quests.time_left.expired")
                         .color(NamedTextColor.RED);
 
             Component questSummary = Component.empty()
@@ -74,7 +75,7 @@ public class QuestStatusJoinMessage {
                 .append(
                     Component.text(activeQuest.getQuestDetails().getName(), NamedTextColor.GREEN)
                         .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
-                            "/quests info " + activeQuest.getQuestDetails().getId()))
+                            "/quests details " + activeQuest.getQuestDetails().getId()))
                         .hoverEvent(
                             HoverEvent.showText(Component.text("Click to see more details"))))
                 .append(Component.text(" ("))
@@ -83,7 +84,7 @@ public class QuestStatusJoinMessage {
                 .appendSpace()
                 .appendSpace()
                 .append(Component.text("[", NamedTextColor.RED))
-                .append(messaging.getLocalizedRawMessage("join.quest.summary.cancel")
+                .append(messaging.getLocalizedRawMessage("summary.active_quests.cancel")
                     .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
                         "/quests cancel " + activeQuest.getQuestDetails().getId()))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to cancel this quest")))
@@ -95,7 +96,7 @@ public class QuestStatusJoinMessage {
                 .appendSpace()
                 .appendSpace()
                 .append(Component.text("• ", NamedTextColor.GRAY))
-                .append(messaging.getLocalizedChatNoPrefix("join.quest.summary.progress",
+                .append(messaging.getLocalizedChatNoPrefix("summary.active_quests.progress",
                     Component.text(activeQuest.getProgressPercentage() + "%",
                         NamedTextColor.YELLOW),
                     Component.text(activeQuest.getProgress()),
