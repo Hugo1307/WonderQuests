@@ -11,15 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class ActiveQuestsService {
 
   private final ActiveQuestsCache activeQuestsCache;
   private final ActiveQuestRepository activeQuestRepository;
-
-  private final ReentrantLock lock = new ReentrantLock();
 
   @Inject
   public ActiveQuestsService(ActiveQuestsCache activeQuestsCache,
@@ -65,7 +62,8 @@ public class ActiveQuestsService {
 
   public CompletableFuture<Void> completeQuest(ActiveQuestDto activeQuestDto) {
 
-    PlayerQuestKey playerQuestKey = new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId());
+    PlayerQuestKey playerQuestKey = new PlayerQuestKey(activeQuestDto.getPlayerId(),
+        activeQuestDto.getQuestId());
 
     if (activeQuestsCache.has(playerQuestKey)) {
       activeQuestsCache.invalidate(playerQuestKey);
@@ -101,19 +99,19 @@ public class ActiveQuestsService {
           activeQuests.stream()
               .filter(activeQuestDto -> activeQuestDto.getQuestId().equals(questId))
               .findFirst()
-              .ifPresent(activeQuestDto -> {
-                System.out.println("Incrementing quest progress...");
-                System.out.println("New progress: " + (activeQuestDto.getProgress() + 1));
-                activeQuestDto.setProgress(activeQuestDto.getProgress() + 1);
-              });
+              .ifPresent(
+                  activeQuestDto -> activeQuestDto.setProgress(activeQuestDto.getProgress() + 1));
         });
 
   }
 
   public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
+
     ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
-    System.out.println("Saving active quest: " + activeQuestModel);
-    return activeQuestRepository.save(activeQuestModel).thenApply(Objects::nonNull);
+
+    return activeQuestRepository.save(activeQuestModel)
+        .thenApply(Objects::nonNull);
+
   }
 
 }

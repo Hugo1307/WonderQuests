@@ -3,10 +3,8 @@ package dev.hugog.minecraft.wonderquests.cache;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
