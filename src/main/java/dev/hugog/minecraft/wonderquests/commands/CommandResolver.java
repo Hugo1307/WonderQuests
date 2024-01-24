@@ -5,6 +5,7 @@ import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCo
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateObjectiveCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
@@ -54,10 +55,14 @@ public class CommandResolver {
         }
       }
       case "objective" -> {
-        System.out.println("Objective command");
         if (args[0].equalsIgnoreCase("create")) {
-          System.out.println("Objective create command");
           this.pluginCommand = new CreateObjectiveCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        }
+      }
+      case "reward" -> {
+        if (args[0].equalsIgnoreCase("create")) {
+          this.pluginCommand = new CreateRewardCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }

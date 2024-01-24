@@ -5,7 +5,7 @@ import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-import dev.hugog.minecraft.wonderquests.data.services.PlayerService;
+import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class AvailableQuestsGui implements Gui {
   private final Server server;
 
   private final QuestsService questsService;
-  private final PlayerService playerService;
+  private final ActiveQuestsService activeQuestsService;
   private final GuiManager guiManager;
 
   private final ConcurrencyHandler concurrencyHandler;
@@ -41,11 +41,11 @@ public class AvailableQuestsGui implements Gui {
 
   @Inject
   public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin,
-      PlayerService playerService, Server server, GuiManager guiManager,
+      ActiveQuestsService activeQuestsService, Server server, GuiManager guiManager,
       ConcurrencyHandler concurrencyHandler, QuestsService questsService) {
     this.player = player;
     this.plugin = plugin;
-    this.playerService = playerService;
+    this.activeQuestsService = activeQuestsService;
     this.server = server;
     this.guiManager = guiManager;
     this.concurrencyHandler = concurrencyHandler;
@@ -57,7 +57,7 @@ public class AvailableQuestsGui implements Gui {
 
     this.inventory = server.createInventory(player, 9, Component.text("Available Quests"));
 
-    return playerService.getAvailableQuests(player.getUniqueId())
+    return questsService.getAvailableQuests(player.getUniqueId())
         .thenAccept((quests) -> {
           quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
         });
@@ -87,7 +87,7 @@ public class AvailableQuestsGui implements Gui {
 
       Integer questId = itemPersistentContainer.get(getQuestIdKey(), PersistentDataType.INTEGER);
 
-      playerService.alreadyStartedQuest(player.getUniqueId(), questId)
+      activeQuestsService.hasAlreadyStartedQuest(player.getUniqueId(), questId)
           .thenAccept((alreadyStarted) -> {
 
             if (alreadyStarted) {
@@ -102,7 +102,7 @@ public class AvailableQuestsGui implements Gui {
                     return;
                   }
 
-                  playerService.startQuest(player.getUniqueId(), questId, quest.get().getObjective().getNumericValue())
+                  activeQuestsService.startQuest(player.getUniqueId(), questId, quest.get().getObjective().getNumericValue())
                       .whenComplete((success, throwable) -> {
 
                         if (throwable != null) {

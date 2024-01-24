@@ -4,8 +4,10 @@ import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
 import dev.hugog.minecraft.wonderquests.data.types.RewardType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class QuestRewardDto implements Dto<QuestRewardModel> {
 
