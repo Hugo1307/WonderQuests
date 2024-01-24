@@ -25,7 +25,15 @@ public class CurrentQuestsCommand extends AbstractPluginCommand {
     ObtainPlayerActiveQuestsAction obtainPlayerActiveQuestsAction = actionFactory.buildObtainPlayerActiveQuestsAction(
         sender);
     obtainPlayerActiveQuestsAction.execute().thenAccept((activeQuests) -> {
+
+      if (activeQuests.isEmpty()) {
+        // TODO: Add message to messages.yml
+        sender.sendMessage("You don't have any active quests!");
+        return;
+      }
+
       sendQuestsToPlayer((Player) sender, activeQuests);
+
     });
 
     return true;
@@ -38,17 +46,18 @@ public class CurrentQuestsCommand extends AbstractPluginCommand {
       double progressInPercentage = 100d;
 
       if (activeQuest.getTarget() != 0) {
-        progressInPercentage= activeQuest.getProgress() * 100 / activeQuest.getTarget();
+        progressInPercentage = activeQuest.getProgress() * 100 / activeQuest.getTarget();
       }
+
+      long timeLeft = (activeQuest.getQuestDetails().getTimeLimit()*1000 - (System.currentTimeMillis()
+          - activeQuest.getStartedAt())) / 1000;
 
       player.sendMessage("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
       player.sendMessage(activeQuest.getQuestDetails().getName());
       player.sendMessage(activeQuest.getQuestDetails().getDescription());
       player.sendMessage("");
       player.sendMessage("Progress: " + progressInPercentage + " %");
-      player.sendMessage(
-          "Time Left: " + (activeQuest.getQuestDetails().getTimeLimit() - System.currentTimeMillis()
-              - activeQuest.getStartedAt()));
+      player.sendMessage("Time Left: " + (timeLeft > 0 ? timeLeft + "s" : "Expired"));
       player.sendMessage("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
 
     });

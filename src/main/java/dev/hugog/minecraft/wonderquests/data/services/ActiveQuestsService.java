@@ -79,4 +79,14 @@ public class ActiveQuestsService {
         .orElse(false);
   }
 
+  public boolean isQuestExpired(UUID playerId, Integer questId) {
+    return activeQuestsCache.get(playerId).stream()
+        .filter(activeQuestDto -> activeQuestDto.getQuestId().equals(questId))
+        .findFirst()
+        .map(activeQuestDto ->
+            activeQuestDto.getQuestDetails().getTimeLimit() * 1000 -
+                (System.currentTimeMillis() - activeQuestDto.getStartedAt()) < 0)
+        .orElse(false);
+  }
+
 }
