@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.chat.summaries;
 
+import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
@@ -13,6 +14,7 @@ public class QuestDetailsSummary implements PluginChatSummary {
   private final QuestsService questsService;
   private final Messaging messaging;
 
+  @Inject
   public QuestDetailsSummary(QuestsService questsService, Messaging messaging) {
     this.questsService = questsService;
     this.messaging = messaging;
