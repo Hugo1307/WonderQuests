@@ -44,7 +44,7 @@ public class SignUpdateListener implements Listener {
         Player player = event.getPlayer();
         Sign sign = (Sign) event.getBlock().getState();
 
-        // TODO: Store the sign in the database so we can update it later
+        // TODO: Store the sign in the database so we can update it later.
 
 //        activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
 //            .thenAccept(activeQuests -> {
