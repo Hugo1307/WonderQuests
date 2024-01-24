@@ -76,7 +76,8 @@ public class QuestGoalsListener implements Listener {
                   return;
                 }
 
-                activeQuest.setProgress(activeQuest.getProgress() + 1);
+                activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
+                    activeQuest.getQuestId());
                 // TODO: Improve this message
                 player.sendMessage("+1");
 
@@ -129,7 +130,8 @@ public class QuestGoalsListener implements Listener {
                   return;
                 }
 
-                activeQuest.setProgress(activeQuest.getProgress() + 1);
+                activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
+                    activeQuest.getQuestId());
                 // TODO: Improve this message
                 player.sendMessage("+1");
 

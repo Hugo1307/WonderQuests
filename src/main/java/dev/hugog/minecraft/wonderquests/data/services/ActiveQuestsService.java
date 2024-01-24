@@ -11,12 +11,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class ActiveQuestsService {
 
   private final ActiveQuestsCache activeQuestsCache;
   private final ActiveQuestRepository activeQuestRepository;
+
+  private final ReentrantLock lock = new ReentrantLock();
 
   @Inject
   public ActiveQuestsService(ActiveQuestsCache activeQuestsCache,
@@ -46,11 +49,22 @@ public class ActiveQuestsService {
       return CompletableFuture.completedFuture(activeQuestsCache.get(playerId));
     }
 
+    activeQuestsCache.getActiveQuestsToSave().forEach(activeQuests -> {
+      activeQuests.forEach(activeQuestDto -> {
+        System.out.println("Saving active quest...");
+        this.saveActiveQuest(activeQuestDto).join();
+      });
+    });
+
+    activeQuestsCache.clearSaved();
+
     return activeQuestRepository.findAllByPlayerId(playerId)
         .thenApply(questModels -> {
               Set<ActiveQuestDto> activeQuests = questModels.stream()
                   .map(ActiveQuestModel::toDto)
                   .collect(Collectors.toSet());
+
+              System.out.println("Loaded Active quests: " + activeQuests);
 
               activeQuestsCache.put(playerId, activeQuests);
 
@@ -87,6 +101,28 @@ public class ActiveQuestsService {
             activeQuestDto.getQuestDetails().getTimeLimit() * 1000 -
                 (System.currentTimeMillis() - activeQuestDto.getStartedAt()) < 0)
         .orElse(false);
+  }
+
+  public void incrementQuestProgress(UUID playerId, Integer questId) {
+
+    getActiveQuestsForPlayer(playerId)
+        .thenAccept((activeQuests) -> {
+          activeQuests.stream()
+              .filter(activeQuestDto -> activeQuestDto.getQuestId().equals(questId))
+              .findFirst()
+              .ifPresent(activeQuestDto -> {
+                System.out.println("Incrementing quest progress...");
+                System.out.println("New progress: " + (activeQuestDto.getProgress() + 1));
+                activeQuestDto.setProgress(activeQuestDto.getProgress() + 1);
+              });
+        });
+
+  }
+
+  public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
+    ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
+    System.out.println("Saving active quest: " + activeQuestModel);
+    return activeQuestRepository.save(activeQuestModel).thenApply(Objects::nonNull);
   }
 
 }

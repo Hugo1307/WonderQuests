@@ -22,8 +22,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class QuestsService {
 
@@ -97,11 +95,6 @@ public class QuestsService {
   public CompletableFuture<Boolean> checkIfQuestExists(Integer id) {
     return questsRepository.findById(id)
         .thenApply(Optional::isPresent);
-  }
-
-  public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
-    ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
-    return activeQuestRepository.save(activeQuestModel);
   }
 
   public CompletableFuture<Set<QuestDto>> getAvailableQuests(UUID playerId) {
