@@ -1,7 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.cache.ActiveQuestsCache;
+import dev.hugog.minecraft.wonderquests.cache.implementation.ActiveQuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.models.ActiveQuestModel;
@@ -49,22 +49,11 @@ public class ActiveQuestsService {
       return CompletableFuture.completedFuture(activeQuestsCache.get(playerId));
     }
 
-    activeQuestsCache.getActiveQuestsToSave().forEach(activeQuests -> {
-      activeQuests.forEach(activeQuestDto -> {
-        System.out.println("Saving active quest...");
-        this.saveActiveQuest(activeQuestDto).join();
-      });
-    });
-
-    activeQuestsCache.clearSaved();
-
     return activeQuestRepository.findAllByPlayerId(playerId)
         .thenApply(questModels -> {
               Set<ActiveQuestDto> activeQuests = questModels.stream()
                   .map(ActiveQuestModel::toDto)
                   .collect(Collectors.toSet());
-
-              System.out.println("Loaded Active quests: " + activeQuests);
 
               activeQuestsCache.put(playerId, activeQuests);
 
@@ -76,10 +65,12 @@ public class ActiveQuestsService {
 
   public CompletableFuture<Void> completeQuest(ActiveQuestDto activeQuestDto) {
 
-    UUID playerId = activeQuestDto.getPlayerId();
-    if (activeQuestsCache.has(playerId)) {
-      activeQuestsCache.invalidate(playerId);
+    PlayerQuestKey playerQuestKey = new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId());
+
+    if (activeQuestsCache.has(playerQuestKey)) {
+      activeQuestsCache.invalidate(playerQuestKey);
     }
+
     return activeQuestRepository.delete(
         new PlayerQuestKey(activeQuestDto.getPlayerId(), activeQuestDto.getQuestId()));
 

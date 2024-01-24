@@ -1,12 +1,12 @@
-package dev.hugog.minecraft.wonderquests.actions.concrete;
+package dev.hugog.minecraft.wonderquests.actions.implementation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
-import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
+import dev.hugog.minecraft.wonderquests.data.types.RequirementType;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSession;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionBuilder;
 import dev.hugog.minecraft.wonderquests.interaction.InteractiveSessionFormatter;
@@ -20,27 +20,29 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CreateQuestObjectiveAction extends AbstractAction<Boolean> {
+public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
 
   private final int questId;
 
   private final Logger logger;
-
   private final Messaging messaging;
-  private final QuestsService questsService;
   private final InteractiveSessionManager sessionManager;
+  private final QuestsService questsService;
 
   @Inject
-  public CreateQuestObjectiveAction(@Assisted CommandSender sender, @Assisted int questId,
-      @Named("bukkitLogger") Logger logger,
-      Messaging messaging, QuestsService questsService,
-      InteractiveSessionManager sessionManager) {
+  public CreateQuestRequirementAction(@Assisted CommandSender sender, @Assisted int questId,
+      @Named("bukkitLogger") Logger logger, Messaging messaging,
+      InteractiveSessionManager sessionManager, QuestsService questsService) {
+
     super(sender);
+
     this.questId = questId;
+
     this.logger = logger;
     this.messaging = messaging;
-    this.questsService = questsService;
     this.sessionManager = sessionManager;
+    this.questsService = questsService;
+
   }
 
   @Override
@@ -62,15 +64,15 @@ public class CreateQuestObjectiveAction extends AbstractAction<Boolean> {
             return false;
           }
 
-          QuestObjectiveDto newObjective = new QuestObjectiveDto();
+          QuestRequirementDto newRequirement = new QuestRequirementDto();
 
           // Set the quest ID for the new requirement
-          newObjective.setQuestId(questId);
+          newRequirement.setQuestId(questId);
 
           InteractiveSessionFormatter formatter = getSessionFormatter(player);
-          List<InteractiveStep> sessionSteps = getSessionSteps(newObjective);
-          Runnable storeObjectiveInDatabase = () -> questsService.addQuestObjective(
-                  newObjective)
+          List<InteractiveStep> sessionSteps = getSessionSteps(newRequirement);
+          Runnable storeRequirementInDatabase = () -> questsService.addQuestRequirement(
+                  newRequirement)
               .whenComplete((result, error) -> {
 
                 if (error != null) {
@@ -87,7 +89,7 @@ public class CreateQuestObjectiveAction extends AbstractAction<Boolean> {
 
               });
           InteractiveSession interactiveSession = createSession(player, formatter, sessionSteps,
-              storeObjectiveInDatabase);
+              storeRequirementInDatabase);
 
           boolean sessionStarted = interactiveSession.startSession();
 
@@ -113,66 +115,79 @@ public class CreateQuestObjectiveAction extends AbstractAction<Boolean> {
         .build();
   }
 
-  private List<InteractiveStep> getSessionSteps(QuestObjectiveDto objectiveDto) {
+  private List<InteractiveStep> getSessionSteps(QuestRequirementDto requirementDto) {
 
     InteractiveStep requirementTypeStep = InteractiveStep.builder()
-        .message(messaging.getLocalizedRawMessage("Objective Type:"))
-        .hint(Component.text("place_block | break_block | craft_item | kill_mobs | kill_players",
+        .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.type"))
+        .hint(Component.text("money | permission | item | quest_completed | quest_not_completed",
             NamedTextColor.GRAY))
-        .inputVerification(input -> ObjectiveType.fromString(input) != null)
-        .onValidInput(input -> objectiveDto.setType(ObjectiveType.fromString(input)))
+        .inputVerification(input -> RequirementType.fromString(input) != null)
+        .onValidInput(input -> requirementDto.setType(RequirementType.fromString(input)))
         .customNextStep(input -> {
 
-          ObjectiveType objectiveType = ObjectiveType.fromString(input);
+          RequirementType requirementType = RequirementType.fromString(input);
 
-          if (objectiveType == null) {
+          if (requirementType == null) {
             return null;
           }
 
-          return switch (objectiveType) {
-            case PLACE_BLOCK, BREAK_BLOCK -> "blockName_step";
-            case CRAFT_ITEM -> "itemName_step";
-            case KILL_MOBS -> "mobName_step";
-            case KILL_PLAYERS -> "amount_step";
-            case LOCATION -> null;
+          return switch (requirementType) {
+            case MONEY -> "moneyStep";
+            case PERMISSION -> "permissionStep";
+            case ITEM -> "itemStep";
+            case QUEST_COMPLETED -> "questCompletedStep";
+            case QUEST_NOT_COMPLETED -> "questNotCompletedStep";
           };
 
         })
+
         .build();
 
-    InteractiveStep blockNameStep = InteractiveStep.builder()
-        .id("blockName_step")
-        .message(Component.text("Provide the block name: "))
-        .inputVerification(input -> input.matches("[a-zA-Z_]+"))
-        .onValidInput(objectiveDto::setStringValue)
-        .customNextStep((input) -> "amount_step")
-        .build();
-
-    InteractiveStep itemNameStep = InteractiveStep.builder()
-        .id("itemName_step")
-        .message(Component.text("Provide the item name: "))
-        .inputVerification(input -> input.matches("[a-zA-Z_]+"))
-        .onValidInput(objectiveDto::setStringValue)
-        .customNextStep((input) -> "amount_step")
-        .build();
-
-    InteractiveStep mobNameStep = InteractiveStep.builder()
-        .id("mobName_step")
-        .message(Component.text("Provide the mob name: "))
-        .inputVerification(input -> input.matches("[a-zA-Z_]+"))
-        .onValidInput(objectiveDto::setStringValue)
-        .customNextStep((input) -> "amount_step")
-        .build();
-
-    InteractiveStep amountStep = InteractiveStep.builder()
-        .id("amount_step")
-        .message(Component.text("Provide the amount: "))
+    InteractiveStep moneyStep = InteractiveStep.builder()
+        .id("moneyStep")
+        .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.money"))
         .inputVerification(input -> input.matches("[0-9]*.?[0-9]+"))
-        .onValidInput(input -> objectiveDto.setNumericValue(Float.parseFloat(input)))
+        .onValidInput(input -> requirementDto.setNumericValue(Float.parseFloat(input)))
         .isTerminalStep(true)
         .build();
 
-    return List.of(requirementTypeStep, blockNameStep, itemNameStep, mobNameStep, amountStep);
+    InteractiveStep permissionStep = InteractiveStep.builder()
+        .id("permissionStep")
+        .message(
+            messaging.getLocalizedRawMessage("actions.requirements.create.interaction.permission"))
+        .inputVerification(input -> input.length() > 3)
+        .onValidInput(requirementDto::setStringValue)
+        .isTerminalStep(true)
+        .build();
+
+    InteractiveStep itemStep = InteractiveStep.builder()
+        .id("itemStep")
+        .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.item"))
+        .inputVerification(input -> input.length() > 3)
+        .onValidInput(requirementDto::setStringValue)
+        .isTerminalStep(true)
+        .build();
+
+    InteractiveStep questCompletedStep = InteractiveStep.builder()
+        .id("questCompletedStep")
+        .message(messaging.getLocalizedRawMessage(
+            "actions.requirements.create.interaction.quest_completed"))
+        .inputVerification(input -> input.matches("[0-9]+"))
+        .onValidInput(input -> requirementDto.setNumericValue(Float.parseFloat(input)))
+        .isTerminalStep(true)
+        .build();
+
+    InteractiveStep questNotCompletedStep = InteractiveStep.builder()
+        .id("questNotCompletedStep")
+        .message(
+            messaging.getLocalizedRawMessage("actions.requirements.create.interaction.no_quest"))
+        .inputVerification(input -> input.matches("[0-9]+"))
+        .onValidInput(input -> requirementDto.setNumericValue(Float.parseFloat(input)))
+        .isTerminalStep(true)
+        .build();
+
+    return List.of(requirementTypeStep, moneyStep, permissionStep, itemStep, questCompletedStep,
+        questNotCompletedStep);
 
   }
 

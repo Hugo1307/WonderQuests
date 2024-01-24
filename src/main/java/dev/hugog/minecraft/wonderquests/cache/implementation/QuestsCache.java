@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.cache;
+package dev.hugog.minecraft.wonderquests.cache.implementation;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

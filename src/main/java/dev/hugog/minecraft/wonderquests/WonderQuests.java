@@ -3,6 +3,7 @@ package dev.hugog.minecraft.wonderquests;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import dev.hugog.minecraft.wonderquests.cache.CacheScheduler;
 import dev.hugog.minecraft.wonderquests.commands.BukkitCommandExecutor;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
@@ -48,6 +49,9 @@ public final class WonderQuests extends JavaPlugin {
   @Inject
   private QuestGoalsListener questGoalsListener;
 
+  @Inject
+  private CacheScheduler cacheScheduler;
+
   @Override
   public void onEnable() {
 
@@ -83,6 +87,9 @@ public final class WonderQuests extends JavaPlugin {
       getServer().getPluginManager().registerEvents(guiClickListener, this);
       getServer().getPluginManager().registerEvents(playerJoinListener, this);
       getServer().getPluginManager().registerEvents(questGoalsListener, this);
+
+      // Start cache scheduler
+      cacheScheduler.runTaskTimerAsynchronously(this, 10*20L, 10*20L);
 
       getLogger().info("Plugin successfully enabled!");
 

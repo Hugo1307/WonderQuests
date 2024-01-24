@@ -1,4 +1,4 @@
-package dev.hugog.minecraft.wonderquests.actions.concrete;
+package dev.hugog.minecraft.wonderquests.actions.implementation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
