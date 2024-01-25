@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -50,8 +51,9 @@ public class AvailableQuestsGui implements Gui {
   @Override
   public CompletableFuture<Void> build() {
 
-    this.inventory = plugin.getServer()
-        .createInventory(player, 9, Component.text("Available Quests"));
+    Component guiTitle = Component.text("Available Quests", NamedTextColor.DARK_GRAY);
+
+    this.inventory = plugin.getServer().createInventory(player, 27, guiTitle);
 
     return questsService.getAvailableQuests(player).thenAccept((quests) -> {
       quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
