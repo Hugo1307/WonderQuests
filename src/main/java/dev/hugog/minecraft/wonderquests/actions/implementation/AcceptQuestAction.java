@@ -2,6 +2,7 @@ package dev.hugog.minecraft.wonderquests.actions.implementation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
@@ -9,7 +10,10 @@ import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
+import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,6 +25,8 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
 
   private final ItemStack questItem;
 
+  private final Logger logger;
+  private final Messaging messaging;
   private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
   private final ConcurrencyHandler concurrencyHandler;
@@ -28,11 +34,15 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
 
   @Inject
   public AcceptQuestAction(@Assisted CommandSender sender, @Assisted ItemStack questItem,
+      @Named("bukkitLogger") Logger logger,
+      Messaging messaging,
       ActiveQuestsService activeQuestsService, QuestsService questsService,
       ConcurrencyHandler concurrencyHandler, WonderQuests plugin) {
 
     super(sender);
     this.questItem = questItem;
+    this.logger = logger;
+    this.messaging = messaging;
     this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
     this.concurrencyHandler = concurrencyHandler;
@@ -64,7 +74,9 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
         .thenCompose((alreadyStarted) -> {
 
           if (alreadyStarted) {
-            player.sendMessage("You have already started this quest!");
+            player.sendMessage(
+                messaging.getLocalizedChatWithPrefix("actions.quests.accept.already_started")
+            );
             return CompletableFuture.completedFuture(false);
           }
 
@@ -72,7 +84,9 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
               .thenCompose((quest) -> {
 
                 if (quest.isEmpty()) {
-                  player.sendMessage("Quest not found!");
+                  player.sendMessage(
+                      messaging.getLocalizedChatWithPrefix("actions.quests.accept.not_found")
+                  );
                   return CompletableFuture.completedFuture(false);
                 }
 
@@ -81,7 +95,10 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
 
                 if (!hasNecessary) {
                   player.sendMessage(
-                      "You don't have the necessary requirements to start this quest!");
+                      messaging.getLocalizedChatWithPrefix(
+                          "actions.quests.accept.requirements.lack"
+                      )
+                  );
                   return CompletableFuture.completedFuture(false);
                 }
 
@@ -92,7 +109,12 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
                     .thenApply((success) -> {
 
                       if (!success) {
-                        player.sendMessage("Quest could not be started!");
+                        player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                            "actions.quests.accept.error"
+                        ));
+                        logger.warning(
+                            "Unable to start quest " + questId + " for player " + player.getName()
+                                + " - database error.");
                         return false;
                       }
 
@@ -100,25 +122,43 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
                               .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.STARTED)),
                           true);
 
-                      player.sendMessage("Quest started!");
+                      player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                          "actions.quests.accept.success",
+                          Component.text(quest.get().getName())
+                      ));
 
                       return true;
 
                     })
                     .exceptionally((throwable) -> {
-                      player.sendMessage("An error occurred while starting the quest!");
+                      player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                          "actions.quests.accept.error"
+                      ));
+                      logger.warning(
+                          "Unable to start quest " + questId + " for player " + player.getName()
+                              + "- Exception: " + throwable.getMessage());
                       return false;
                     });
 
 
               }).exceptionally((throwable) -> {
-                player.sendMessage("An error occurred while starting the quest!");
+                player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                    "actions.quests.accept.error"
+                ));
+                logger.warning(
+                    "Unable to start quest " + questId + " for player " + player.getName()
+                        + "- Exception: " + throwable.getMessage());
                 return false;
               });
 
         })
         .exceptionally((throwable) -> {
-          player.sendMessage("An error occurred while starting the quest!");
+          player.sendMessage(messaging.getLocalizedChatWithPrefix(
+              "actions.quests.accept.error"
+          ));
+          logger.warning(
+              "Unable to start quest " + questId + " for player " + player.getName()
+                  + "- Exception: " + throwable.getMessage());
           return false;
         });
 
