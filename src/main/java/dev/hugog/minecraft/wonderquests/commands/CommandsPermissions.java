@@ -18,6 +18,7 @@ public enum CommandsPermissions {
   DELETE_REWARD("wonderquests.commands.reward.delete"),
   LIST_QUESTS("wonderquests.commands.quest.list"),
   QUEST_DETAILS("wonderquests.commands.quest.details"),
+  HELP("wonderquests.commands.help"),
   ADMIN("wonderquests.commands.admin");
 
   private final String permission;

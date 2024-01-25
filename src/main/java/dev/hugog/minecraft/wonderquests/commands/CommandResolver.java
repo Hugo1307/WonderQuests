@@ -10,6 +10,7 @@ import dev.hugog.minecraft.wonderquests.commands.concrete.ActiveQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRewardCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.HelpCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.ListQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class CommandResolver {
    */
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
     switch (commandLabel) {
+      case "help" -> this.pluginCommand = new HelpCommand(sender, args, dependencies);
       case "create" -> this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
       case "details" -> this.pluginCommand = new QuestDetailsCommand(sender, args, dependencies);
       case "requirement" -> {
@@ -81,10 +83,10 @@ public class CommandResolver {
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }
-      case "cancel" -> this.pluginCommand = new AbortQuestCommand(sender, args, dependencies);
+      case "abort" -> this.pluginCommand = new AbortQuestCommand(sender, args, dependencies);
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
-      case "status" -> this.pluginCommand = new ActiveQuestsCommand(sender, args, dependencies);
+      case "active" -> this.pluginCommand = new ActiveQuestsCommand(sender, args, dependencies);
       case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
       case "delete" -> this.pluginCommand = new DeleteQuestCommand(sender, args, dependencies);
       default -> this.pluginCommand = null;
