@@ -4,20 +4,22 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
-import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.chat.interaction.InteractiveSession;
 import dev.hugog.minecraft.wonderquests.chat.interaction.InteractiveSessionBuilder;
 import dev.hugog.minecraft.wonderquests.chat.interaction.InteractiveSessionFormatter;
 import dev.hugog.minecraft.wonderquests.chat.interaction.InteractiveSessionManager;
 import dev.hugog.minecraft.wonderquests.chat.interaction.InteractiveStep;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
+import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 public class CreateQuestAction extends AbstractAction<Boolean> {
@@ -46,7 +48,7 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
   public Boolean execute() {
 
     if (!(sender instanceof Player player)) {
-      sender.sendMessage("Only players can create quests.");
+      sender.sendMessage(messaging.getLocalizedChatWithPrefix("actions.general.players_only"));
       return false;
     }
 
@@ -119,7 +121,9 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
     InteractiveStep blockNameStep = InteractiveStep.builder()
         .id("blockName_step")
         .message(messaging.getLocalizedChatNoPrefix("commands.quest.create.objective.block"))
-        .inputVerification(input -> input.matches("[a-zA-Z_]+"))
+        .inputVerification(
+            input -> input.matches("[a-zA-Z_]+") && Material.matchMaterial(input) != null
+        )
         .onValidInput(objectiveDto::setStringValue)
         .customNextStep((input) -> "amount_step")
         .build();
@@ -127,7 +131,7 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
     InteractiveStep mobNameStep = InteractiveStep.builder()
         .id("mobName_step")
         .message(messaging.getLocalizedChatNoPrefix("commands.quest.create.objective.mob"))
-        .inputVerification(input -> input.matches("[a-zA-Z_]+"))
+        .inputVerification(input -> input.matches("[a-zA-Z_]+") && EntityType.fromName(input) != null)
         .onValidInput(objectiveDto::setStringValue)
         .customNextStep((input) -> "amount_step")
         .build();
