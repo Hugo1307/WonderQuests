@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
@@ -69,19 +70,9 @@ public class QuestGoalsListener implements Listener {
                   .equals(brokenBlockMaterial.toString())) {
 
                 questsMediator.updateQuestProgress(player, activeQuest);
-                // TODO: Improve this message
-                player.sendActionBar(
-                    Component.empty()
-                        .append(Component.text(
-                            activeQuest.getQuestDetails().getName(),
-                            NamedTextColor.BLUE)
-                        ).decorate(TextDecoration.BOLD)
-                        .append(Component.text(" - ", NamedTextColor.GRAY))
-                        .append(Component.text(
-                            activeQuest.getProgress() + "/" + activeQuest.getTarget(),
-                            NamedTextColor.GRAY)
-                        )
-                );
+
+                // Send a message to the player, using the action bar, with the quest progress
+                sendProgressMessage(player, activeQuest);
 
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
@@ -132,19 +123,9 @@ public class QuestGoalsListener implements Listener {
                   && objective.getType() == ObjectiveType.PLACE_BLOCK) {
 
                 questsMediator.updateQuestProgress(player, activeQuest);
-                // TODO: Improve this message
-                player.sendActionBar(
-                    Component.empty()
-                        .append(Component.text(
-                            activeQuest.getQuestDetails().getName(),
-                            NamedTextColor.BLUE)
-                        )
-                        .append(Component.text(" - ", NamedTextColor.GRAY))
-                        .append(Component.text(
-                            activeQuest.getProgress() + "/" + activeQuest.getTarget(),
-                            NamedTextColor.GRAY)
-                        )
-                );
+
+                // Send a message to the player, using the action bar, with the quest progress
+                sendProgressMessage(player, activeQuest);
 
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
@@ -273,5 +254,20 @@ public class QuestGoalsListener implements Listener {
 //        });
 //
 //  }
+
+  private void sendProgressMessage(Player player, ActiveQuestDto activeQuest) {
+    player.sendActionBar(
+        Component.empty()
+            .append(Component.text(
+                activeQuest.getQuestDetails().getName(),
+                NamedTextColor.BLUE)
+            )
+            .append(Component.text(" - ", NamedTextColor.GRAY))
+            .append(Component.text(
+                activeQuest.getProgress() + "/" + activeQuest.getTarget(),
+                NamedTextColor.GRAY)
+            )
+    );
+  }
 
 }
