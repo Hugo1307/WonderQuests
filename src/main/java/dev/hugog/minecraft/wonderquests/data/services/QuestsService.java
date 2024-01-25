@@ -16,9 +16,9 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.bukkit.entity.Player;
 
 public class QuestsService {
 
@@ -79,9 +79,10 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
-  public CompletableFuture<Set<QuestDto>> getAvailableQuests(UUID playerId) {
+  public CompletableFuture<Set<QuestDto>> getAvailableQuests(Player player) {
     return questsRepository.findAll().thenApply(questModels -> questModels.stream()
         .map(QuestModel::toDto)
+        .filter(quest -> playerHasRequirements(player, quest))
         .collect(Collectors.toSet()));
   }
 
@@ -94,6 +95,30 @@ public class QuestsService {
 
   public CompletableFuture<Void> deleteQuest(Integer id) {
     return questsRepository.delete(id);
+  }
+
+  public boolean playerHasRequirements(Player player, QuestDto quest) {
+
+    boolean hasRequirements = true;
+
+    List<QuestRequirementDto> questRequirements = quest.getRequirements();
+
+    for (QuestRequirementDto requirement : questRequirements) {
+
+      switch (requirement.getType()) {
+        case MONEY:
+        case ITEM:
+        case QUEST_COMPLETED:
+        case QUEST_NOT_COMPLETED:
+          break;
+        case PERMISSION:
+          hasRequirements = hasRequirements && player.hasPermission(requirement.getStringValue());
+      }
+
+    }
+
+    return hasRequirements;
+
   }
 
 }

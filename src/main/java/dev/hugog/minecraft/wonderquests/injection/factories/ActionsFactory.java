@@ -1,5 +1,6 @@
 package dev.hugog.minecraft.wonderquests.injection.factories;
 
+import dev.hugog.minecraft.wonderquests.actions.implementation.AcceptQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CancelQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRequirementAction;
@@ -12,6 +13,7 @@ import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAllQuestsActi
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAvailableQuestsAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowQuestDetailsAction;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
 
 public interface ActionsFactory {
 
@@ -36,5 +38,7 @@ public interface ActionsFactory {
   DeleteRequirementAction buildDeleteRequirementAction(CommandSender sender, int requirementId);
 
   DeleteRewardAction buildDeleteRewardAction(CommandSender sender, int rewardId);
+
+  AcceptQuestAction buildAcceptQuestAction(CommandSender sender, ItemStack questItem);
 
 }
