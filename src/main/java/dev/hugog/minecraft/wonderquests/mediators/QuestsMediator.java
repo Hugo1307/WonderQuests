@@ -14,7 +14,11 @@ import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -94,9 +98,34 @@ public class QuestsMediator {
 
   }
 
+  public CompletableFuture<Set<QuestDto>> getAvailableQuests(Player player) {
+
+    return questsService.getPotentialAvailableQuests(player)
+        .thenCompose(
+            quests -> completedQuestsService.getCompletedQuestByPlayer(player.getUniqueId())
+                .thenApply(questsCompleted -> {
+
+                  Set<QuestDto> availableQuests = new HashSet<>();
+                  Set<Integer> completedQuestsIds = questsCompleted.stream()
+                      .map(CompletedQuestDto::getQuestId)
+                      .collect(Collectors.toSet());
+
+                  quests.forEach(quest -> {
+                    if (!completedQuestsIds.contains(quest.getId())) {
+                      availableQuests.add(quest);
+                    }
+                  });
+
+                  return availableQuests;
+
+                }));
+
+  }
+
   public void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
-    activeQuestsService.removeQuest(new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId()))
+    activeQuestsService.removeQuest(
+            new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId()))
         .thenRun(() -> {
 
           // Call the ActiveQuestUpdateEvent to update the signs, for example.

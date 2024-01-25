@@ -5,8 +5,8 @@ import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
+import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,7 @@ public class AvailableQuestsGui implements Gui {
 
   private final Player player;
   private final WonderQuests plugin;
-  private final QuestsService questsService;
+  private final QuestsMediator questsMediator;
   private final GuiManager guiManager;
   private final ConcurrencyHandler concurrencyHandler;
 
@@ -36,14 +36,14 @@ public class AvailableQuestsGui implements Gui {
 
   @Inject
   public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin, GuiManager guiManager,
-      ConcurrencyHandler concurrencyHandler, QuestsService questsService,
+      ConcurrencyHandler concurrencyHandler, QuestsMediator questsMediator,
       ActionsFactory actionsFactory) {
 
     this.player = player;
     this.plugin = plugin;
     this.guiManager = guiManager;
     this.concurrencyHandler = concurrencyHandler;
-    this.questsService = questsService;
+    this.questsMediator = questsMediator;
     this.actionsFactory = actionsFactory;
 
   }
@@ -55,7 +55,7 @@ public class AvailableQuestsGui implements Gui {
 
     this.inventory = plugin.getServer().createInventory(player, 27, guiTitle);
 
-    return questsService.getAvailableQuests(player).thenAccept((quests) -> {
+    return questsMediator.getAvailableQuests(player).thenAccept((quests) -> {
       quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
     });
 
