@@ -26,8 +26,8 @@ public class DeleteRequirementCommand extends AbstractPluginCommand {
       return false;
     }
 
-    if (player.hasPermission(CommandsPermissions.DELETE_REQUIREMENT.getPermission())) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
+    if (!player.hasPermission(CommandsPermissions.DELETE_REQUIREMENT.getPermission())) {
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 

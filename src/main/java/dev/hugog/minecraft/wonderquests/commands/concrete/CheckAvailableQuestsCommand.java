@@ -21,12 +21,12 @@ public class CheckAvailableQuestsCommand extends AbstractPluginCommand {
 
     final Messaging messaging = dependencies.getMessaging();
 
-    if (!(sender instanceof Player)) {
+    if (!(sender instanceof Player player)) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.players_only"));
       return false;
     }
 
-    if (!sender.hasPermission(CommandsPermissions.AVAILABLE_QUESTS.getPermission())) {
+    if (!player.hasPermission(CommandsPermissions.AVAILABLE_QUESTS.getPermission())) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }

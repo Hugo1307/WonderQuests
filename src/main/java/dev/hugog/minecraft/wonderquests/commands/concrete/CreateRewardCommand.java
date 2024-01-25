@@ -22,13 +22,13 @@ public class CreateRewardCommand extends AbstractPluginCommand {
 
     final Messaging messaging = dependencies.getMessaging();
 
-    if (!(sender instanceof Player)) {
+    if (!(sender instanceof Player player)) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.players_only"));
       return false;
     }
 
-    if (!sender.hasPermission(CommandsPermissions.CREATE_REWARD.getPermission())) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
+    if (!player.hasPermission(CommandsPermissions.CREATE_REWARD.getPermission())) {
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 

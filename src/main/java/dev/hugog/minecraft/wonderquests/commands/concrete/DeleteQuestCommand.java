@@ -27,8 +27,8 @@ public class DeleteQuestCommand extends AbstractPluginCommand {
       return false;
     }
 
-    if (player.hasPermission(CommandsPermissions.DELETE_QUEST.getPermission())) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
+    if (!player.hasPermission(CommandsPermissions.DELETE_QUEST.getPermission())) {
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 

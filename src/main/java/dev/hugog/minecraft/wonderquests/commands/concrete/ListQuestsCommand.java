@@ -27,8 +27,8 @@ public class ListQuestsCommand extends AbstractPluginCommand {
       return false;
     }
 
-    if (player.hasPermission(CommandsPermissions.LIST_QUESTS.getPermission())) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
+    if (!player.hasPermission(CommandsPermissions.LIST_QUESTS.getPermission())) {
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 

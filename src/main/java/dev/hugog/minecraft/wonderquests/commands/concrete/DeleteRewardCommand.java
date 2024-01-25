@@ -28,7 +28,7 @@ public class DeleteRewardCommand extends AbstractPluginCommand {
     }
 
     if (!player.hasPermission(CommandsPermissions.DELETE_REWARD.getPermission())) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 

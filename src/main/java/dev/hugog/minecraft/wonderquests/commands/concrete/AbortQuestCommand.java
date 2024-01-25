@@ -27,7 +27,7 @@ public class AbortQuestCommand extends AbstractPluginCommand {
       return false;
     }
 
-    if (player.hasPermission(CommandsPermissions.ABORT_QUEST.getPermission())) {
+    if (!player.hasPermission(CommandsPermissions.ABORT_QUEST.getPermission())) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
