@@ -15,6 +15,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesReposit
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
+import dev.hugog.minecraft.wonderquests.data.repositories.SignsRepository;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import dev.hugog.minecraft.wonderquests.injection.factories.GuiFactory;
 import org.bukkit.Server;
@@ -54,7 +55,8 @@ public class BasicBinderModule extends AbstractModule {
       QuestRequirementsRepository questRequirementsRepository,
       QuestRewardsRepository questRewardsRepository,
       ActiveQuestRepository activeQuestRepository,
-      CompletedQuestRepository completedQuestRepository
+      CompletedQuestRepository completedQuestRepository,
+      SignsRepository signsRepository
   ) {
     return List.of(
         playersRepository,
@@ -63,7 +65,8 @@ public class BasicBinderModule extends AbstractModule {
         questRequirementsRepository,
         questRewardsRepository,
         activeQuestRepository,
-        completedQuestRepository
+        completedQuestRepository,
+        signsRepository
     );
 
   }

@@ -2,16 +2,14 @@ package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
-import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
-import dev.hugog.minecraft.wonderquests.mediators.QuestRewardsMediator;
+import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,14 +22,14 @@ public class QuestGoalsListener implements Listener {
 
   private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
-  private final QuestRewardsMediator questRewardsMediator;
+  private final QuestsMediator questsMediator;
 
   @Inject
   public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService,
-      QuestRewardsMediator questRewardsMediator) {
+      QuestsMediator questsMediator) {
     this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
-    this.questRewardsMediator = questRewardsMediator;
+    this.questsMediator = questsMediator;
   }
 
   @EventHandler
@@ -71,16 +69,15 @@ public class QuestGoalsListener implements Listener {
               if (objective.getType() == ObjectiveType.BREAK_BLOCK && objective.getStringValue()
                   .equals(brokenBlockMaterial.toString())) {
 
+                questsMediator.updateQuestProgress(player, activeQuest);
+
+                // Send a message to the player, using the action bar, with the quest progress
+                sendProgressMessage(player, activeQuest);
+
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
-                  handleQuestCompletion(player, activeQuest);
-                  return;
+                  questsMediator.handleQuestCompletion(player, activeQuest);
                 }
-
-                activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
-                    activeQuest.getQuestId());
-                // TODO: Improve this message
-                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
@@ -125,16 +122,15 @@ public class QuestGoalsListener implements Listener {
               if (objective.getStringValue().equals(block.getType().toString())
                   && objective.getType() == ObjectiveType.PLACE_BLOCK) {
 
+                questsMediator.updateQuestProgress(player, activeQuest);
+
+                // Send a message to the player, using the action bar, with the quest progress
+                sendProgressMessage(player, activeQuest);
+
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
-                  handleQuestCompletion(player, activeQuest);
-                  return;
+                  questsMediator.handleQuestCompletion(player, activeQuest);
                 }
-
-                activeQuestsService.incrementQuestProgress(activeQuest.getPlayerId(),
-                    activeQuest.getQuestId());
-                // TODO: Improve this message
-                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
@@ -259,29 +255,19 @@ public class QuestGoalsListener implements Listener {
 //
 //  }
 
-  private void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
-
-    activeQuestsService.removeQuest(
-        new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId())).thenRun(() -> {
-
-      questRewardsMediator.giveQuestRewardsToPlayer(player, activeQuest.getQuestId());
-
-      questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
-
-        // The quest doesn't exist
-        if (quest.isEmpty()) {
-          return;
-        }
-
-        QuestDto questDto = quest.get();
-
-        player.sendMessage("Quest completed!");
-        player.showTitle(Title.title(Component.text("Quest completed!"),
-            Component.text(questDto.getName() + " completed!")));
-      });
-
-    });
-
+  private void sendProgressMessage(Player player, ActiveQuestDto activeQuest) {
+    player.sendActionBar(
+        Component.empty()
+            .append(Component.text(
+                activeQuest.getQuestDetails().getName(),
+                NamedTextColor.BLUE)
+            )
+            .append(Component.text(" - ", NamedTextColor.GRAY))
+            .append(Component.text(
+                activeQuest.getProgress() + "/" + activeQuest.getTarget(),
+                NamedTextColor.GRAY)
+            )
+    );
   }
 
 }
