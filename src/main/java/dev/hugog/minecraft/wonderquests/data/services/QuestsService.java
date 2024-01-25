@@ -15,10 +15,8 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import org.bukkit.entity.Player;
 
 public class QuestsService {
 
@@ -70,7 +68,10 @@ public class QuestsService {
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
 
     return questsRepository.findById(id)
-        .thenApply(questModelOptional -> questModelOptional.map(QuestModel::toDto));
+        .thenApply(questModelOptional -> {
+          System.out.println(questModelOptional.get());
+          return questModelOptional.map(QuestModel::toDto);
+        });
 
   }
 

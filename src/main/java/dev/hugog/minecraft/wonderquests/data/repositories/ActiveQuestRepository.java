@@ -92,8 +92,8 @@ public class ActiveQuestRepository extends
                   rs.getString("item"),
                   rs.getInt("time_limit"),
                   null,
-                  Collections.emptyList(),
-                  Collections.emptyList()
+                  Collections.emptySet(),
+                  Collections.emptySet()
               )
           ));
         }
@@ -197,8 +197,8 @@ public class ActiveQuestRepository extends
                   rs.getString("item"),
                   rs.getInt("time_limit"),
                   null,
-                  Collections.emptyList(),
-                  Collections.emptyList()
+                  Collections.emptySet(),
+                  Collections.emptySet()
               )
           ));
         }
