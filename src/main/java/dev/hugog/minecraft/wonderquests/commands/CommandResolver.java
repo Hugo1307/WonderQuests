@@ -1,12 +1,12 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.commands.concrete.CancelQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.AbortQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
-import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.ActiveQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRewardCommand;
@@ -81,10 +81,10 @@ public class CommandResolver {
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }
-      case "cancel" -> this.pluginCommand = new CancelQuestCommand(sender, args, dependencies);
+      case "cancel" -> this.pluginCommand = new AbortQuestCommand(sender, args, dependencies);
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
-      case "status" -> this.pluginCommand = new CurrentQuestsCommand(sender, args, dependencies);
+      case "status" -> this.pluginCommand = new ActiveQuestsCommand(sender, args, dependencies);
       case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
       case "delete" -> this.pluginCommand = new DeleteQuestCommand(sender, args, dependencies);
       default -> this.pluginCommand = null;
