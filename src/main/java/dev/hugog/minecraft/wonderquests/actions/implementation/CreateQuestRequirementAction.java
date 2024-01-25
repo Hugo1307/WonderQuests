@@ -163,7 +163,7 @@ public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
     InteractiveStep itemStep = InteractiveStep.builder()
         .id("itemStep")
         .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.item"))
-        .inputVerification(input -> input.matches("[a-z_]+") && Material.matchMaterial(input) != null)
+        .inputVerification(input -> input.matches("[a-zA-Z_]+") && Material.matchMaterial(input) != null)
         .onValidInput(requirementDto::setStringValue)
         .isTerminalStep(true)
         .build();

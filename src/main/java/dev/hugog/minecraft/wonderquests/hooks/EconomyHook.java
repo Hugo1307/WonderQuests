@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.hooks;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -9,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+@Singleton
 public class EconomyHook {
 
   private final Logger logger;
@@ -29,6 +31,7 @@ public class EconomyHook {
 
     if (economyProvider != null) {
       economy = economyProvider.getProvider();
+      System.out.println(economy);
       logger.info("Successfully hooked into Vault economy.");
     } else {
       economy = null;

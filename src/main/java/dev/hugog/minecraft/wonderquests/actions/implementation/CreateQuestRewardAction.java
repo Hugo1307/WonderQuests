@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -158,14 +159,27 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
     InteractiveStep moneyStep = InteractiveStep.builder()
         .id("moneyStep")
         .message(
-            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.command")
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.money")
         )
-        .inputVerification(input -> true)
-        .onValidInput(rewardDto::setStringValue)
+        .inputVerification(input -> input.matches("[0-9]*.?[0-9]+"))
+        .onValidInput(input -> rewardDto.setNumericValue(Float.parseFloat(input)))
         .isTerminalStep(true)
         .build();
 
-    return List.of(requirementTypeStep, experienceStep, commandStep);
+    InteractiveStep itemsStep = InteractiveStep.builder()
+        .id("itemsStep")
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.item")
+        )
+        .inputVerification(input -> input.matches("[a-zA-Z_]+") && Material.matchMaterial(input) != null)
+        .onValidInput(input -> {
+          rewardDto.setStringValue(input);
+          rewardDto.setNumericValue(1F);
+        })
+        .isTerminalStep(true)
+        .build();
+
+    return List.of(requirementTypeStep, experienceStep, commandStep, moneyStep, itemsStep);
 
   }
 
