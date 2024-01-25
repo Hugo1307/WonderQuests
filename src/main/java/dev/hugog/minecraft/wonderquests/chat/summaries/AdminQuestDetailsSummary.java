@@ -44,7 +44,10 @@ public class AdminQuestDetailsSummary implements PluginChatSummary {
         .thenAccept((questOptional) -> {
 
           if (questOptional.isEmpty()) {
-            player.sendMessage(messaging.getLocalizedChatNoPrefix("general.quest.not_found"));
+            player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                "general.quest.not_found",
+                Component.text(questId)
+            ));
             return;
           }
 

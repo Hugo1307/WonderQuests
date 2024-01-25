@@ -71,13 +71,13 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
                 if (error != null) {
                   player.sendMessage(
-                      messaging.getLocalizedChatWithPrefix("actions.requirements.create.error"));
+                      messaging.getLocalizedChatWithPrefix("actions.rewards.create.error"));
                   logger.warning("Unable to create quest reward: " + error.getMessage());
                   return;
                 }
 
                 player.sendMessage(
-                    messaging.getLocalizedChatWithPrefix("actions.requirements.create.success",
+                    messaging.getLocalizedChatWithPrefix("actions.rewards.create.success",
                         Component.text(questId))
                 );
 
@@ -100,11 +100,11 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
   private InteractiveSessionFormatter getSessionFormatter(Player player) {
     return InteractiveSessionFormatter.builder(player, messaging)
-        .title(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.title"))
-        .summary(messaging.getLocalizedRawMessage("actions.requirements.create.summary"))
+        .title(messaging.getLocalizedRawMessage("actions.rewards.create.interaction.title"))
+        .summary(messaging.getLocalizedRawMessage("actions.rewards.create.summary"))
         .cancelMessage(
-            messaging.getLocalizedRawMessage("actions.requirements.create.interaction.cancel"))
-        .finalMessage(messaging.getLocalizedRawMessage("actions.requirements.create.pending",
+            messaging.getLocalizedRawMessage("actions.rewards.create.interaction.cancel"))
+        .finalMessage(messaging.getLocalizedRawMessage("actions.rewards.create.pending",
             Component.text(questId)))
         .build();
   }
@@ -112,7 +112,7 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
   private List<InteractiveStep> getSessionSteps(QuestRewardDto rewardDto) {
 
     InteractiveStep requirementTypeStep = InteractiveStep.builder()
-        .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.type"))
+        .message(messaging.getLocalizedRawMessage("actions.rewards.create.interaction.type"))
         .hint(Component.text("experience | command",
             NamedTextColor.GRAY))
         .inputVerification(input -> RewardType.fromString(input) != null)
@@ -137,7 +137,9 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
     InteractiveStep experienceStep = InteractiveStep.builder()
         .id("experienceStep")
-        .message(Component.text("Please enter the amount of experience to give the player:"))
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.experience")
+        )
         .inputVerification(input -> input.matches("[0-9]*.?[0-9]+"))
         .onValidInput(input -> rewardDto.setNumericValue(Float.parseFloat(input)))
         .isTerminalStep(true)
@@ -145,7 +147,9 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
     InteractiveStep commandStep = InteractiveStep.builder()
         .id("commandStep")
-        .message(Component.text("Please enter the command to execute as reward:"))
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.command")
+        )
         .inputVerification(input -> true)
         .onValidInput(rewardDto::setStringValue)
         .isTerminalStep(true)
