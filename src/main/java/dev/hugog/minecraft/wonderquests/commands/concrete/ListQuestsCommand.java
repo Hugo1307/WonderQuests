@@ -3,6 +3,7 @@ package dev.hugog.minecraft.wonderquests.commands.concrete;
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAllQuestsAction;
 import dev.hugog.minecraft.wonderquests.commands.AbstractPluginCommand;
 import dev.hugog.minecraft.wonderquests.commands.CommandDependencies;
+import dev.hugog.minecraft.wonderquests.commands.CommandsPermissions;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
@@ -21,19 +22,17 @@ public class ListQuestsCommand extends AbstractPluginCommand {
 
     Messaging messaging = dependencies.getMessaging();
 
-    if (!(sender instanceof Player)) {
+    if (!(sender instanceof Player player)) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.players_only"));
       return false;
     }
 
-    // TODO: Check permissions
-
-    if (args.length < 1) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("commands.quest.list.usage"));
+    if (!player.hasPermission(CommandsPermissions.LIST_QUESTS.getPermission())) {
+      player.sendMessage(messaging.getLocalizedChatWithPrefix("general.no_permission"));
       return false;
     }
 
-    if (!args[0].matches("[-+]?\\d+")) {
+    if (args.length < 1 || !args[0].matches("[-+]?\\d+")) {
       sender.sendMessage(messaging.getLocalizedChatWithPrefix("commands.quest.list.usage"));
       return false;
     }

@@ -5,6 +5,7 @@ import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
 import dev.hugog.minecraft.wonderquests.chat.summaries.AdminQuestDetailsSummary;
 import dev.hugog.minecraft.wonderquests.chat.summaries.QuestDetailsSummary;
+import dev.hugog.minecraft.wonderquests.commands.CommandsPermissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -30,7 +31,7 @@ public class ShowQuestDetailsAction extends AbstractAction<Boolean> {
       return false;
     }
 
-    if (player.hasPermission("wonderquests.admin")) {
+    if (player.hasPermission(CommandsPermissions.ADMIN.getPermission())) {
       adminQuestDetailsSummary.showToPlayer(player, questId);
     } else {
       questDetailsSummary.showToPlayer(player, questId);

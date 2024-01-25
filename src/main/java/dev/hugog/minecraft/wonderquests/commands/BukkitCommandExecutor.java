@@ -12,12 +12,10 @@ import org.jetbrains.annotations.NotNull;
  * <h4>Represents the default Bukkit command executor.</h4>
  * <br>
  * <p>The class receives commands from the chat and redirects them to the {@link CommandResolver}
- * if
- * they are commands from this plugin.</p>
+ * if they are commands from this plugin.</p>
  *
  * <p>The {@link CommandResolver}, part of the <strong>Commander Pattern</strong>, will create a
- * new
- * {@link PluginCommand} instance based on the command's label and execute the command.</p>
+ * new {@link PluginCommand} instance based on the command's label and execute the command.</p>
  *
  * <p>See {@link CommandResolver#setPluginCommand(String, CommandSender, String[])}.</p>
  */
@@ -39,7 +37,8 @@ public class BukkitCommandExecutor implements CommandExecutor {
     }
 
     if (args.length == 0) {
-      commandSender.sendMessage("§cUsage: /quests <create>");
+      commandResolver.setPluginCommand("help", commandSender, args);
+      commandResolver.executeCommand();
       return true;
     }
 
