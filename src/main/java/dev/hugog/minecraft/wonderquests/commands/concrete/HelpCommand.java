@@ -36,34 +36,47 @@ public class HelpCommand extends AbstractPluginCommand {
 
     Component helpMessage = Component.empty()
         .appendNewline()
-        .append(Component.text("WonderQuests Help", NamedTextColor.GREEN)
+        .append(messaging.getLocalizedRawMessage("commands.help.title")
+            .color(NamedTextColor.GREEN)
             .decorate(TextDecoration.BOLD)
         )
         .appendNewline()
         .appendNewline()
-        .append(commandHelpComponent("quests", "Displays this help menu"))
+        .append(commandHelpComponent("quests",
+            messaging.getLocalizedRawMessage("commands.help.help.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests available", "Lists all available quests"))
+        .append(commandHelpComponent("quests available",
+            messaging.getLocalizedRawMessage("commands.help.quest.available.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests active", "Lists all your active quests"))
+        .append(commandHelpComponent("quests active",
+            messaging.getLocalizedRawMessage("commands.help.quest.active.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests abort <quest_id>", "Abort a started quest"))
+        .append(commandHelpComponent("quests abort <quest_id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.abort.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests details <quest_id>", "Displays details for a quest"))
+        .append(commandHelpComponent("quests details <quest_id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.details.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests create", "Create a new quest"))
+        .append(commandHelpComponent("quests create",
+            messaging.getLocalizedRawMessage("commands.help.quest.create.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests delete <quest_id>", "Delete a quest"))
+        .append(commandHelpComponent("quests delete <quest_id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.delete.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests list <page>", "Lists all quests"))
+        .append(commandHelpComponent("quests list <page>",
+            messaging.getLocalizedRawMessage("commands.help.quest.list.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests reward create <quest_id>", "Create a new reward"))
+        .append(commandHelpComponent("quests reward create <quest_id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.reward.create.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests reward delete <id>", "Delete a reward"))
+        .append(commandHelpComponent("quests reward delete <id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.reward.delete.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests requirement create <quest_id>", "Create a new requirement"))
+        .append(commandHelpComponent("quests requirement create <quest_id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.requirement.create.command")))
         .appendNewline()
-        .append(commandHelpComponent("quests requirement delete <id>", "Delete a requirement."));
+        .append(commandHelpComponent("quests requirement delete <id>",
+            messaging.getLocalizedRawMessage("commands.help.quest.requirement.delete.command")));
 
     sender.sendMessage(helpMessage);
     sender.sendMessage(messaging.getChatSeparator());
@@ -72,7 +85,7 @@ public class HelpCommand extends AbstractPluginCommand {
 
   }
 
-  private Component commandHelpComponent(String command, String description) {
+  private Component commandHelpComponent(String command, Component description) {
     return Component.text("  /" + command, NamedTextColor.GREEN)
         .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + command))
         .hoverEvent(Component.text("Click to run this command", NamedTextColor.GRAY))
@@ -82,7 +95,7 @@ public class HelpCommand extends AbstractPluginCommand {
         .appendSpace()
         .appendSpace()
         .append(Component.text("• ", NamedTextColor.GRAY))
-        .append(Component.text(description, NamedTextColor.GRAY))
+        .append(description.color(NamedTextColor.GRAY))
         .appendNewline();
   }
 
