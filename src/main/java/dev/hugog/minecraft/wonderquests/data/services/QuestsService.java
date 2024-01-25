@@ -15,6 +15,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesReposit
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -70,11 +71,13 @@ public class QuestsService {
   /**
    * Obtains a quest by its id.
    *
-   * <p>If the quest is cached, it will return the cached value. Otherwise, it will query the database
+   * <p>If the quest is cached, it will return the cached value. Otherwise, it will query the
+   * database
    * and cache the result.</p>
    *
    * @param id The id of the quest to obtain.
-   * @return A {@link CompletableFuture} with the {@link QuestDto} if it exists, or an empty {@link Optional} if it doesn't.
+   * @return A {@link CompletableFuture} with the {@link QuestDto} if it exists, or an empty
+   * {@link Optional} if it doesn't.
    */
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
 
@@ -99,6 +102,13 @@ public class QuestsService {
     return questsRepository.findAll().thenApply(questModels -> questModels.stream()
         .map(QuestModel::toDto)
         .collect(Collectors.toSet()));
+  }
+
+  public CompletableFuture<List<QuestDto>> getAllQuestsInInterval(Integer start, Integer end) {
+    return questsRepository.findAllInInterval(start, end)
+        .thenApply(questModels -> questModels.stream()
+            .map(QuestModel::toDto)
+            .collect(Collectors.toList()));
   }
 
 }

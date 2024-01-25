@@ -7,6 +7,7 @@ import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.ListQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
@@ -66,6 +67,7 @@ public class CommandResolver {
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
       case "status" -> this.pluginCommand = new CurrentQuestsCommand(sender, args, dependencies);
+      case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
       default -> this.pluginCommand = null;
     }
   }

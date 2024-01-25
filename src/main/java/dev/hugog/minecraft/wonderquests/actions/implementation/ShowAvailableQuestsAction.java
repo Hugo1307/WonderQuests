@@ -19,6 +19,7 @@ public class ShowAvailableQuestsAction extends AbstractAction<Boolean> {
 
   @Override
   public Boolean execute() {
+    // TODO: Check if sender is a player
     guiFactory.buildAvailableQuestsGui((Player) sender).open();
     return false;
   }
