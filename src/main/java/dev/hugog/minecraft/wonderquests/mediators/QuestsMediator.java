@@ -7,14 +7,18 @@ import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.CompletedQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.CompletedQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
+import dev.hugog.minecraft.wonderquests.hooks.EconomyHook;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
@@ -22,7 +26,9 @@ import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class QuestsMediator {
 
@@ -33,12 +39,14 @@ public class QuestsMediator {
   private final CompletedQuestsService completedQuestsService;
   private final WonderQuests plugin;
   private final Messaging messaging;
+  private final EconomyHook economyHook;
 
   @Inject
   public QuestsMediator(@Named("bukkitLogger") Logger logger,
       ConcurrencyHandler concurrencyHandler, QuestsService questsService,
       ActiveQuestsService activeQuestsService, CompletedQuestsService completedQuestsService,
-      WonderQuests plugin, Messaging messaging) {
+      WonderQuests plugin, Messaging messaging, EconomyHook economyHook) {
+
     this.logger = logger;
     this.concurrencyHandler = concurrencyHandler;
     this.questsService = questsService;
@@ -46,6 +54,8 @@ public class QuestsMediator {
     this.completedQuestsService = completedQuestsService;
     this.plugin = plugin;
     this.messaging = messaging;
+    this.economyHook = economyHook;
+
   }
 
   public void giveQuestRewardsToPlayer(Player player, Integer questId) {
@@ -66,8 +76,13 @@ public class QuestsMediator {
 
         switch (reward.getType()) {
           case EXPERIENCE -> player.giveExp(reward.getNumericValue().intValue());
-          case MONEY, ITEMS -> {
-          }
+          case MONEY -> economyHook.depositPlayer(player.getUniqueId(), reward.getNumericValue());
+          case ITEMS -> player.getInventory().addItem(
+              new ItemStack(
+                  Objects.requireNonNull(Material.matchMaterial(reward.getStringValue())),
+                  reward.getNumericValue().intValue()
+              )
+          );
           case COMMAND -> concurrencyHandler.runOnMainThread(
               () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
                   reward.getStringValue().replace("%player%", player.getName())
@@ -98,9 +113,15 @@ public class QuestsMediator {
 
   }
 
+  public CompletableFuture<Set<QuestDto>> getPotentialAvailableQuests(Player player) {
+    return questsService.getAllQuests().thenApply(quests -> quests.stream()
+        .filter(quest -> playerHasRequirements(player, quest))
+        .collect(Collectors.toSet()));
+  }
+
   public CompletableFuture<Set<QuestDto>> getAvailableQuests(Player player) {
 
-    return questsService.getPotentialAvailableQuests(player)
+    return getPotentialAvailableQuests(player)
         .thenCompose(
             quests -> completedQuestsService.getCompletedQuestByPlayer(player.getUniqueId())
                 .thenApply(questsCompleted -> {
@@ -119,6 +140,34 @@ public class QuestsMediator {
                   return availableQuests;
 
                 }));
+
+  }
+
+  public boolean playerHasRequirements(Player player, QuestDto quest) {
+
+    boolean hasRequirements = true;
+
+    List<QuestRequirementDto> questRequirements = quest.getRequirements();
+
+    for (QuestRequirementDto requirement : questRequirements) {
+
+      hasRequirements = switch (requirement.getType()) {
+        case MONEY -> hasRequirements
+            && economyHook.getBalance(player.getUniqueId()) >= requirement.getNumericValue();
+        case EXPERIENCE -> hasRequirements
+            && player.getLevel() >= requirement.getNumericValue().intValue();
+        case PERMISSION -> hasRequirements && player.hasPermission(requirement.getStringValue());
+        case ITEM -> hasRequirements && player.getInventory().containsAtLeast(
+            new ItemStack(
+                Objects.requireNonNull(Material.matchMaterial(requirement.getStringValue()))
+            ),
+            1
+        );
+      };
+
+    }
+
+    return hasRequirements;
 
   }
 

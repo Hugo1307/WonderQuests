@@ -11,6 +11,7 @@ import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
@@ -29,6 +30,7 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
   private final Messaging messaging;
   private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
+  private final QuestsMediator questsMediator;
   private final ConcurrencyHandler concurrencyHandler;
   private final WonderQuests plugin;
 
@@ -37,6 +39,7 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
       @Named("bukkitLogger") Logger logger,
       Messaging messaging,
       ActiveQuestsService activeQuestsService, QuestsService questsService,
+      QuestsMediator questsMediator,
       ConcurrencyHandler concurrencyHandler, WonderQuests plugin) {
 
     super(sender);
@@ -45,6 +48,7 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
     this.messaging = messaging;
     this.activeQuestsService = activeQuestsService;
     this.questsService = questsService;
+    this.questsMediator = questsMediator;
     this.concurrencyHandler = concurrencyHandler;
     this.plugin = plugin;
 
@@ -91,7 +95,7 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
                 }
 
                 // Check Requirements
-                boolean hasNecessary = questsService.playerHasRequirements(player, quest.get());
+                boolean hasNecessary = questsMediator.playerHasRequirements(player, quest.get());
 
                 if (!hasNecessary) {
                   player.sendMessage(

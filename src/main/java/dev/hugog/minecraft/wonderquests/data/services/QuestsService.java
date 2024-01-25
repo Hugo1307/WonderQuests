@@ -79,13 +79,6 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
-  public CompletableFuture<Set<QuestDto>> getPotentialAvailableQuests(Player player) {
-    return questsRepository.findAll().thenApply(questModels -> questModels.stream()
-        .map(QuestModel::toDto)
-        .filter(quest -> playerHasRequirements(player, quest))
-        .collect(Collectors.toSet()));
-  }
-
   public CompletableFuture<List<QuestDto>> getAllQuestsInInterval(Integer start, Integer end) {
     return questsRepository.findAllInInterval(start, end)
         .thenApply(questModels -> questModels.stream()
@@ -93,32 +86,15 @@ public class QuestsService {
             .collect(Collectors.toList()));
   }
 
-  public CompletableFuture<Void> deleteQuest(Integer id) {
-    return questsRepository.delete(id);
+  public CompletableFuture<List<QuestDto>> getAllQuests() {
+    return questsRepository.findAll()
+        .thenApply(questModels -> questModels.stream()
+            .map(QuestModel::toDto)
+            .collect(Collectors.toList()));
   }
 
-  public boolean playerHasRequirements(Player player, QuestDto quest) {
-
-    boolean hasRequirements = true;
-
-    List<QuestRequirementDto> questRequirements = quest.getRequirements();
-
-    for (QuestRequirementDto requirement : questRequirements) {
-
-      switch (requirement.getType()) {
-        case MONEY:
-        case ITEM:
-        case QUEST_COMPLETED:
-        case QUEST_NOT_COMPLETED:
-          break;
-        case PERMISSION:
-          hasRequirements = hasRequirements && player.hasPermission(requirement.getStringValue());
-      }
-
-    }
-
-    return hasRequirements;
-
+  public CompletableFuture<Void> deleteQuest(Integer id) {
+    return questsRepository.delete(id);
   }
 
 }

@@ -112,7 +112,6 @@ public class CreateQuestAction extends AbstractAction<Boolean> {
           return switch (objectiveType) {
             case PLACE_BLOCK, BREAK_BLOCK -> "blockName_step";
             case KILL_MOBS -> "mobName_step";
-            case CRAFT_ITEM, KILL_PLAYERS, LOCATION -> null;
           };
 
         })

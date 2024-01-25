@@ -113,7 +113,7 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
     InteractiveStep requirementTypeStep = InteractiveStep.builder()
         .message(messaging.getLocalizedRawMessage("actions.rewards.create.interaction.type"))
-        .hint(Component.text("experience | command",
+        .hint(Component.text("money | items | experience | command",
             NamedTextColor.GRAY))
         .inputVerification(input -> RewardType.fromString(input) != null)
         .onValidInput(input -> rewardDto.setType(RewardType.fromString(input)))
@@ -128,11 +128,11 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
           return switch (rewardType) {
             case EXPERIENCE -> "experienceStep";
             case COMMAND -> "commandStep";
-            case MONEY, ITEMS -> null;
+            case MONEY -> "moneyStep";
+            case ITEMS -> "itemsStep";
           };
 
         })
-
         .build();
 
     InteractiveStep experienceStep = InteractiveStep.builder()
@@ -147,6 +147,16 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
     InteractiveStep commandStep = InteractiveStep.builder()
         .id("commandStep")
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.command")
+        )
+        .inputVerification(input -> true)
+        .onValidInput(rewardDto::setStringValue)
+        .isTerminalStep(true)
+        .build();
+
+    InteractiveStep moneyStep = InteractiveStep.builder()
+        .id("moneyStep")
         .message(
             messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.command")
         )

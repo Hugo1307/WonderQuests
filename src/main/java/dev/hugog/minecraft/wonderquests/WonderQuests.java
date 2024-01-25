@@ -10,6 +10,7 @@ import dev.hugog.minecraft.wonderquests.config.PluginConfigHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
+import dev.hugog.minecraft.wonderquests.hooks.EconomyHook;
 import dev.hugog.minecraft.wonderquests.injection.BasicBinderModule;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import dev.hugog.minecraft.wonderquests.language.MessagingConfigurator;
@@ -65,6 +66,9 @@ public final class WonderQuests extends JavaPlugin {
   @Inject
   private MessagingConfigurator messagingConfigurator;
 
+  @Inject
+  private EconomyHook economyHook;
+
   @Override
   public void onEnable() {
 
@@ -108,6 +112,8 @@ public final class WonderQuests extends JavaPlugin {
 
       // Start cache scheduler
       cacheScheduler.runTaskTimerAsynchronously(this, 10 * 20L, 10 * 20L);
+
+      economyHook.setupEconomy();
 
       getLogger().info("Plugin successfully enabled!");
 
