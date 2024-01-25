@@ -8,6 +8,7 @@ import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementComma
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.ListQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
@@ -55,6 +56,9 @@ public class CommandResolver {
       case "requirement" -> {
         if (args[0].equalsIgnoreCase("create")) {
           this.pluginCommand = new CreateRequirementCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        } else if (args[0].equalsIgnoreCase("delete")) {
+          this.pluginCommand = new DeleteRequirementCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }
