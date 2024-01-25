@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -113,7 +114,7 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
     InteractiveStep requirementTypeStep = InteractiveStep.builder()
         .message(messaging.getLocalizedRawMessage("actions.rewards.create.interaction.type"))
-        .hint(Component.text("experience | command",
+        .hint(Component.text("money | items | experience | command",
             NamedTextColor.GRAY))
         .inputVerification(input -> RewardType.fromString(input) != null)
         .onValidInput(input -> rewardDto.setType(RewardType.fromString(input)))
@@ -128,11 +129,11 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
           return switch (rewardType) {
             case EXPERIENCE -> "experienceStep";
             case COMMAND -> "commandStep";
-            case MONEY, ITEMS -> null;
+            case MONEY -> "moneyStep";
+            case ITEMS -> "itemsStep";
           };
 
         })
-
         .build();
 
     InteractiveStep experienceStep = InteractiveStep.builder()
@@ -155,7 +156,30 @@ public class CreateQuestRewardAction extends AbstractAction<Boolean> {
         .isTerminalStep(true)
         .build();
 
-    return List.of(requirementTypeStep, experienceStep, commandStep);
+    InteractiveStep moneyStep = InteractiveStep.builder()
+        .id("moneyStep")
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.money")
+        )
+        .inputVerification(input -> input.matches("[0-9]*.?[0-9]+"))
+        .onValidInput(input -> rewardDto.setNumericValue(Float.parseFloat(input)))
+        .isTerminalStep(true)
+        .build();
+
+    InteractiveStep itemsStep = InteractiveStep.builder()
+        .id("itemsStep")
+        .message(
+            messaging.getLocalizedChatNoPrefix("actions.rewards.create.interaction.item")
+        )
+        .inputVerification(input -> input.matches("[a-zA-Z_]+") && Material.matchMaterial(input) != null)
+        .onValidInput(input -> {
+          rewardDto.setStringValue(input);
+          rewardDto.setNumericValue(1F);
+        })
+        .isTerminalStep(true)
+        .build();
+
+    return List.of(requirementTypeStep, experienceStep, commandStep, moneyStep, itemsStep);
 
   }
 

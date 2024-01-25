@@ -31,4 +31,10 @@ public class CompletedQuestsService {
             .collect(Collectors.toSet()));
   }
 
+  public CompletableFuture<Boolean> hasCompletedQuest(UUID playerId, Integer questId) {
+    return getCompletedQuestByPlayer(playerId)
+        .thenApply(completedQuests -> completedQuests.stream()
+            .anyMatch(completedQuest -> completedQuest.getQuestId().equals(questId)));
+  }
+
 }

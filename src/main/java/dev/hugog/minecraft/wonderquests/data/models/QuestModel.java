@@ -1,8 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.models;
 
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-
-import java.util.List;
+import java.util.Set;
 
 public record QuestModel(
     Integer id,
@@ -13,8 +12,8 @@ public record QuestModel(
     String item,
     Integer timeLimit,
     QuestObjectiveModel objective,
-    List<QuestRequirementModel> requirements,
-    List<QuestRewardModel> rewards
+    Set<QuestRequirementModel> requirements,
+    Set<QuestRewardModel> rewards
 ) implements DataModel<QuestDto> {
 
   @Override

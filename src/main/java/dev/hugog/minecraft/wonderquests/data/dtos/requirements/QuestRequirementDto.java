@@ -26,8 +26,7 @@ public class QuestRequirementDto implements Dto<QuestRequirementModel> {
       case PERMISSION -> "Permission: " + stringValue;
       case ITEM -> "Item: " + stringValue;
       case MONEY -> "Money: " + numericValue;
-      case QUEST_COMPLETED -> "Quest Completed: " + numericValue;
-      case QUEST_NOT_COMPLETED -> "Quest Not Completed: " + numericValue;
+      case EXPERIENCE -> "Experience: " + numericValue;
     };
   }
 

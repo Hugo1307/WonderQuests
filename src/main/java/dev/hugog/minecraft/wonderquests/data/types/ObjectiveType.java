@@ -2,7 +2,7 @@ package dev.hugog.minecraft.wonderquests.data.types;
 
 public enum ObjectiveType {
 
-  BREAK_BLOCK, PLACE_BLOCK, CRAFT_ITEM, KILL_MOBS, KILL_PLAYERS, LOCATION;
+  BREAK_BLOCK, PLACE_BLOCK, KILL_MOBS;
 
   public static ObjectiveType fromString(String string) {
     for (ObjectiveType objectiveType : ObjectiveType.values()) {

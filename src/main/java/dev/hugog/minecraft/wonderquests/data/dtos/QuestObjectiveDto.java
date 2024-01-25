@@ -25,9 +25,6 @@ public class QuestObjectiveDto implements Dto<QuestObjectiveModel> {
       case KILL_MOBS -> String.format("Kill %d %s", numericValue.intValue(), stringValue);
       case BREAK_BLOCK -> String.format("Break %d %s blocks", numericValue.intValue(), stringValue);
       case PLACE_BLOCK -> String.format("Place %d %s blocks", numericValue.intValue(), stringValue);
-      case CRAFT_ITEM -> String.format("Craft %d %s", numericValue.intValue(), stringValue);
-      case LOCATION -> String.format("Go to %s", stringValue);
-      case KILL_PLAYERS -> String.format("Kill %d players", numericValue.intValue());
     };
   }
 

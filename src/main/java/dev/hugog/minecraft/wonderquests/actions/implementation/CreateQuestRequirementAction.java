@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -119,7 +120,7 @@ public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
 
     InteractiveStep requirementTypeStep = InteractiveStep.builder()
         .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.type"))
-        .hint(Component.text("money | permission | item | quest_completed | quest_not_completed",
+        .hint(Component.text("money | item | permission | experience",
             NamedTextColor.GRAY))
         .inputVerification(input -> RequirementType.fromString(input) != null)
         .onValidInput(input -> requirementDto.setType(RequirementType.fromString(input)))
@@ -135,8 +136,7 @@ public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
             case MONEY -> "moneyStep";
             case PERMISSION -> "permissionStep";
             case ITEM -> "itemStep";
-            case QUEST_COMPLETED -> "questCompletedStep";
-            case QUEST_NOT_COMPLETED -> "questNotCompletedStep";
+            case EXPERIENCE -> "experienceStep";
           };
 
         })
@@ -163,31 +163,21 @@ public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
     InteractiveStep itemStep = InteractiveStep.builder()
         .id("itemStep")
         .message(messaging.getLocalizedRawMessage("actions.requirements.create.interaction.item"))
-        .inputVerification(input -> input.length() > 3)
+        .inputVerification(input -> input.matches("[a-zA-Z_]+") && Material.matchMaterial(input) != null)
         .onValidInput(requirementDto::setStringValue)
         .isTerminalStep(true)
         .build();
 
-    InteractiveStep questCompletedStep = InteractiveStep.builder()
-        .id("questCompletedStep")
+    InteractiveStep experienceStep = InteractiveStep.builder()
+        .id("experienceStep")
         .message(messaging.getLocalizedRawMessage(
-            "actions.requirements.create.interaction.quest_completed"))
+            "actions.requirements.create.interaction.experience"))
         .inputVerification(input -> input.matches("[0-9]+"))
         .onValidInput(input -> requirementDto.setNumericValue(Float.parseFloat(input)))
         .isTerminalStep(true)
         .build();
 
-    InteractiveStep questNotCompletedStep = InteractiveStep.builder()
-        .id("questNotCompletedStep")
-        .message(
-            messaging.getLocalizedRawMessage("actions.requirements.create.interaction.no_quest"))
-        .inputVerification(input -> input.matches("[0-9]+"))
-        .onValidInput(input -> requirementDto.setNumericValue(Float.parseFloat(input)))
-        .isTerminalStep(true)
-        .build();
-
-    return List.of(requirementTypeStep, moneyStep, permissionStep, itemStep, questCompletedStep,
-        questNotCompletedStep);
+    return List.of(requirementTypeStep, moneyStep, permissionStep, itemStep, experienceStep);
 
   }
 

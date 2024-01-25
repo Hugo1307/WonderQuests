@@ -111,8 +111,8 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                     rs.getString("quest_objective_str_value"),
                     rs.getFloat("quest_objective_num_value")
                 ),
-                new ArrayList<>(),
-                new ArrayList<>()
+                new HashSet<>(),
+                new HashSet<>()
             );
           }
 
@@ -259,8 +259,8 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                     rs.getString("quest_objective_str_value"),
                     rs.getFloat("quest_objective_num_value")
                 ),
-                new ArrayList<>(),
-                new ArrayList<>()
+                new HashSet<>(),
+                new HashSet<>()
             ));
             questModelOptional = questModels.stream()
                 .filter(questModel -> questModel.id() == questId)
@@ -366,8 +366,8 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                     rs.getString("quest_objective_str_value"),
                     rs.getFloat("quest_objective_num_value")
                 ),
-                new ArrayList<>(),
-                new ArrayList<>()
+                new HashSet<>(),
+                new HashSet<>()
             ));
             questModelOptional = questModels.stream()
                 .filter(questModel -> questModel.id() == questId)

@@ -205,6 +205,7 @@ public class AdminQuestDetailsSummary implements PluginChatSummary {
             );
           } else {
             quest.getRequirements().forEach((requirement) -> {
+              System.out.println(requirement);
               player.sendMessage(Component.empty()
                   .appendSpace()
                   .appendSpace()
