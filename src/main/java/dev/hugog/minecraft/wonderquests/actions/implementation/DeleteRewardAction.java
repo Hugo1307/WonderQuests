@@ -3,27 +3,28 @@ package dev.hugog.minecraft.wonderquests.actions.implementation;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
-import dev.hugog.minecraft.wonderquests.data.services.QuestRequirementsService;
+import dev.hugog.minecraft.wonderquests.data.services.QuestRewardsService;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class DeleteRequirementAction extends AbstractAction<CompletableFuture<Boolean>> {
+public class DeleteRewardAction extends AbstractAction<CompletableFuture<Boolean>> {
 
-  private final int requirementId;
+  private final int rewardId;
   private final Messaging messaging;
-  private final QuestRequirementsService questRequirementsService;
+  private final QuestRewardsService questRewardsService;
 
   @Inject
-  public DeleteRequirementAction(@Assisted CommandSender sender, @Assisted int requirementId,
-      Messaging messaging, QuestRequirementsService questRequirementsService) {
+  public DeleteRewardAction(@Assisted CommandSender sender, @Assisted int rewardId,
+      Messaging messaging,
+      QuestRewardsService questRewardsService) {
 
     super(sender);
-    this.requirementId = requirementId;
+    this.rewardId = rewardId;
     this.messaging = messaging;
-    this.questRequirementsService = questRequirementsService;
+    this.questRewardsService = questRewardsService;
 
   }
 
@@ -34,29 +35,29 @@ public class DeleteRequirementAction extends AbstractAction<CompletableFuture<Bo
       return CompletableFuture.completedFuture(false);
     }
 
-    return questRequirementsService.checkIfRequirementExists(requirementId)
+    return questRewardsService.checkIfRewardExists(rewardId)
         .thenCompose(exists -> {
 
           if (!exists) {
             player.sendMessage(messaging.getLocalizedChatWithPrefix(
-                "actions.requirements.delete.not_found",
-                Component.text(requirementId)
+                "actions.rewards.delete.not_found",
+                Component.text(rewardId)
             ));
             return CompletableFuture.completedFuture(false);
           }
 
-          return questRequirementsService.deleteRequirement(requirementId)
+          return questRewardsService.deleteReward(rewardId)
               .thenApply(ignored -> {
                 player.sendMessage(messaging.getLocalizedChatWithPrefix(
-                    "actions.requirements.delete.success",
-                    Component.text(requirementId)
+                    "actions.rewards.delete.success",
+                    Component.text(rewardId)
                 ));
                 return true;
               })
               .exceptionally(deleteThrowable -> {
                 player.sendMessage(messaging.getLocalizedChatWithPrefix(
-                    "actions.requirements.delete.error",
-                    Component.text(requirementId)
+                    "actions.rewards.delete.error",
+                    Component.text(rewardId)
                 ));
                 return false;
               });
@@ -64,8 +65,8 @@ public class DeleteRequirementAction extends AbstractAction<CompletableFuture<Bo
         })
         .exceptionally(throwable -> {
           player.sendMessage(messaging.getLocalizedChatWithPrefix(
-              "actions.requirements.delete.error",
-              Component.text(requirementId)
+              "actions.rewards.delete.error",
+              Component.text(rewardId)
           ));
           return false;
         });

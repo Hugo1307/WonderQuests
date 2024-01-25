@@ -6,6 +6,7 @@ import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRequir
 import dev.hugog.minecraft.wonderquests.actions.implementation.CreateQuestRewardAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.DeleteQuestAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.DeleteRequirementAction;
+import dev.hugog.minecraft.wonderquests.actions.implementation.DeleteRewardAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowActiveQuestsAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAllQuestsAction;
 import dev.hugog.minecraft.wonderquests.actions.implementation.ShowAvailableQuestsAction;
@@ -33,5 +34,7 @@ public interface ActionsFactory {
   DeleteQuestAction buildDeleteQuestAction(CommandSender sender, int questId);
 
   DeleteRequirementAction buildDeleteRequirementAction(CommandSender sender, int requirementId);
+
+  DeleteRewardAction buildDeleteRewardAction(CommandSender sender, int rewardId);
 
 }
