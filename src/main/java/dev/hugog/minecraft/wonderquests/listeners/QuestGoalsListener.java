@@ -9,7 +9,6 @@ import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -49,6 +48,11 @@ public class QuestGoalsListener implements Listener {
           }
 
           activeQuests.forEach((activeQuest) -> {
+
+            // Even if the quest is expired, we still need to notify that the quest was updated.
+            // This is because we need to trigger the ActiveQuestUpdateEvent, so we can remove
+            // the quest if it is expired.
+            questsMediator.notifyQuestUpdate(player, activeQuest);
 
             // If the quest is expired, we don't need to do anything with this event
             if (activeQuestsService.isQuestExpired(activeQuest.getPlayerId(),
@@ -104,6 +108,11 @@ public class QuestGoalsListener implements Listener {
           }
 
           activeQuests.forEach((activeQuest) -> {
+
+            // Even if the quest is expired, we still need to notify that the quest was updated.
+            // This is because we need to trigger the ActiveQuestUpdateEvent, so we can remove
+            // the quest if it is expired.
+            questsMediator.notifyQuestUpdate(player, activeQuest);
 
             // If the quest is expired, we don't need to do anything with this event
             if (activeQuestsService.isQuestExpired(activeQuest.getPlayerId(),

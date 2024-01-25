@@ -30,6 +30,10 @@ public class ActiveQuestDto implements Dto<ActiveQuestModel> {
         / 1000;
   }
 
+  public boolean isExpired() {
+    return getQuestDetails().getTimeLimit() * 1000 - (System.currentTimeMillis() - getStartedAt()) < 0;
+  }
+
   @Override
   public ActiveQuestModel toModel() {
     return new ActiveQuestModel(playerId, questId, target, progress, startedAt,

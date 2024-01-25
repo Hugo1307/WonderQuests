@@ -69,15 +69,20 @@ public class QuestsMediator {
 
   public void updateQuestProgress(Player player, ActiveQuestDto activeQuest) {
 
+    notifyQuestUpdate(player, activeQuest);
+    activeQuestsService.incrementQuestProgress(player.getUniqueId(), activeQuest.getQuestId());
+
+  }
+
+  public void notifyQuestUpdate(Player player, ActiveQuestDto activeQuest) {
+
     // Call the ActiveQuestUpdateEvent to update the signs, for example.
     concurrencyHandler.run(
         () -> plugin.getServer().getPluginManager().callEvent(
-            new ActiveQuestUpdateEvent(player, QuestUpdateType.UPDATED)
+            new ActiveQuestUpdateEvent(player, QuestUpdateType.UPDATED, activeQuest)
         ),
         true
     );
-
-    activeQuestsService.incrementQuestProgress(player.getUniqueId(), activeQuest.getQuestId());
 
   }
 
@@ -96,7 +101,7 @@ public class QuestsMediator {
         }
 
         concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-            .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED)), true);
+            .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED, activeQuest)), true);
 
         QuestDto questDto = quest.get();
 

@@ -62,7 +62,7 @@ public class CancelQuestAction extends AbstractAction<CompletableFuture<Boolean>
 
                 // Call the event to notify that the quest has been cancelled
                 concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-                        .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.CANCELLED)),
+                        .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.CANCELLED, null)),
                     true);
 
                 player.sendMessage(
