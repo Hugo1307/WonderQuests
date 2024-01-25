@@ -79,7 +79,7 @@ public class QuestsService {
         .thenApply(Optional::isPresent);
   }
 
-  public CompletableFuture<Set<QuestDto>> getAvailableQuests(Player player) {
+  public CompletableFuture<Set<QuestDto>> getPotentialAvailableQuests(Player player) {
     return questsRepository.findAll().thenApply(questModels -> questModels.stream()
         .map(QuestModel::toDto)
         .filter(quest -> playerHasRequirements(player, quest))
