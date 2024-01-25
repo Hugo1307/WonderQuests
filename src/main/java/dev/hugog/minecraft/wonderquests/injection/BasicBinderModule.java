@@ -18,6 +18,7 @@ import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.SignsRepository;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import dev.hugog.minecraft.wonderquests.injection.factories.GuiFactory;
+import java.io.File;
 import org.bukkit.Server;
 
 import java.util.List;
@@ -47,6 +48,9 @@ public class BasicBinderModule extends AbstractModule {
 
     this.bind(FileConfiguration.class)
         .toInstance(plugin.getConfig());
+
+    this.bind(File.class).annotatedWith(Names.named("pluginFolder"))
+        .toInstance(plugin.getDataFolder());
 
     this.bind(Server.class).toInstance(plugin.getServer());
 
