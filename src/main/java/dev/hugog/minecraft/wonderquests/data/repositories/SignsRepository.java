@@ -8,7 +8,9 @@ import dev.hugog.minecraft.wonderquests.data.models.SignModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -132,29 +134,21 @@ public class SignsRepository extends AbstractDataRepository<SignModel, Integer> 
     }), true);
   }
 
-  public CompletableFuture<Optional<SignModel>> findByLocation(
-      String worldName,
-      Integer x,
-      Integer y,
-      Integer z
-  ) {
+  public CompletableFuture<Set<SignModel>> findAll() {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "SELECT * FROM sign WHERE world_name = ? AND x = ? AND y = ? AND z = ?;");
-
-        ps.setString(1, worldName);
-        ps.setInt(2, x);
-        ps.setInt(3, y);
-        ps.setInt(4, z);
+            "SELECT * FROM sign;");
 
         ResultSet rs = ps.executeQuery();
+        Set<SignModel> signs = new HashSet<>();
 
-        if (rs.next()) {
-          return Optional.of(
+        while (rs.next()) {
+
+          signs.add(
               new SignModel(
                   rs.getInt("id"),
                   rs.getString("type"),
@@ -164,16 +158,16 @@ public class SignsRepository extends AbstractDataRepository<SignModel, Integer> 
                   rs.getInt("z")
               )
           );
+
         }
 
+        return signs;
+
       } catch (SQLException e) {
-        logger.severe(String.format("Error while finding sign by location %s! Caused by: %s",
-            worldName + ":" + x + ":" + y + ":" + z,
+        logger.severe(String.format("Error while finding all signs! Caused by: %s",
             e.getMessage()));
         throw new RuntimeException(e);
       }
-
-      return Optional.empty();
 
     }), true);
 

@@ -65,34 +65,6 @@ public class SignUpdateListener implements Listener {
           return null;
         });
 
-//        activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
-//            .thenAccept(activeQuests -> {
-//              activeQuests.stream().min((a, b) -> b.getStartedAt().compareTo(a.getStartedAt()))
-//                  .ifPresentOrElse(activeQuest -> {
-//
-//                    Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("WonderQuests"), () -> {
-//                      player.sendSignChange(sign.getLocation(), new String[] {
-//                          ChatColor.BOLD + "" + ChatColor.GREEN + "WonderQuests",
-//                          ChatColor.YELLOW + activeQuest.getQuestDetails().getName(),
-//                          ChatColor.GREEN + String.valueOf(activeQuest.getProgressPercentage()) + "%",
-//                          ChatColor.GRAY + String.valueOf(activeQuest.getProgress()) + "/" + activeQuest.getTarget()
-//                      });
-//                    }, 20L);
-//
-//                  }, () -> {
-//
-//                    Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("WonderQuests"), () -> {
-//                      player.sendSignChange(sign.getLocation(), new String[] {
-//                          ChatColor.BOLD + "" + ChatColor.GREEN + "WonderQuests",
-//                          null,
-//                          ChatColor.GRAY + "No active quests",
-//                          null
-//                      });
-//                    }, 20L);
-//
-//                  });
-//            });
-
       }
 
     }
