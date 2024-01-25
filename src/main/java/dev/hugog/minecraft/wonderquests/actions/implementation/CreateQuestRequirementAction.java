@@ -49,7 +49,7 @@ public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
   public Boolean execute() {
 
     if (!(sender instanceof Player player)) {
-      sender.sendMessage(messaging.getLocalizedChatWithPrefix("actions.general.players_only"));
+      sender.sendMessage(messaging.getLocalizedChatWithPrefix("general.players_only"));
       return false;
     }
 

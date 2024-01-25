@@ -3,11 +3,14 @@ package dev.hugog.minecraft.wonderquests.commands;
 import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CancelQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
-import dev.hugog.minecraft.wonderquests.commands.concrete.CreateObjectiveCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CurrentQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRequirementCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRewardCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.ListQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
@@ -52,20 +55,29 @@ public class CommandResolver {
       case "create" -> this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
       case "details" -> this.pluginCommand = new QuestDetailsCommand(sender, args, dependencies);
       case "requirement" -> {
+
         if (args[0].equalsIgnoreCase("create")) {
+
           this.pluginCommand = new CreateRequirementCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
+
+        } else if (args[0].equalsIgnoreCase("delete")) {
+
+          this.pluginCommand = new DeleteRequirementCommand(
+              sender,
+              Arrays.copyOfRange(args, 1, args.length),
+              dependencies
+          );
+
         }
-      }
-      case "objective" -> {
-        if (args[0].equalsIgnoreCase("create")) {
-          this.pluginCommand = new CreateObjectiveCommand(sender,
-              Arrays.copyOfRange(args, 1, args.length), dependencies);
-        }
+
       }
       case "reward" -> {
         if (args[0].equalsIgnoreCase("create")) {
           this.pluginCommand = new CreateRewardCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        } else if (args[0].equalsIgnoreCase("delete")) {
+          this.pluginCommand = new DeleteRewardCommand(sender,
               Arrays.copyOfRange(args, 1, args.length), dependencies);
         }
       }
@@ -73,6 +85,8 @@ public class CommandResolver {
       case "available" ->
           this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
       case "status" -> this.pluginCommand = new CurrentQuestsCommand(sender, args, dependencies);
+      case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
+      case "delete" -> this.pluginCommand = new DeleteQuestCommand(sender, args, dependencies);
       default -> this.pluginCommand = null;
     }
   }

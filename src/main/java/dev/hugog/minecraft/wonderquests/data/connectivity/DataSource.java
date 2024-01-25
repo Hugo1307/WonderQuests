@@ -84,6 +84,7 @@ public class DataSource {
       operation.accept(con);
     } catch (SQLException e) {
       logger.severe("Error while applying an operation! Caused by: " + e.getMessage());
+      throw new RuntimeException(e);
     }
 
   }
@@ -94,9 +95,8 @@ public class DataSource {
       return operation.apply(con);
     } catch (SQLException e) {
       logger.severe("Error while executing an operation! Caused by: " + e.getMessage());
+      throw new RuntimeException(e);
     }
-
-    return null;
 
   }
 

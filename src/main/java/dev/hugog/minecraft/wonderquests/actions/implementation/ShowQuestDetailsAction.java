@@ -3,6 +3,7 @@ package dev.hugog.minecraft.wonderquests.actions.implementation;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.actions.AbstractAction;
+import dev.hugog.minecraft.wonderquests.chat.summaries.AdminQuestDetailsSummary;
 import dev.hugog.minecraft.wonderquests.chat.summaries.QuestDetailsSummary;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,12 +12,15 @@ public class ShowQuestDetailsAction extends AbstractAction<Boolean> {
 
   private final int questId;
   private final QuestDetailsSummary questDetailsSummary;
+  private final AdminQuestDetailsSummary adminQuestDetailsSummary;
 
   @Inject
-  public ShowQuestDetailsAction(@Assisted CommandSender sender, @Assisted int questId, QuestDetailsSummary questDetailsSummary) {
+  public ShowQuestDetailsAction(@Assisted CommandSender sender, @Assisted int questId,
+      QuestDetailsSummary questDetailsSummary, AdminQuestDetailsSummary adminQuestDetailsSummary) {
     super(sender);
     this.questId = questId;
     this.questDetailsSummary = questDetailsSummary;
+    this.adminQuestDetailsSummary = adminQuestDetailsSummary;
   }
 
   @Override
@@ -26,7 +30,11 @@ public class ShowQuestDetailsAction extends AbstractAction<Boolean> {
       return false;
     }
 
-    questDetailsSummary.showToPlayer(player, questId);
+    if (player.hasPermission("wonderquests.admin")) {
+      adminQuestDetailsSummary.showToPlayer(player, questId);
+    } else {
+      questDetailsSummary.showToPlayer(player, questId);
+    }
 
     return true;
 

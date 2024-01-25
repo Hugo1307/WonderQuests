@@ -1,7 +1,6 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
-import dev.hugog.minecraft.wonderquests.cache.implementation.QuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
@@ -10,11 +9,11 @@ import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRewardModel;
-import dev.hugog.minecraft.wonderquests.data.repositories.ActiveQuestRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestObjectivesRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRequirementsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestRewardsRepository;
 import dev.hugog.minecraft.wonderquests.data.repositories.QuestsRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -24,26 +23,20 @@ import java.util.stream.Collectors;
 public class QuestsService {
 
   private final QuestsRepository questsRepository;
-  private final QuestsCache questsCache;
   private final QuestObjectivesRepository questObjectivesRepository;
   private final QuestRequirementsRepository questRequirementsRepository;
   private final QuestRewardsRepository questRewardsRepository;
-  private final ActiveQuestRepository activeQuestRepository;
 
   @Inject
   public QuestsService(QuestsRepository questsRepository,
-      QuestsCache questsCache,
       QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository,
-      ActiveQuestRepository activeQuestRepository) {
+      QuestRewardsRepository questRewardsRepository) {
 
     this.questsRepository = questsRepository;
-    this.questsCache = questsCache;
     this.questObjectivesRepository = questObjectivesRepository;
     this.questRequirementsRepository = questRequirementsRepository;
     this.questRewardsRepository = questRewardsRepository;
-    this.activeQuestRepository = activeQuestRepository;
 
   }
 
@@ -70,23 +63,14 @@ public class QuestsService {
   /**
    * Obtains a quest by its id.
    *
-   * <p>If the quest is cached, it will return the cached value. Otherwise, it will query the database
-   * and cache the result.</p>
-   *
    * @param id The id of the quest to obtain.
-   * @return A {@link CompletableFuture} with the {@link QuestDto} if it exists, or an empty {@link Optional} if it doesn't.
+   * @return A {@link CompletableFuture} with the {@link QuestDto} if it exists, or an empty
+   * {@link Optional} if it doesn't.
    */
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
 
-    if (questsCache.has(id)) {
-      return CompletableFuture.completedFuture(Optional.of(questsCache.get(id)));
-    }
-
-    return questsRepository.findById(id).thenApply(questModel -> {
-      Optional<QuestDto> questDto = questModel.map(QuestModel::toDto);
-      questDto.ifPresent(dto -> questsCache.put(id, dto));
-      return questDto;
-    });
+    return questsRepository.findById(id)
+        .thenApply(questModelOptional -> questModelOptional.map(QuestModel::toDto));
 
   }
 
@@ -99,6 +83,17 @@ public class QuestsService {
     return questsRepository.findAll().thenApply(questModels -> questModels.stream()
         .map(QuestModel::toDto)
         .collect(Collectors.toSet()));
+  }
+
+  public CompletableFuture<List<QuestDto>> getAllQuestsInInterval(Integer start, Integer end) {
+    return questsRepository.findAllInInterval(start, end)
+        .thenApply(questModels -> questModels.stream()
+            .map(QuestModel::toDto)
+            .collect(Collectors.toList()));
+  }
+
+  public CompletableFuture<Void> deleteQuest(Integer id) {
+    return questsRepository.delete(id);
   }
 
 }
