@@ -32,7 +32,9 @@ public class CancelQuestCommand extends AbstractPluginCommand {
 
     // Build and call the action
     CancelQuestAction action = actionsFactory.buildCancelQuestAction(sender, Integer.parseInt(args[0]));
-    return action.execute();
+    action.execute();
+
+    return true;
 
   }
 
