@@ -9,7 +9,9 @@ import dev.hugog.minecraft.wonderquests.data.models.CompletedQuestModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
@@ -141,6 +143,39 @@ public class CompletedQuestRepository extends
       }
 
     }), true);
+  }
+
+  public CompletableFuture<Set<CompletedQuestModel>> findAllByPlayer(UUID playerId) {
+
+    return concurrencyHandler.supply(() -> dataSource.execute(con -> {
+
+      try {
+
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT * FROM completed_quest WHERE player_id = ?;");
+
+        ps.setObject(1, playerId);
+
+        ResultSet rs = ps.executeQuery();
+        Set<CompletedQuestModel> completedQuests = new HashSet<>();
+
+        while (rs.next()) {
+          completedQuests.add(new CompletedQuestModel(
+              rs.getObject("player_id", UUID.class),
+              rs.getInt("quest_id")
+          ));
+        }
+
+        return completedQuests;
+
+      } catch (SQLException e) {
+        logger.severe(String.format("Error while finding %s with player id %s! Caused by: %s",
+            tableName, playerId, e.getMessage()));
+        throw new RuntimeException(e);
+      }
+
+    }), true);
+
   }
 
 }

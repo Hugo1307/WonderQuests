@@ -5,9 +5,11 @@ import com.google.inject.name.Named;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.CompletedQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
+import dev.hugog.minecraft.wonderquests.data.services.CompletedQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
@@ -24,18 +26,20 @@ public class QuestsMediator {
   private final ConcurrencyHandler concurrencyHandler;
   private final QuestsService questsService;
   private final ActiveQuestsService activeQuestsService;
+  private final CompletedQuestsService completedQuestsService;
   private final WonderQuests plugin;
   private final Messaging messaging;
 
   @Inject
   public QuestsMediator(@Named("bukkitLogger") Logger logger,
       ConcurrencyHandler concurrencyHandler, QuestsService questsService,
-      ActiveQuestsService activeQuestsService,
+      ActiveQuestsService activeQuestsService, CompletedQuestsService completedQuestsService,
       WonderQuests plugin, Messaging messaging) {
     this.logger = logger;
     this.concurrencyHandler = concurrencyHandler;
     this.questsService = questsService;
     this.activeQuestsService = activeQuestsService;
+    this.completedQuestsService = completedQuestsService;
     this.plugin = plugin;
     this.messaging = messaging;
   }
@@ -92,46 +96,53 @@ public class QuestsMediator {
 
   public void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
-    activeQuestsService.removeQuest(
-        new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId())).thenRun(() -> {
+    activeQuestsService.removeQuest(new PlayerQuestKey(player.getUniqueId(), activeQuest.getQuestId()))
+        .thenRun(() -> {
 
-      giveQuestRewardsToPlayer(player, activeQuest.getQuestId());
+          // Call the ActiveQuestUpdateEvent to update the signs, for example.
+          concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
+                  .callEvent(
+                      new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED, activeQuest)),
+              true);
 
-      questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+          giveQuestRewardsToPlayer(player, activeQuest.getQuestId());
 
-        // The quest doesn't exist
-        if (quest.isEmpty()) {
-          return;
-        }
+          completedQuestsService.addCompletedQuest(new CompletedQuestDto(
+              player.getUniqueId(),
+              activeQuest.getQuestId()
+          ));
 
-        concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-                .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED, activeQuest)),
-            true);
+          questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
 
-        QuestDto questDto = quest.get();
+            // The quest doesn't exist
+            if (quest.isEmpty()) {
+              return;
+            }
 
-        player.sendMessage(messaging.getLocalizedChatWithPrefix(
-            "quests.completion.message",
-            Component.text(questDto.getName()))
-        );
+            QuestDto questDto = quest.get();
 
-        player.showTitle(Title.title(
-                messaging.getLocalizedRawMessage("quests.completion.message.title")
-                    .color(NamedTextColor.GOLD),
-                messaging.getLocalizedRawMessage(
-                        "quests.completion.message.subtitle",
-                        Component.text(questDto.getName(), NamedTextColor.GREEN)
-                    )
-                    .color(NamedTextColor.GRAY)
-            )
-        );
+            player.sendMessage(messaging.getLocalizedChatWithPrefix(
+                "quests.completion.message",
+                Component.text(questDto.getName()))
+            );
 
-        player.sendMessage(messaging.getQuestMessagePrefix()
-            .append(Component.text(quest.get().getClosingMsg())));
+            player.showTitle(Title.title(
+                    messaging.getLocalizedRawMessage("quests.completion.message.title")
+                        .color(NamedTextColor.GOLD),
+                    messaging.getLocalizedRawMessage(
+                            "quests.completion.message.subtitle",
+                            Component.text(questDto.getName(), NamedTextColor.GREEN)
+                        )
+                        .color(NamedTextColor.GRAY)
+                )
+            );
 
-      });
+            player.sendMessage(messaging.getQuestMessagePrefix()
+                .append(Component.text(quest.get().getClosingMsg())));
 
-    });
+          });
+
+        });
 
   }
 
