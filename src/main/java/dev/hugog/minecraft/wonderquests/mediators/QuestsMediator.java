@@ -11,8 +11,10 @@ import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
 import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
+import dev.hugog.minecraft.wonderquests.language.Messaging;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 
@@ -23,17 +25,19 @@ public class QuestsMediator {
   private final QuestsService questsService;
   private final ActiveQuestsService activeQuestsService;
   private final WonderQuests plugin;
+  private final Messaging messaging;
 
   @Inject
   public QuestsMediator(@Named("bukkitLogger") Logger logger,
       ConcurrencyHandler concurrencyHandler, QuestsService questsService,
       ActiveQuestsService activeQuestsService,
-      WonderQuests plugin) {
+      WonderQuests plugin, Messaging messaging) {
     this.logger = logger;
     this.concurrencyHandler = concurrencyHandler;
     this.questsService = questsService;
     this.activeQuestsService = activeQuestsService;
     this.plugin = plugin;
+    this.messaging = messaging;
   }
 
   public void giveQuestRewardsToPlayer(Player player, Integer questId) {
@@ -101,13 +105,27 @@ public class QuestsMediator {
         }
 
         concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-            .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED, activeQuest)), true);
+                .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.COMPLETED, activeQuest)),
+            true);
 
         QuestDto questDto = quest.get();
 
-        player.sendMessage("Quest completed!");
-        player.showTitle(Title.title(Component.text("Quest completed!"),
-            Component.text(questDto.getName() + " completed!")));
+        player.sendMessage(messaging.getLocalizedChatWithPrefix(
+            "quests.completion.message",
+            Component.text(questDto.getName()))
+        );
+
+        player.showTitle(Title.title(
+                messaging.getLocalizedRawMessage("quests.completion.message.title")
+                    .color(NamedTextColor.GOLD),
+                messaging.getLocalizedRawMessage(
+                        "quests.completion.message.subtitle",
+                        Component.text(questDto.getName(), NamedTextColor.GREEN)
+                    )
+                    .color(NamedTextColor.GRAY)
+            )
+        );
+
       });
 
     });
