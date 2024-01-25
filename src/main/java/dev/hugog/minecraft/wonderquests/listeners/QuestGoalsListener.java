@@ -60,7 +60,7 @@ public class QuestGoalsListener implements Listener {
               return;
             }
 
-            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+            questsService.getQuestById(activeQuest.getQuestId(), true).thenAccept((quest) -> {
 
               // The quest doesn't exist
               if (quest.isEmpty()) {
@@ -120,7 +120,7 @@ public class QuestGoalsListener implements Listener {
               return;
             }
 
-            questsService.getQuestById(activeQuest.getQuestId()).thenAccept((quest) -> {
+            questsService.getQuestById(activeQuest.getQuestId(), true).thenAccept((quest) -> {
 
               // The quest doesn't exist
               if (quest.isEmpty()) {

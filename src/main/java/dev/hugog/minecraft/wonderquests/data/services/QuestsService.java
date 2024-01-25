@@ -1,6 +1,7 @@
 package dev.hugog.minecraft.wonderquests.data.services;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.cache.implementation.QuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
@@ -24,17 +25,19 @@ public class QuestsService {
   private final QuestObjectivesRepository questObjectivesRepository;
   private final QuestRequirementsRepository questRequirementsRepository;
   private final QuestRewardsRepository questRewardsRepository;
+  private final QuestsCache questsCache;
 
   @Inject
   public QuestsService(QuestsRepository questsRepository,
       QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository) {
+      QuestRewardsRepository questRewardsRepository, QuestsCache questsCache) {
 
     this.questsRepository = questsRepository;
     this.questObjectivesRepository = questObjectivesRepository;
     this.questRequirementsRepository = questRequirementsRepository;
     this.questRewardsRepository = questRewardsRepository;
+    this.questsCache = questsCache;
 
   }
 
@@ -58,20 +61,42 @@ public class QuestsService {
     return questRewardsRepository.insert(questRewardModel);
   }
 
-  /**
-   * Obtains a quest by its id.
-   *
-   * @param id The id of the quest to obtain.
-   * @return A {@link CompletableFuture} with the {@link QuestDto} if it exists, or an empty
-   * {@link Optional} if it doesn't.
-   */
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
-
     return questsRepository.findById(id)
-        .thenApply(questModelOptional -> {
-          System.out.println(questModelOptional.get());
-          return questModelOptional.map(QuestModel::toDto);
-        });
+        .thenApply(questModel -> questModel.map(QuestModel::toDto));
+  }
+
+  /**
+   * <h4>Retrieves a quest by its ID, with an option to use cache.</h4>
+   * <br>
+   * <p>If the quest is found, the Optional will contain the QuestDto.</p>
+   * <p>If the quest is not found, the Optional will be empty.</p>
+   * <p>If useCache is true and the quest is in the cache, the quest will be retrieved the cache.</p>
+   * <p>If useCache is true and the quest is not in the cache, the quest will be retrieved from the repository and then stored in the cache for future requests.</p>
+   * <p>If useCache is false, the quest will be retrieved directly from the repository.</p>
+   *
+   * @param id       The ID of the quest to retrieve.
+   * @param useCache A boolean indicating whether to use cache for retrieving the quest.
+   * @return A CompletableFuture that, when completed, will contain an Optional<QuestDto>.
+   */
+  public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id, boolean useCache) {
+
+    // If cache is not to be used, retrieve the quest directly from the repository
+    if (!useCache) {
+      return getQuestById(id);
+    }
+
+    // If the quest is in the cache, retrieve it from there
+    if (questsCache.has(id)) {
+      return CompletableFuture.completedFuture(Optional.of(questsCache.get(id)));
+    }
+
+    // If the quest is not in the cache, retrieve it from the repository and store it in the cache for future requests
+    return questsRepository.findById(id).thenApply(questModel -> {
+      Optional<QuestDto> questDto = questModel.map(QuestModel::toDto);
+      questDto.ifPresent(dto -> questsCache.put(id, dto));
+      return questDto;
+    });
 
   }
 
