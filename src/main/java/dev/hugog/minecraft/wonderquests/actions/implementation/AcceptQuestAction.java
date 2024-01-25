@@ -119,13 +119,17 @@ public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>
                       }
 
                       concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-                              .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.STARTED, null)),
+                              .callEvent(
+                                  new ActiveQuestUpdateEvent(player, QuestUpdateType.STARTED, null)),
                           true);
 
                       player.sendMessage(messaging.getLocalizedChatWithPrefix(
                           "actions.quests.accept.success",
                           Component.text(quest.get().getName())
                       ));
+
+                      player.sendMessage(messaging.getQuestMessagePrefix()
+                          .append(Component.text(quest.get().getOpeningMsg())));
 
                       return true;
 

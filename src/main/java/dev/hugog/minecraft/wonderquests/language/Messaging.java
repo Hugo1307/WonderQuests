@@ -96,6 +96,13 @@ public class Messaging {
         .build();
   }
 
+  public Component getQuestMessagePrefix() {
+    return Component.text()
+        .append(Component.text(" >>> ", NamedTextColor.YELLOW))
+        .color(NamedTextColor.GRAY)
+        .build();
+  }
+
   public Component getChatSeparator() {
     return Component.text()
         .color(NamedTextColor.GRAY)

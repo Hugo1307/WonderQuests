@@ -126,6 +126,9 @@ public class QuestsMediator {
             )
         );
 
+        player.sendMessage(messaging.getQuestMessagePrefix()
+            .append(Component.text(quest.get().getClosingMsg())));
+
       });
 
     });
