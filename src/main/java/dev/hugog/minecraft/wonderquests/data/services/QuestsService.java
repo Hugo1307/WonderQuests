@@ -29,22 +29,19 @@ public class QuestsService {
   private final QuestObjectivesRepository questObjectivesRepository;
   private final QuestRequirementsRepository questRequirementsRepository;
   private final QuestRewardsRepository questRewardsRepository;
-  private final ActiveQuestRepository activeQuestRepository;
 
   @Inject
   public QuestsService(QuestsRepository questsRepository,
       QuestsCache questsCache,
       QuestObjectivesRepository questObjectivesRepository,
       QuestRequirementsRepository questRequirementsRepository,
-      QuestRewardsRepository questRewardsRepository,
-      ActiveQuestRepository activeQuestRepository) {
+      QuestRewardsRepository questRewardsRepository) {
 
     this.questsRepository = questsRepository;
     this.questsCache = questsCache;
     this.questObjectivesRepository = questObjectivesRepository;
     this.questRequirementsRepository = questRequirementsRepository;
     this.questRewardsRepository = questRewardsRepository;
-    this.activeQuestRepository = activeQuestRepository;
 
   }
 
@@ -109,6 +106,10 @@ public class QuestsService {
         .thenApply(questModels -> questModels.stream()
             .map(QuestModel::toDto)
             .collect(Collectors.toList()));
+  }
+
+  public CompletableFuture<Void> deleteQuest(Integer id) {
+    return questsRepository.delete(id);
   }
 
 }
