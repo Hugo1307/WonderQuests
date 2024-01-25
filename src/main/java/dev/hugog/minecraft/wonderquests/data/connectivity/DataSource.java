@@ -6,6 +6,7 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
+import dev.hugog.minecraft.wonderquests.config.PluginConfigHandler;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Consumer;
@@ -35,7 +36,7 @@ public class DataSource {
   }
 
   public boolean initDataSource(String host, String port, String databaseName, String username,
-      String password) {
+      String password, int maxPoolSize) {
 
     try {
       Class.forName("org.postgresql.Driver");
@@ -48,7 +49,7 @@ public class DataSource {
             databaseName));
 
     config.setPoolName("WonderQuests-HikariCPPool");
-    config.setMaximumPoolSize(5);
+    config.setMaximumPoolSize(maxPoolSize);
 
     config.setUsername(username);
     config.setPassword(password);
@@ -71,6 +72,25 @@ public class DataSource {
     this.databaseUser = username;
 
     return true;
+
+  }
+
+  public boolean initDataSource(PluginConfigHandler pluginConfigHandler) {
+
+    try {
+      Class.forName("org.postgresql.Driver");
+    } catch (ClassNotFoundException e) {
+      logger.severe("Error while loading the PostgreSQL driver! Caused by: " + e.getMessage());
+    }
+
+    String host = pluginConfigHandler.getDatabaseHost();
+    int port = pluginConfigHandler.getDatabasePort();
+    String databaseName = pluginConfigHandler.getDatabaseName();
+    String username = pluginConfigHandler.getDatabaseUser();
+    String password = pluginConfigHandler.getDatabasePassword();
+    int maxPoolSize = pluginConfigHandler.getDatabaseMaxPoolSize();
+
+    return initDataSource(host, String.valueOf(port), databaseName, username, password, maxPoolSize);
 
   }
 

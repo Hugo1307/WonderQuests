@@ -6,11 +6,13 @@ import com.google.inject.Injector;
 import dev.hugog.minecraft.wonderquests.cache.CacheScheduler;
 import dev.hugog.minecraft.wonderquests.commands.BukkitCommandExecutor;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
+import dev.hugog.minecraft.wonderquests.config.PluginConfigHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
 import dev.hugog.minecraft.wonderquests.injection.BasicBinderModule;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import dev.hugog.minecraft.wonderquests.language.MessagingConfigurator;
 import dev.hugog.minecraft.wonderquests.listeners.ActiveQuestUpdateListener;
 import dev.hugog.minecraft.wonderquests.listeners.GuiClickListener;
 import dev.hugog.minecraft.wonderquests.listeners.InteractiveChatListener;
@@ -60,13 +62,19 @@ public final class WonderQuests extends JavaPlugin {
   @Inject
   private CacheScheduler cacheScheduler;
 
+  @Inject
+  private MessagingConfigurator messagingConfigurator;
+
   @Override
   public void onEnable() {
 
     initDependencyInjectionModule();
 
-    boolean connectedToDb = dataSource.initDataSource("localhost", "5432", "wonder_quests",
-        "postgres", "admin");
+    saveDefaultConfig();
+
+    messagingConfigurator.configure();
+
+    boolean connectedToDb = dataSource.initDataSource(new PluginConfigHandler(getConfig()));
 
     if (!connectedToDb) {
       getLogger().severe("Error while connecting to the database! Disabling plugin...");
@@ -86,9 +94,9 @@ public final class WonderQuests extends JavaPlugin {
 
       getLogger().info("Database check finished! Enabling plugin...");
 
-      registerCommands();
-
       messaging.loadBundles();
+
+      registerCommands();
 
       // Register Listener
       getServer().getPluginManager().registerEvents(interactiveChatListener, this);
@@ -99,7 +107,7 @@ public final class WonderQuests extends JavaPlugin {
       getServer().getPluginManager().registerEvents(activeQuestUpdateListener, this);
 
       // Start cache scheduler
-      cacheScheduler.runTaskTimerAsynchronously(this, 10*20L, 10*20L);
+      cacheScheduler.runTaskTimerAsynchronously(this, 10 * 20L, 10 * 20L);
 
       getLogger().info("Plugin successfully enabled!");
 
