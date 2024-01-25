@@ -8,6 +8,7 @@ import dev.hugog.minecraft.wonderquests.data.types.ObjectiveType;
 import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -67,15 +68,25 @@ public class QuestGoalsListener implements Listener {
               if (objective.getType() == ObjectiveType.BREAK_BLOCK && objective.getStringValue()
                   .equals(brokenBlockMaterial.toString())) {
 
+                questsMediator.updateQuestProgress(player, activeQuest);
+                // TODO: Improve this message
+                player.sendActionBar(
+                    Component.empty()
+                        .append(Component.text(
+                            activeQuest.getQuestDetails().getName(),
+                            NamedTextColor.BLUE)
+                        ).decorate(TextDecoration.BOLD)
+                        .append(Component.text(" - ", NamedTextColor.GRAY))
+                        .append(Component.text(
+                            activeQuest.getProgress() + "/" + activeQuest.getTarget(),
+                            NamedTextColor.GRAY)
+                        )
+                );
+
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
                   questsMediator.handleQuestCompletion(player, activeQuest);
-                  return;
                 }
-
-                questsMediator.updateQuestProgress(player, activeQuest);
-                // TODO: Improve this message
-                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
@@ -120,15 +131,25 @@ public class QuestGoalsListener implements Listener {
               if (objective.getStringValue().equals(block.getType().toString())
                   && objective.getType() == ObjectiveType.PLACE_BLOCK) {
 
+                questsMediator.updateQuestProgress(player, activeQuest);
+                // TODO: Improve this message
+                player.sendActionBar(
+                    Component.empty()
+                        .append(Component.text(
+                            activeQuest.getQuestDetails().getName(),
+                            NamedTextColor.BLUE)
+                        )
+                        .append(Component.text(" - ", NamedTextColor.GRAY))
+                        .append(Component.text(
+                            activeQuest.getProgress() + "/" + activeQuest.getTarget(),
+                            NamedTextColor.GRAY)
+                        )
+                );
+
                 if (activeQuestsService.isQuestCompleted(activeQuest.getPlayerId(),
                     activeQuest.getQuestId())) {
                   questsMediator.handleQuestCompletion(player, activeQuest);
-                  return;
                 }
-
-                questsMediator.updateQuestProgress(player, activeQuest);
-                // TODO: Improve this message
-                player.sendActionBar(Component.text("[+1]", NamedTextColor.GREEN));
 
               }
 
