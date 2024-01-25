@@ -5,10 +5,8 @@ import com.google.inject.assistedinject.Assisted;
 import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
-import dev.hugog.minecraft.wonderquests.events.ActiveQuestUpdateEvent;
-import dev.hugog.minecraft.wonderquests.events.QuestUpdateType;
+import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 public class AvailableQuestsGui implements Gui {
@@ -28,23 +25,26 @@ public class AvailableQuestsGui implements Gui {
   private final Player player;
   private final WonderQuests plugin;
   private final QuestsService questsService;
-  private final ActiveQuestsService activeQuestsService;
   private final GuiManager guiManager;
   private final ConcurrencyHandler concurrencyHandler;
+
+  private final ActionsFactory actionsFactory;
 
   @Getter
   private Inventory inventory;
 
   @Inject
-  public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin,
-      ActiveQuestsService activeQuestsService, GuiManager guiManager,
-      ConcurrencyHandler concurrencyHandler, QuestsService questsService) {
+  public AvailableQuestsGui(@Assisted Player player, WonderQuests plugin, GuiManager guiManager,
+      ConcurrencyHandler concurrencyHandler, QuestsService questsService,
+      ActionsFactory actionsFactory) {
+
     this.player = player;
     this.plugin = plugin;
-    this.activeQuestsService = activeQuestsService;
     this.guiManager = guiManager;
     this.concurrencyHandler = concurrencyHandler;
     this.questsService = questsService;
+    this.actionsFactory = actionsFactory;
+
   }
 
   @Override
@@ -53,7 +53,7 @@ public class AvailableQuestsGui implements Gui {
     this.inventory = plugin.getServer()
         .createInventory(player, 9, Component.text("Available Quests"));
 
-    return questsService.getAvailableQuests(player.getUniqueId()).thenAccept((quests) -> {
+    return questsService.getAvailableQuests(player).thenAccept((quests) -> {
       quests.forEach((quest) -> inventory.addItem(buildItemFromQuest(quest)));
     });
 
@@ -69,64 +69,18 @@ public class AvailableQuestsGui implements Gui {
   @Override
   public void close() {
     guiManager.unregisterGui(this);
-    player.closeInventory();
+    concurrencyHandler.runOnMainThread(player::closeInventory);
   }
 
   @Override
   public void onClick(ItemStack clickedItem) {
 
-    PersistentDataContainer itemPersistentContainer = clickedItem.getItemMeta()
-        .getPersistentDataContainer();
-
-    if (itemPersistentContainer.has(getQuestIdKey(), PersistentDataType.INTEGER)) {
-
-      Integer questId = itemPersistentContainer.get(getQuestIdKey(), PersistentDataType.INTEGER);
-
-      activeQuestsService.hasAlreadyStartedQuest(player.getUniqueId(), questId)
-          .thenAccept((alreadyStarted) -> {
-
-            if (alreadyStarted) {
-              player.sendMessage("You have already started this quest!");
-              return;
-            }
-
-            questsService.getQuestById(questId).thenAccept((quest) -> {
-              if (quest.isEmpty()) {
-                player.sendMessage("Quest not found!");
-                return;
-              }
-
-              activeQuestsService.startQuest(player.getUniqueId(), questId,
-                      quest.get().getObjective().getNumericValue())
-                  .whenComplete((success, throwable) -> {
-
-                    if (throwable != null) {
-                      player.sendMessage("An error occurred while starting the quest!");
-                      return;
-                    }
-
-                    if (success) {
-
-                      concurrencyHandler.run(() -> plugin.getServer().getPluginManager()
-                              .callEvent(new ActiveQuestUpdateEvent(player, QuestUpdateType.STARTED)),
-                          true);
-
-                      player.sendMessage("Quest started!");
-
-                    } else {
-                      player.sendMessage("Quest could not be started!");
-                    }
-
-                  });
-
-            });
-
-
-          });
-
-      close();
-
-    }
+    actionsFactory.buildAcceptQuestAction(player, clickedItem).execute()
+        .thenAccept(accepted -> {
+          if (accepted) {
+            close();
+          }
+        });
 
   }
 
