@@ -13,7 +13,7 @@ public class QuestsCache {
 
   public QuestsCache() {
     this.questsCache = CacheBuilder.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
   }
 
