@@ -39,7 +39,7 @@ public class QuestRequirementsRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     QuestsRepository questsRepository = new QuestsRepository(
         Logger.getLogger(this.getClass().getName()), dataSource,

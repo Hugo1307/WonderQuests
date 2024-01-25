@@ -86,7 +86,7 @@ public class AvailableQuestsStatusSummary implements PluginChatSummary {
                 .append(Component.text("[", NamedTextColor.RED))
                 .append(messaging.getLocalizedRawMessage("summary.active_quests.cancel")
                     .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
-                        "/quests cancel " + activeQuest.getQuestDetails().getId()))
+                        "/quests abort " + activeQuest.getQuestDetails().getId()))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to cancel this quest")))
                     .color(NamedTextColor.RED)
                 )

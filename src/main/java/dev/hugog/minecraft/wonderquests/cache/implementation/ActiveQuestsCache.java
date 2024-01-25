@@ -1,7 +1,9 @@
 package dev.hugog.minecraft.wonderquests.cache.implementation;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.hugog.minecraft.wonderquests.cache.AbstractCache;
+import dev.hugog.minecraft.wonderquests.config.PluginConfigHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import java.time.Duration;
@@ -12,8 +14,9 @@ import java.util.stream.Collectors;
 @Singleton
 public class ActiveQuestsCache extends AbstractCache<PlayerQuestKey, ActiveQuestDto> {
 
-  public ActiveQuestsCache() {
-    super(Duration.ofSeconds(5));
+  @Inject
+  public ActiveQuestsCache(PluginConfigHandler pluginConfigHandler) {
+    super(Duration.ofSeconds(pluginConfigHandler.getCacheActiveQuestsExpirationTime()));
   }
 
   public boolean has(UUID playerId) {

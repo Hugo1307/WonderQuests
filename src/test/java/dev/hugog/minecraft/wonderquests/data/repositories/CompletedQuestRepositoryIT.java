@@ -46,7 +46,7 @@ public class CompletedQuestRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     completedQuestRepository = new CompletedQuestRepository(
         Logger.getLogger(this.getClass().getName()),

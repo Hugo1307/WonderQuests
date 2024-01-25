@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import dev.hugog.minecraft.wonderquests.cache.CacheScheduler;
 import dev.hugog.minecraft.wonderquests.commands.BukkitCommandExecutor;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
+import dev.hugog.minecraft.wonderquests.config.PluginConfigHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DbInitializer;
 import dev.hugog.minecraft.wonderquests.data.services.QuestsService;
@@ -65,8 +66,9 @@ public final class WonderQuests extends JavaPlugin {
 
     initDependencyInjectionModule();
 
-    boolean connectedToDb = dataSource.initDataSource("localhost", "5432", "wonder_quests",
-        "postgres", "admin");
+    saveDefaultConfig();
+
+    boolean connectedToDb = dataSource.initDataSource(new PluginConfigHandler(getConfig()));
 
     if (!connectedToDb) {
       getLogger().severe("Error while connecting to the database! Disabling plugin...");

@@ -1,0 +1,12 @@
+Database:
+  Host: localhost
+  Port: 5432
+  Name: test
+  User: root
+  Password: root
+  Pool:
+    MaxSize: 10
+
+Cache:
+  ActiveQuests:
+    TTL: 30             # Time in minutes
