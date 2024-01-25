@@ -89,7 +89,12 @@ public class CommandResolver {
       case "active" -> this.pluginCommand = new ActiveQuestsCommand(sender, args, dependencies);
       case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
       case "delete" -> this.pluginCommand = new DeleteQuestCommand(sender, args, dependencies);
-      default -> this.pluginCommand = null;
+      default -> {
+        this.pluginCommand = null;
+        sender.sendMessage(
+            dependencies.getMessaging().getLocalizedChatWithPrefix("general.unknown_command")
+        );
+      }
     }
   }
 
