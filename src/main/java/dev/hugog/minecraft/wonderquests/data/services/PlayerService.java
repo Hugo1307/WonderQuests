@@ -25,7 +25,7 @@ public class PlayerService {
     });
   }
 
-  private CompletableFuture<Boolean> createPlayer(UUID uuid) {
+  public CompletableFuture<Boolean> createPlayer(UUID uuid) {
     PlayerDto playerDto = new PlayerDto(uuid);
     return playersRepository.insert(playerDto.toModel()).thenApply(Objects::nonNull);
   }
