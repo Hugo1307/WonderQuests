@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import dev.hugog.minecraft.wonderquests.data.services.SignService;
 import dev.hugog.minecraft.wonderquests.data.types.SignType;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
+import dev.hugog.minecraft.wonderquests.mediators.SignsMediator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
@@ -20,12 +22,20 @@ import org.bukkit.event.block.SignChangeEvent;
 public class SignUpdateListener implements Listener {
 
   private final SignService signService;
+  private final SignsMediator signsMediator;
+  private final Server server;
   private final Messaging messaging;
 
   @Inject
-  public SignUpdateListener(SignService signService, Messaging messaging) {
+  public SignUpdateListener(SignService signService, SignsMediator signsMediator,
+      Server server,
+      Messaging messaging) {
+
     this.signService = signService;
+    this.signsMediator = signsMediator;
+    this.server = server;
     this.messaging = messaging;
+
   }
 
   @EventHandler
@@ -55,11 +65,17 @@ public class SignUpdateListener implements Listener {
         player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.scheduled"));
 
         signService.registerSign(SignType.ACTIVE_QUEST, sign.getLocation()).thenAccept(id -> {
+
           if (id == null) {
             player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.failed"));
             return;
           }
+
           player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.successful"));
+
+          // Send packet to all online players to update the recently created sign
+          server.getOnlinePlayers().forEach(signsMediator::updateQuestsSign);
+
         }).exceptionally(throwable -> {
           player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.failed"));
           return null;
