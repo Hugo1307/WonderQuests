@@ -20,8 +20,8 @@ public record QuestModel(
   public QuestDto toDto() {
     return new QuestDto(id, name, description, openingMsg, closingMsg, item, timeLimit,
         objective != null ? objective.toDto() : null,
-        requirements.stream().map(QuestRequirementModel::toDto).toList(),
-        rewards.stream().map(QuestRewardModel::toDto).toList()
+        requirements != null ? requirements.stream().map(QuestRequirementModel::toDto).toList() : null,
+        rewards != null ? rewards.stream().map(QuestRewardModel::toDto).toList() : null
     );
   }
 
