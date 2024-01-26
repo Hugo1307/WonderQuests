@@ -19,7 +19,7 @@ public class QuestRequirementsRepository extends
 
   @Inject
   public QuestRequirementsRepository(@Named("bukkitLogger") Logger logger,
-      ConcurrencyHandler concurrencyHandler, DataSource dataSource) {
+      DataSource dataSource, ConcurrencyHandler concurrencyHandler) {
     super("quest_requirement", 1, logger, dataSource, concurrencyHandler);
   }
 

@@ -45,7 +45,7 @@ public class QuestRequirementsRepositoryIT {
         Logger.getLogger(this.getClass().getName()), dataSource,
         concurrencyHandler);
     questRequirementsRepository = new QuestRequirementsRepository(
-        Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
+        Logger.getLogger(this.getClass().getName()), dataSource, concurrencyHandler);
 
     // Create quest table before creating quest objectives table because of foreign key
     questsRepository.createTable().join();
