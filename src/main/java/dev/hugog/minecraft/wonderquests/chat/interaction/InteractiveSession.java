@@ -94,7 +94,7 @@ public class InteractiveSession {
 
   }
 
-  private InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
+  InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
 
     // If there is no branching condition, we just go to the next step
     if (currentStep.getCustomNextStep() == null) {
@@ -117,7 +117,7 @@ public class InteractiveSession {
 
   }
 
-  private void finishSession() {
+  void finishSession() {
 
     interactiveSessionFormatter.sendFinishingMessage();
 
