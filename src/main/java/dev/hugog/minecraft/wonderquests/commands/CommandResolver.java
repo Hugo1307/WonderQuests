@@ -1,8 +1,18 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.commands.concrete.AbortQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CheckAvailableQuestsCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateQuestCommand;
 import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRequirementCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.CreateRewardCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.ActiveQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteQuestCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRequirementCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.DeleteRewardCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.HelpCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.ListQuestsCommand;
+import dev.hugog.minecraft.wonderquests.commands.concrete.QuestDetailsCommand;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
@@ -18,7 +28,7 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandResolver {
 
-  private PluginCommand pluginCommand;
+  protected PluginCommand pluginCommand;
 
   private final CommandDependencies dependencies;
 
@@ -42,15 +52,49 @@ public class CommandResolver {
    * @param commandLabel the command string, i.e., command name.
    */
   public void setPluginCommand(String commandLabel, CommandSender sender, String[] args) {
-    if (commandLabel.equals("create")) {
-      this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
-    } else if (commandLabel.equals("requirement")) {
-      if (args[0].equalsIgnoreCase("create")) {
-        this.pluginCommand = new CreateRequirementCommand(sender,
-            Arrays.copyOfRange(args, 1, args.length), dependencies);
+    switch (commandLabel) {
+      case "help" -> this.pluginCommand = new HelpCommand(sender, args, dependencies);
+      case "create" -> this.pluginCommand = new CreateQuestCommand(sender, args, dependencies);
+      case "details" -> this.pluginCommand = new QuestDetailsCommand(sender, args, dependencies);
+      case "requirement" -> {
+
+        if (args[0].equalsIgnoreCase("create")) {
+
+          this.pluginCommand = new CreateRequirementCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+
+        } else if (args[0].equalsIgnoreCase("delete")) {
+
+          this.pluginCommand = new DeleteRequirementCommand(
+              sender,
+              Arrays.copyOfRange(args, 1, args.length),
+              dependencies
+          );
+
+        }
+
       }
-    } else {
-      this.pluginCommand = null;
+      case "reward" -> {
+        if (args[0].equalsIgnoreCase("create")) {
+          this.pluginCommand = new CreateRewardCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        } else if (args[0].equalsIgnoreCase("delete")) {
+          this.pluginCommand = new DeleteRewardCommand(sender,
+              Arrays.copyOfRange(args, 1, args.length), dependencies);
+        }
+      }
+      case "abort" -> this.pluginCommand = new AbortQuestCommand(sender, args, dependencies);
+      case "available" ->
+          this.pluginCommand = new CheckAvailableQuestsCommand(sender, args, dependencies);
+      case "active" -> this.pluginCommand = new ActiveQuestsCommand(sender, args, dependencies);
+      case "list" -> this.pluginCommand = new ListQuestsCommand(sender, args, dependencies);
+      case "delete" -> this.pluginCommand = new DeleteQuestCommand(sender, args, dependencies);
+      default -> {
+        this.pluginCommand = null;
+        sender.sendMessage(
+            dependencies.getMessaging().getLocalizedChatWithPrefix("general.unknown_command")
+        );
+      }
     }
   }
 

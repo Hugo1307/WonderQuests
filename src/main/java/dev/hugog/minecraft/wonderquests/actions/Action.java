@@ -1,7 +1,7 @@
 package dev.hugog.minecraft.wonderquests.actions;
 
-public interface Action {
+public interface Action<T> {
 
-  boolean execute();
+  T execute();
 
 }

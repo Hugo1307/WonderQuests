@@ -20,7 +20,7 @@ class PlayersRepositoryIT {
 
   private PlayersRepository playersRepository;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
       "postgres:16.1-alpine"
   );
 
@@ -41,7 +41,7 @@ class PlayersRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     playersRepository = new PlayersRepository(Logger.getLogger(this.getClass().getName()),
         dataSource, concurrencyHandler);

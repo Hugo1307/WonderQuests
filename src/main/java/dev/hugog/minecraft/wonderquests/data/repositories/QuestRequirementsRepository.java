@@ -14,15 +14,31 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class extends the AbstractDataRepository and provides the implementation for the abstract methods.
+ * It represents a repository for quest requirements in the game.
+ */
 public class QuestRequirementsRepository extends
     AbstractDataRepository<QuestRequirementModel, Integer> {
 
+  /**
+   * Constructor for the QuestRequirementsRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
   public QuestRequirementsRepository(@Named("bukkitLogger") Logger logger,
-      ConcurrencyHandler concurrencyHandler, DataSource dataSource) {
+      DataSource dataSource, ConcurrencyHandler concurrencyHandler) {
     super("quest_requirement", 1, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * This method creates the quest_requirement table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -34,7 +50,7 @@ public class QuestRequirementsRepository extends
         PreparedStatement createTablePs = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_requirement ("
                 + "id SERIAL PRIMARY KEY,"
-                + "quest_id INT4 REFERENCES quest (id),"
+                + "quest_id INT4 REFERENCES quest (id) ON DELETE CASCADE,"
                 + "type VARCHAR(31) NOT NULL,"
                 + "num_value FLOAT8,"
                 + "str_value VARCHAR(255)"
@@ -61,6 +77,12 @@ public class QuestRequirementsRepository extends
 
   }
 
+  /**
+   * This method finds a quest requirement by its id.
+   *
+   * @param id the id of the quest requirement
+   * @return a CompletableFuture that will be completed with an Optional containing the found quest requirement, or empty if no quest requirement was found.
+   */
   @Override
   public CompletableFuture<Optional<QuestRequirementModel>> findById(Integer id) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -96,6 +118,12 @@ public class QuestRequirementsRepository extends
     }), true);
   }
 
+  /**
+   * This method inserts a quest requirement into the quest_requirement table.
+   *
+   * @param model the quest requirement to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted quest requirement.
+   */
   @Override
   public CompletableFuture<Integer> insert(QuestRequirementModel model) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -138,6 +166,12 @@ public class QuestRequirementsRepository extends
     }), true);
   }
 
+  /**
+   * This method deletes a quest requirement by its id.
+   *
+   * @param id the id of the quest requirement
+   * @return a CompletableFuture that will be completed when the quest requirement is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(Integer id) {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
@@ -161,6 +195,12 @@ public class QuestRequirementsRepository extends
     }), true);
   }
 
+  /**
+   * This method finds all quest requirements by quest id.
+   *
+   * @param questId the id of the quest
+   * @return a CompletableFuture that will be completed with a List containing all found quest requirements.
+   */
   public CompletableFuture<List<QuestRequirementModel>> findAllByQuestId(Integer questId) {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {

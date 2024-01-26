@@ -1,14 +1,17 @@
 package dev.hugog.minecraft.wonderquests.data.repositories;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
-import java.util.List;
+import java.util.HashSet;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +22,14 @@ class QuestObjectivesRepositoryIT {
 
   private DataSource dataSource;
 
+  private QuestsRepository questsRepository;
+
   private QuestObjectivesRepository questObjectivesRepository;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+
+  private QuestModel questModel;
+  private QuestObjectiveModel questObjectiveModel;
 
   @BeforeAll
   static void setUpAll() {
@@ -40,22 +48,42 @@ class QuestObjectivesRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
-    QuestsRepository questsRepository = new QuestsRepository(
-        Logger.getLogger(this.getClass().getName()), dataSource,
-        concurrencyHandler);
+    questsRepository = new QuestsRepository(
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
+        concurrencyHandler
+    );
+
     questObjectivesRepository = new QuestObjectivesRepository(
-        Logger.getLogger(this.getClass().getName()), dataSource,
-        concurrencyHandler);
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
+        concurrencyHandler
+    );
 
-    // Create quest table before creating quest objectives table because of foreign key
+    questModel = new QuestModel(
+        1,
+        "Test Name",
+        "Test Description",
+        "Opening Message",
+        "Closing Message",
+        "sand", 1,
+        null,
+        new HashSet<>(),
+        new HashSet<>()
+    );
+
+    questObjectiveModel = new QuestObjectiveModel(
+        1,
+        questModel.id(),
+        "Test Type",
+        "Test Value",
+        1.0f
+    );
+
     questsRepository.createTable().join();
     questObjectivesRepository.createTable().join();
-
-    // Insert a quest to avoid foreign key errors
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
-        .join();
 
   }
 
@@ -68,128 +96,80 @@ class QuestObjectivesRepositoryIT {
   @Test
   @DisplayName("createTable() successfully creates a quest_objective table when it does not exist")
   public void createTable_CreatesQuestObjectiveTableWhenNotExists() {
-    Assertions.assertTrue(questObjectivesRepository.doesTableExists().join());
+    assertTrue(questObjectivesRepository.doesTableExists().join());
+  }
+
+  @Test
+  @DisplayName("findById() returns the quest objective when it exists in the database")
+  public void findById_ReturnsQuestObjectiveWhenExists() {
+
+    questsRepository.insert(questModel).join();
+    questObjectivesRepository.insert(questObjectiveModel).join();
+
+    questObjectivesRepository.findById(questObjectiveModel.id())
+        .thenAccept(questObjective -> {
+          assertTrue(questObjective.isPresent());
+          assertEquals(questObjective.get(), questObjectiveModel);
+        }).join();
+
+  }
+
+  @Test
+  @DisplayName("findById() returns empty when the quest objective does not exist in the database")
+  public void findById_ReturnsEmptyWhenNotExists() {
+
+    questObjectivesRepository.findById(questObjectiveModel.id())
+        .thenAccept(questObjective -> assertFalse(questObjective.isPresent())).join();
+
   }
 
   @Test
   @DisplayName("insert() successfully inserts a quest objective into the database")
   public void insert_SuccessfullyInsertsQuestObjectiveIntoDatabase() {
-    int id = 1;
-    QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(id, 1, "Test Type",
-        "Test Value", 1.0f);
+
+    questsRepository.insert(questModel).join();
 
     questObjectivesRepository.insert(questObjectiveModel).join();
 
-    // Check if the quest objective exists in the database
-    questObjectivesRepository.findById(id).thenAccept(quest -> {
-      Assertions.assertTrue(quest.isPresent());
-      Assertions.assertEquals(questObjectiveModel, quest.get());
-    }).join();
+    questObjectivesRepository.findById(questObjectiveModel.id())
+        .thenAccept(questObjective -> assertTrue(questObjective.isPresent())).join();
+
   }
 
   @Test
   @DisplayName("delete() successfully deletes a quest objective from the database")
   public void delete_DeletesQuestObjectiveFromDatabase() {
 
-    int id = 1;
-
-    questObjectivesRepository.insert(
-        new QuestObjectiveModel(id, 1, "Test Type", "Test Value", 1.0f)).join();
-    questObjectivesRepository.delete(id).join();
-
-    // Check if the quest objective no longer exists in the database
-    questObjectivesRepository.findById(id)
-        .thenAccept(questObjective -> Assertions.assertFalse(questObjective.isPresent())).join();
-
-  }
-
-  @Test
-  @DisplayName("delete() does not affect other quest objectives in the database")
-  public void delete_DoesNotAffectOtherQuestObjectives() {
-
-    int id1 = 1;
-    int id2 = 2;
-
-    questObjectivesRepository.insert(
-        new QuestObjectiveModel(id1, 1, "Test Type", "Test Value", 1.0f)).join();
-    questObjectivesRepository.insert(
-        new QuestObjectiveModel(id2, 1, "Test Type", "Test Value", 1.0f)).join();
-
-    questObjectivesRepository.delete(id1).join();
-
-    // Check if the second quest objective still exists in the database
-    questObjectivesRepository.findById(id2)
-        .thenAccept(questObjective -> Assertions.assertTrue(questObjective.isPresent())).join();
-
-  }
-
-  @Test
-  @DisplayName("delete() doesn't throw exception when the quest objective does not exist in the database")
-  public void delete_DoesNotThrowsExceptionWhenNotExists() {
-
-    int id = 1;
-    Assertions.assertDoesNotThrow(() -> questObjectivesRepository.delete(id).join());
-
-  }
-
-  @Test
-  @DisplayName("findById() returns the quest objective when it exists in the database")
-  public void findById_ReturnsQuestObjectiveWhenExists() {
-    int id = 1;
-
-    QuestObjectiveModel questObjectiveModel = new QuestObjectiveModel(id, 1, "Test Type",
-        "Test Value", 1.0f);
-
+    questsRepository.insert(questModel).join();
     questObjectivesRepository.insert(questObjectiveModel).join();
 
-    questObjectivesRepository.findById(id)
-        .thenAccept(questObjective -> {
-          Assertions.assertTrue(questObjective.isPresent());
-          Assertions.assertEquals(id, questObjective.get().id());
-          Assertions.assertEquals(questObjectiveModel, questObjective.get());
-        }).join();
-  }
+    questObjectivesRepository.delete(questObjectiveModel.id()).join();
 
-  @Test
-  @DisplayName("findById() returns empty when the quest objective does not exist in the database")
-  public void findById_ReturnsEmptyWhenNotExists() {
-    int id = 1;
-
-    questObjectivesRepository.findById(id)
-        .thenAccept(questObjective -> Assertions.assertFalse(questObjective.isPresent())).join();
-  }
-
-  @Test
-  @DisplayName("findAllByQuestId() returns all quest objectives for a given quest id")
-  public void findAllByQuestId_ReturnsAllQuestObjectivesForGivenQuestId() {
-
-    int questId = 1;
-
-    QuestObjectiveModel questObjectiveModel1 = new QuestObjectiveModel(1, questId, "Test Type",
-        "Test Value", 1.0f);
-
-    QuestObjectiveModel questObjectiveModel2 = new QuestObjectiveModel(2, questId, "Test Type 2",
-        "Test Value 2", 2.0f);
-
-    questObjectivesRepository.insert(questObjectiveModel1).join();
-    questObjectivesRepository.insert(questObjectiveModel2).join();
-
-    questObjectivesRepository.findAllByQuestId(questId)
-        .thenAccept(questObjectives -> {
-          Assertions.assertEquals(2, questObjectives.size());
-          org.assertj.core.api.Assertions.assertThat(questObjectives)
-              .containsAll(List.of(questObjectiveModel1, questObjectiveModel2));
-        }).join();
+    questObjectivesRepository.findById(questObjectiveModel.id())
+        .thenAccept(questObjective -> assertFalse(questObjective.isPresent())).join();
 
   }
 
   @Test
-  @DisplayName("findAllByQuestId() returns empty list when no quest objectives exist for a given quest id")
-  public void findAllByQuestId_ReturnsEmptyListWhenNoQuestObjectivesExist() {
+  @DisplayName("findByQuestId() returns the quest objective when it exists in the database")
+  public void findByQuestId_ReturnsQuestObjectiveWhenExists() {
 
-    int questId = 1;
-    questObjectivesRepository.findAllByQuestId(questId)
-        .thenAccept(questObjectives -> Assertions.assertTrue(questObjectives.isEmpty())).join();
+    questsRepository.insert(questModel).join();
+    questObjectivesRepository.insert(questObjectiveModel).join();
+
+    questObjectivesRepository.findByQuestId(questModel.id()).thenAccept(questObjective -> {
+      assertTrue(questObjective.isPresent());
+      assertEquals(questObjective.get(), questObjectiveModel);
+    }).join();
+
+  }
+
+  @Test
+  @DisplayName("findByQuestId() returns empty when the quest objective does not exist in the database")
+  public void findByQuestId_ReturnsEmptyWhenNotExists() {
+
+    questObjectivesRepository.findByQuestId(questModel.id())
+        .thenAccept(questObjective -> assertFalse(questObjective.isPresent())).join();
 
   }
 

@@ -20,7 +20,7 @@ public class QuestRequirementsRepositoryIT {
 
   private DataSource dataSource;
   private QuestRequirementsRepository questRequirementsRepository;
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
 
   @BeforeAll
   static void setUpAll() {
@@ -39,20 +39,20 @@ public class QuestRequirementsRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     QuestsRepository questsRepository = new QuestsRepository(
         Logger.getLogger(this.getClass().getName()), dataSource,
         concurrencyHandler);
     questRequirementsRepository = new QuestRequirementsRepository(
-        Logger.getLogger(this.getClass().getName()), concurrencyHandler, dataSource);
+        Logger.getLogger(this.getClass().getName()), dataSource, concurrencyHandler);
 
     // Create quest table before creating quest objectives table because of foreign key
     questsRepository.createTable().join();
     questRequirementsRepository.createTable().join();
 
     // Insert a quest to avoid foreign key errors in further tests
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
   }

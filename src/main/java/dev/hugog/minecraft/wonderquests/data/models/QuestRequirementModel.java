@@ -13,7 +13,13 @@ public record QuestRequirementModel(
 
   @Override
   public QuestRequirementDto toDto() {
-    return new QuestRequirementDto(id, questId, RequirementType.fromString(type), stringValue,
-        numericValue);
+    return new QuestRequirementDto(
+        id,
+        questId,
+        RequirementType.fromString(type),
+        stringValue,
+        numericValue
+    );
   }
+
 }

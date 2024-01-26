@@ -12,17 +12,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import lombok.Getter;
 
+/**
+ * AbstractDataRepository is an abstract class that provides a template for all data repositories.
+ * It includes common functionalities such as checking if a table exists, deleting a table, and
+ * abstract methods for creating a table, finding a record by id, inserting a record, and deleting a record,
+ * which represent common methods for repositories.
+ *
+ * @param <T> the type of the data model
+ * @param <C> the type of the id
+ */
 public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
   @Getter
-  protected String tableName;
+  protected final String tableName;
 
   @Getter
-  protected int priority;
+  protected final int priority;
 
-  protected Logger logger;
-  protected DataSource dataSource;
-  protected ConcurrencyHandler concurrencyHandler;
+  protected final Logger logger;
+  protected final DataSource dataSource;
+  protected final ConcurrencyHandler concurrencyHandler;
 
   /**
    * Constructor for the AbstractDataRepository class.
@@ -44,6 +53,11 @@ public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
     this.concurrencyHandler = concurrencyHandler;
   }
 
+  /**
+   * Checks if the table exists in the database.
+   *
+   * @return a CompletableFuture that will be completed with a boolean indicating whether the table exists.
+   */
   public CompletableFuture<Boolean> doesTableExists() {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -72,6 +86,11 @@ public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
   }
 
+  /**
+   * Deletes the table from the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is deleted.
+   */
   public CompletableFuture<Void> deleteTable() {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
 
@@ -79,7 +98,7 @@ public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
         Statement statement = con.createStatement();
         // In this context, concatenating the table name is safe as the table name is not user input
-        statement.execute(String.format("DROP TABLE IF EXISTS %s;", tableName));
+        statement.execute(String.format("DROP TABLE IF EXISTS %s CASCADE;", tableName));
 
       } catch (SQLException e) {
         logger.severe(String.format("Error while deleting the %s table! Caused by: %s", tableName,
@@ -94,12 +113,35 @@ public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
     });
   }
 
+  /**
+   * Creates the table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   public abstract CompletableFuture<Void> createTable();
 
+  /**
+   * Finds a record by its id.
+   *
+   * @param id the id of the record
+   * @return a CompletableFuture that will be completed with an Optional containing the found record, or empty if no record was found.
+   */
   public abstract CompletableFuture<Optional<T>> findById(C id);
 
+  /**
+   * Inserts a record into the table.
+   *
+   * @param model the record to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted record.
+   */
   public abstract CompletableFuture<C> insert(T model);
 
+  /**
+   * Deletes a record by its id.
+   *
+   * @param id the id of the record
+   * @return a CompletableFuture that will be completed when the record is deleted.
+   */
   public abstract CompletableFuture<Void> delete(C id);
 
 }

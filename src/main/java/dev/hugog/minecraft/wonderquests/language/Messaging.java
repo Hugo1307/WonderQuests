@@ -1,6 +1,13 @@
 package dev.hugog.minecraft.wonderquests.language;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import net.kyori.adventure.key.Key;
@@ -8,31 +15,56 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
-import net.kyori.adventure.util.UTF8ResourceBundleControl;
 
 @Singleton
 public class Messaging {
 
   private final TranslationRegistry translationRegistry;
 
-  public Messaging() {
+  private final File pluginFolder;
+
+  @Inject
+  public Messaging(@Named("pluginFolder") File pluginFolder) {
     this.translationRegistry = TranslationRegistry.create(Key.key("wonder_quests"));
+    this.pluginFolder = pluginFolder;
   }
 
   public void loadBundles() {
 
-    ResourceBundle englishBundle = ResourceBundle.getBundle(
-        "lang.LanguageBundle",
-        Locale.forLanguageTag("en-US"),
-        UTF8ResourceBundleControl.get());
+    File langFolder = new File(pluginFolder, "lang");
+    URL[] urls;
+    try {
+      urls = new URL[]{langFolder.toURI().toURL()};
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
 
-    ResourceBundle portugueseBundle = ResourceBundle.getBundle(
-        "lang.LanguageBundle",
-        Locale.forLanguageTag("pt-PT"),
-        UTF8ResourceBundleControl.get());
+    try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
 
-    translationRegistry.registerAll(Locale.forLanguageTag("en-US"), englishBundle, true);
-    translationRegistry.registerAll(Locale.forLanguageTag("pt-PT"), portugueseBundle, true);
+      ResourceBundle englishBundle = ResourceBundle.getBundle(
+          "languageBundle",
+          Locale.forLanguageTag("en-US"),
+          classLoader);
+
+      ResourceBundle portugueseBundle = ResourceBundle.getBundle(
+          "languageBundle",
+          Locale.forLanguageTag("pt-PT"),
+          classLoader);
+
+      ResourceBundle deutscheBundle = ResourceBundle.getBundle(
+          "languageBundle",
+          Locale.forLanguageTag("de"),
+          classLoader);
+
+      translationRegistry.registerAll(Locale.forLanguageTag("en-US"), englishBundle, true);
+      translationRegistry.registerAll(Locale.forLanguageTag("pt-PT"), portugueseBundle, true);
+      translationRegistry.registerAll(Locale.forLanguageTag("de"), deutscheBundle, true);
+
+      GlobalTranslator.translator().addSource(translationRegistry);
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
     GlobalTranslator.translator().addSource(translationRegistry);
 
@@ -61,6 +93,13 @@ public class Messaging {
         .content("[!] ")
         .color(NamedTextColor.GRAY)
         .append(Component.translatable(key, args))
+        .build();
+  }
+
+  public Component getQuestMessagePrefix() {
+    return Component.text()
+        .append(Component.text(" >>> ", NamedTextColor.YELLOW))
+        .color(NamedTextColor.GRAY)
         .build();
   }
 

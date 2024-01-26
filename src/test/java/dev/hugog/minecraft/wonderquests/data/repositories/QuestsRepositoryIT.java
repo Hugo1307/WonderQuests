@@ -1,12 +1,18 @@
 package dev.hugog.minecraft.wonderquests.data.repositories;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.connectivity.DataSource;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,10 +22,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 class QuestsRepositoryIT {
 
   private DataSource dataSource;
-
   private QuestsRepository questsRepository;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+
+  private QuestModel questModel;
 
   @BeforeAll
   static void setUpAll() {
@@ -38,12 +45,45 @@ class QuestsRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
-    questsRepository = new QuestsRepository(Logger.getLogger(this.getClass().getName()), dataSource,
+    questsRepository = new QuestsRepository(
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
         concurrencyHandler);
 
+    QuestObjectivesRepository questObjectivesRepository = new QuestObjectivesRepository(
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
+        concurrencyHandler);
+
+    QuestRewardsRepository questRewardsRepository = new QuestRewardsRepository(
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
+        concurrencyHandler);
+
+    QuestRequirementsRepository questRequirementsRepository = new QuestRequirementsRepository(
+        Logger.getLogger(this.getClass().getName()),
+        dataSource,
+        concurrencyHandler
+    );
+
     questsRepository.createTable().join();
+    questObjectivesRepository.createTable().join();
+    questRewardsRepository.createTable().join();
+    questRequirementsRepository.createTable().join();
+
+    questModel = new QuestModel(
+        1,
+        "Test Name",
+        "Test Description",
+        "Opening Message",
+        "Closing Message",
+        "sand", 1,
+        null,
+        new HashSet<>(),
+        new HashSet<>()
+    );
 
   }
 
@@ -56,24 +96,18 @@ class QuestsRepositoryIT {
   @Test
   @DisplayName("createTable() successfully creates a quest table when it does not exist")
   public void createTable_CreatesQuestTableWhenNotExists() {
-    Assertions.assertTrue(questsRepository.doesTableExists().join());
+    assertTrue(questsRepository.doesTableExists().join());
   }
 
   @Test
   @DisplayName("findById() returns the quest when it exists in the database")
   public void findById_ReturnsQuestWhenExists() {
 
-    int id = 1;
+    questsRepository.insert(questModel).join();
 
-    QuestModel questModel = new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0);
-
-    questsRepository.insert(questModel)
-        .join();
-
-    questsRepository.findById(id).thenAccept(quest -> {
-      Assertions.assertTrue(quest.isPresent());
-      Assertions.assertEquals(id, quest.get().id());
-      Assertions.assertEquals(quest.get(), questModel);
+    questsRepository.findById(questModel.id()).thenAccept(quest -> {
+      assertTrue(quest.isPresent());
+      assertEquals(questModel, quest.get());
     }).join();
 
   }
@@ -82,51 +116,80 @@ class QuestsRepositoryIT {
   @DisplayName("findById() returns empty when the quest does not exist in the database")
   public void findById_ReturnsEmptyWhenNotExists() {
 
-    int id = 1;
-
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
-        .join();
+    questsRepository.findById(questModel.id())
+        .thenAccept(quest -> assertFalse(quest.isPresent())).join();
 
   }
 
   @Test
   @DisplayName("insert() successfully inserts a quest into the database")
   public void insert_SuccessfullyInsertsQuestIntoDatabase() {
-    int id = 1;
 
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
-        .join();
+    questsRepository.insert(questModel).join();
 
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertTrue(quest.isPresent()))
-        .join();
+    questsRepository.findById(questModel.id())
+        .thenAccept(quest -> assertTrue(quest.isPresent())).join();
 
   }
 
   @Test
   @DisplayName("delete() successfully deletes a quest from the database")
   public void delete_DeletesQuestFromDatabase() {
-    int id = 1;
 
-    // Insert a quest to avoid foreign key errors
-    questsRepository.insert(new QuestModel(id, "Test Quest", "Test Quest Description", "", "", "", 0))
-        .join();
+    questsRepository.insert(questModel).join();
 
-    questsRepository.delete(id).join();
+    questsRepository.delete(questModel.id()).join();
 
-    questsRepository.findById(id)
-        .thenAccept(quest -> Assertions.assertFalse(quest.isPresent()))
-        .join();
+    questsRepository.findById(questModel.id())
+        .thenAccept(quest -> assertFalse(quest.isPresent())).join();
 
   }
 
   @Test
-  @DisplayName("delete() does not throw when quest does not exist")
-  public void delete_DoesNotThrowWhenQuestDoesNotExist() {
+  @DisplayName("findAll() returns all quests in the database")
+  public void findAll_ReturnsAllQuestsInDatabase() {
 
-    int id = 1;
-    Assertions.assertDoesNotThrow(() -> questsRepository.delete(id).join());
+    QuestModel questModel1 = new QuestModel(1, "Test Name", "Test Description",
+        "Test Opening Msg", "Test Closing Msg", "Test Item", 1,
+        null, new HashSet<>(), new HashSet<>());
+    QuestModel questModel2 = new QuestModel(2, "Test Name", "Test Description",
+        "Test Opening Msg", "Test Closing Msg", "Test Item", 1,
+        null, new HashSet<>(), new HashSet<>());
+
+    questsRepository.insert(questModel1).join();
+    questsRepository.insert(questModel2).join();
+
+    questsRepository.findAll()
+        .thenAccept(quests -> {
+          assertEquals(2, quests.size());
+          assertTrue(quests.containsAll(Set.of(questModel1, questModel2)));
+        }).join();
+
+  }
+
+  @Test
+  @DisplayName("findAllInInterval() returns all quests in the specified interval")
+  public void findAllInInterval_ReturnsAllQuestsInSpecifiedInterval() {
+
+    QuestModel questModel1 = new QuestModel(1, "Test Name", "Test Description",
+        "Test Opening Msg", "Test Closing Msg", "Test Item", 1,
+        null, new HashSet<>(), new HashSet<>());
+    QuestModel questModel2 = new QuestModel(2, "Test Name", "Test Description",
+        "Test Opening Msg", "Test Closing Msg", "Test Item", 1,
+        null, new HashSet<>(), new HashSet<>());
+    QuestModel questModel3 = new QuestModel(3, "Test Name", "Test Description",
+        "Test Opening Msg", "Test Closing Msg", "Test Item", 1,
+        null, new HashSet<>(), new HashSet<>());
+
+    questsRepository.insert(questModel1).join();
+    questsRepository.insert(questModel2).join();
+    questsRepository.insert(questModel3).join();
+
+    questsRepository.findAllInInterval(0, 2)
+        .thenAccept(quests -> {
+          assertEquals(2, quests.size());
+          Assertions.assertThat(quests).containsExactlyInAnyOrder(questModel1, questModel2);
+        }).join();
 
   }
 

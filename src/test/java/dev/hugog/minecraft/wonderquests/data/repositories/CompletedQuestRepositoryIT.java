@@ -25,7 +25,7 @@ public class CompletedQuestRepositoryIT {
 
   private PlayerQuestKey id;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
       "postgres:16.1-alpine"
   );
 
@@ -46,7 +46,7 @@ public class CompletedQuestRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     completedQuestRepository = new CompletedQuestRepository(
         Logger.getLogger(this.getClass().getName()),
@@ -67,7 +67,7 @@ public class CompletedQuestRepositoryIT {
 
     // Insert a player, a quest and an active quest to avoid foreign key errors
     playersRepository.insert(new PlayerModel(id.playerId())).join();
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
   }

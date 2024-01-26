@@ -20,7 +20,7 @@ class QuestRewardsRepositoryIT {
 
   private DataSource dataSource;
   private QuestRewardsRepository questRewardsRepository;
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
 
   @BeforeAll
   static void setUpAll() {
@@ -39,7 +39,7 @@ class QuestRewardsRepositoryIT {
 
     dataSource = new DataSource(Logger.getLogger(this.getClass().getName()));
     dataSource.initDataSource(postgres.getHost(), postgres.getFirstMappedPort().toString(),
-        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword());
+        postgres.getDatabaseName(), postgres.getUsername(), postgres.getPassword(), 5);
 
     QuestsRepository questsRepository = new QuestsRepository(
         Logger.getLogger(this.getClass().getName()), dataSource,
@@ -52,7 +52,7 @@ class QuestRewardsRepositoryIT {
     questRewardsRepository.createTable().join();
 
     // Insert a quest to avoid foreign key errors in further tests
-    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0))
+    questsRepository.insert(new QuestModel(1, "Test Quest", "Test Quest Description", "", "", "", 0, null, null, null))
         .join();
 
   }

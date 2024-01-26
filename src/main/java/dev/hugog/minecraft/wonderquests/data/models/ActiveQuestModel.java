@@ -7,14 +7,16 @@ import java.util.UUID;
 public record ActiveQuestModel(
     UUID playerId,
     Integer questId,
-    Integer completedGoals,
+    Float target,
     Float progress,
-    Long startedAt
+    Long startedAt,
+    QuestModel questDetails
+
 ) implements DataModel<ActiveQuestDto> {
 
   @Override
   public ActiveQuestDto toDto() {
-    return new ActiveQuestDto(playerId, questId, completedGoals, progress, startedAt);
+    return new ActiveQuestDto(playerId, questId, target, progress, startedAt, questDetails != null ? questDetails.toDto() : null);
   }
 
 }
