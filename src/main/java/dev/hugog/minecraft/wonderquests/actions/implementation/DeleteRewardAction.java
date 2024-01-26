@@ -10,6 +10,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of deleting a quest reward.
+ */
 public class DeleteRewardAction extends AbstractAction<CompletableFuture<Boolean>> {
 
   private final int rewardId;

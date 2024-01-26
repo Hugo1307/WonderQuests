@@ -10,6 +10,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of deleting a quest requirement.
+ */
 public class DeleteRequirementAction extends AbstractAction<CompletableFuture<Boolean>> {
 
   private final int requirementId;

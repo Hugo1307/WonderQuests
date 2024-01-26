@@ -9,6 +9,9 @@ import dev.hugog.minecraft.wonderquests.language.Messaging;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of showing all quests to a player.
+ */
 public class ShowAllQuestsAction extends AbstractAction<Boolean> {
 
   private final int page;
