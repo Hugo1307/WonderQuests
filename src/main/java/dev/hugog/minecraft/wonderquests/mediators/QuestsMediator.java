@@ -31,6 +31,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * This class mediates between the quest services and the player.
+ */
 public class QuestsMediator {
 
   private final Logger logger;
@@ -42,6 +45,18 @@ public class QuestsMediator {
   private final Messaging messaging;
   private final EconomyHook economyHook;
 
+  /**
+   * Constructor for the QuestsMediator class.
+   *
+   * @param logger The logger instance.
+   * @param concurrencyHandler The handler for concurrency.
+   * @param questsService The service for quests.
+   * @param activeQuestsService The service for active quests.
+   * @param completedQuestsService The service for completed quests.
+   * @param plugin The plugin instance.
+   * @param messaging The messaging instance used for sending messages.
+   * @param economyHook The economy hook instance.
+   */
   @Inject
   public QuestsMediator(@Named("bukkitLogger") Logger logger,
       ConcurrencyHandler concurrencyHandler, QuestsService questsService,
@@ -59,6 +74,12 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method gives quest rewards to the player.
+   *
+   * @param player The player to give the rewards to.
+   * @param questId The id of the quest.
+   */
   public void giveQuestRewardsToPlayer(Player player, Integer questId) {
 
     questsService.getQuestById(questId).thenAccept(questOptional -> {
@@ -97,6 +118,12 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method updates the quest progress.
+   *
+   * @param player The player whose quest progress is to be updated.
+   * @param activeQuest The active quest to be updated.
+   */
   public void updateQuestProgress(Player player, ActiveQuestDto activeQuest) {
 
     notifyQuestUpdate(player, activeQuest);
@@ -104,6 +131,12 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method notifies the quest update.
+   *
+   * @param player The player to be notified.
+   * @param activeQuest The active quest to be notified.
+   */
   public void notifyQuestUpdate(Player player, ActiveQuestDto activeQuest) {
 
     // Call the ActiveQuestUpdateEvent to update the signs, for example.
@@ -116,12 +149,24 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method gets the potential available quests for the player.
+   *
+   * @param player The player to get the potential available quests for.
+   * @return A CompletableFuture that contains a set of potential available quests.
+   */
   public CompletableFuture<Set<QuestDto>> getPotentialAvailableQuests(Player player) {
     return questsService.getAllQuests().thenApply(quests -> quests.stream()
         .filter(quest -> playerHasRequirements(player, quest))
         .collect(Collectors.toSet()));
   }
 
+  /**
+   * This method gets the available quests for the player.
+   *
+   * @param player The player to get the available quests for.
+   * @return A CompletableFuture that contains a set of available quests.
+   */
   public CompletableFuture<Set<QuestDto>> getAvailableQuests(Player player) {
 
     return getPotentialAvailableQuests(player)
@@ -146,6 +191,13 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method checks if the player has the requirements for the quest.
+   *
+   * @param player The player to check the requirements for.
+   * @param quest The quest to check the requirements of.
+   * @return A boolean indicating if the player has the requirements for the quest.
+   */
   public boolean playerHasRequirements(Player player, QuestDto quest) {
 
     boolean hasRequirements = true;
@@ -174,6 +226,12 @@ public class QuestsMediator {
 
   }
 
+  /**
+   * This method handles the quest completion.
+   *
+   * @param player The player who completed the quest.
+   * @param activeQuest The active quest that was completed.
+   */
   public void handleQuestCompletion(Player player, ActiveQuestDto activeQuest) {
 
     activeQuestsService.removeQuest(

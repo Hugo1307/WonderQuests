@@ -14,12 +14,22 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+/**
+ * This class mediates between the sign services and the player.
+ */
 public class SignsMediator {
 
   private final SignService signService;
   private final ActiveQuestsService activeQuestsService;
   private final Messaging messaging;
 
+  /**
+   * Constructor for the SignsMediator class.
+   *
+   * @param signService The service for signs.
+   * @param activeQuestsService The service for active quests.
+   * @param messaging The messaging instance used for sending messages.
+   */
   @Inject
   public SignsMediator(SignService signService, ActiveQuestsService activeQuestsService,
       Messaging messaging) {
@@ -28,6 +38,11 @@ public class SignsMediator {
     this.messaging = messaging;
   }
 
+  /**
+   * This method updates the quests sign for the player.
+   *
+   * @param player The player to update the quests sign for.
+   */
   public void updateQuestsSign(Player player) {
 
     activeQuestsService.getActiveQuestsForPlayer(player.getUniqueId())
@@ -41,6 +56,12 @@ public class SignsMediator {
 
   }
 
+  /**
+   * This method updates the quests sign using the active quest.
+   *
+   * @param player The player to update the quests sign for.
+   * @param activeQuest The active quest to be used for updating the quests sign.
+   */
   @SuppressWarnings("deprecation")
   public void updateQuestsSignUsingActiveQuest(Player player, ActiveQuestDto activeQuest) {
 
