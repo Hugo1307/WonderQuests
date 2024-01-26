@@ -19,12 +19,23 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+/**
+ * This class listens for quest goal related events and handles them accordingly.
+ * It is used to update the progress of active quests.
+ */
 public class QuestGoalsListener implements Listener {
 
   private final ActiveQuestsService activeQuestsService;
   private final QuestsService questsService;
   private final QuestsMediator questsMediator;
 
+  /**
+   * Constructor for the QuestGoalsListener class.
+   *
+   * @param activeQuestsService The service for active quests.
+   * @param questsService The service for quests.
+   * @param questsMediator The mediator for quests.
+   */
   @Inject
   public QuestGoalsListener(ActiveQuestsService activeQuestsService, QuestsService questsService,
       QuestsMediator questsMediator) {
@@ -33,6 +44,13 @@ public class QuestGoalsListener implements Listener {
     this.questsMediator = questsMediator;
   }
 
+  /**
+   * This method handles the BlockBreakEvent.
+   *
+   * <p>It is used to update the progress of active quests that require the player to break blocks.</p>
+   *
+   * @param event The BlockBreakEvent to be handled.
+   */
   @EventHandler
   public void onBlockBreak(BlockBreakEvent event) {
 
@@ -95,6 +113,13 @@ public class QuestGoalsListener implements Listener {
 
   }
 
+  /**
+   * This method handles the BlockPlaceEvent.
+   *
+   * <p>It is used to update the progress of active quests that require the player to place blocks.</p>
+   *
+   * @param event The BlockPlaceEvent to be handled.
+   */
   @EventHandler
   public void onBlockPlace(BlockPlaceEvent event) {
 
@@ -153,6 +178,13 @@ public class QuestGoalsListener implements Listener {
 
   }
 
+  /**
+   * This method handles the EntityDeathEvent.
+   *
+   * <p>It is used to update the progress of active quests that require the player to kill mobs.</p>
+   *
+   * @param event The EntityDeathEvent to be handled.
+   */
   @EventHandler
   public void onMobKill(EntityDeathEvent event) {
 
@@ -215,6 +247,12 @@ public class QuestGoalsListener implements Listener {
 
   }
 
+  /**
+   * This method sends a message with the quest progress to the player.
+   *
+   * @param player The player to send the message to.
+   * @param activeQuest The active quest to display progress for.
+   */
   private void sendProgressMessage(Player player, ActiveQuestDto activeQuest) {
     player.sendActionBar(
         Component.empty()

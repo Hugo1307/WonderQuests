@@ -21,6 +21,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
+/**
+ * This class listens for sign update events and handles them accordingly.
+ */
 public class SignUpdateListener implements Listener {
 
   private final SignService signService;
@@ -29,6 +32,15 @@ public class SignUpdateListener implements Listener {
   private final Messaging messaging;
   private final ConcurrencyHandler concurrencyHandler;
 
+  /**
+   * Constructor for the SignUpdateListener class.
+   *
+   * @param signService The service for signs.
+   * @param signsMediator The mediator for signs.
+   * @param server The server instance.
+   * @param messaging The messaging instance used for sending messages.
+   * @param concurrencyHandler The handler for concurrency.
+   */
   @Inject
   public SignUpdateListener(SignService signService, SignsMediator signsMediator,
       Server server,
@@ -43,6 +55,13 @@ public class SignUpdateListener implements Listener {
 
   }
 
+  /**
+   * This method handles the SignChangeEvent.
+   *
+   * <p>It is used to listen for signs creation and register signs.</p>
+   *
+   * @param event The SignChangeEvent to be handled.
+   */
   @EventHandler
   public void onSignChanged(SignChangeEvent event) {
 
@@ -70,7 +89,6 @@ public class SignUpdateListener implements Listener {
         player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.scheduled"));
 
         signService.registerSign(SignType.ACTIVE_QUEST, sign.getLocation()).thenAccept(id -> {
-
           if (id == null) {
             player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.failed"));
             return;
@@ -80,7 +98,7 @@ public class SignUpdateListener implements Listener {
 
           // Send packet to all online players to update the recently created sign
           concurrencyHandler.runDelayed(() -> {
-                server.getOnlinePlayers().forEach(signsMediator::updateQuestsSign);
+            server.getOnlinePlayers().forEach(signsMediator::updateQuestsSign);
           }, 1, TimeUnit.SECONDS, false);
 
         }).exceptionally(throwable -> {
@@ -94,6 +112,13 @@ public class SignUpdateListener implements Listener {
 
   }
 
+  /**
+   * This method handles the BlockBreakEvent.
+   *
+   * <p>It is used to listen for signs break and unregister signs.</p>
+   *
+   * @param event The BlockBreakEvent to be handled.
+   */
   @EventHandler
   public void onSignDestroyed(BlockBreakEvent event) {
 
