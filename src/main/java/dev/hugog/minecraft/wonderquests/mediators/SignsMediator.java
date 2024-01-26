@@ -5,6 +5,7 @@ import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.SignService;
 import dev.hugog.minecraft.wonderquests.data.types.SignType;
+import dev.hugog.minecraft.wonderquests.language.Messaging;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -17,11 +18,14 @@ public class SignsMediator {
 
   private final SignService signService;
   private final ActiveQuestsService activeQuestsService;
+  private final Messaging messaging;
 
   @Inject
-  public SignsMediator(SignService signService, ActiveQuestsService activeQuestsService) {
+  public SignsMediator(SignService signService, ActiveQuestsService activeQuestsService,
+      Messaging messaging) {
     this.signService = signService;
     this.activeQuestsService = activeQuestsService;
+    this.messaging = messaging;
   }
 
   public void updateQuestsSign(Player player) {
@@ -93,10 +97,8 @@ public class SignsMediator {
                   ),
                   null,
                   LegacyComponentSerializer.legacySection().serialize(
-                      Component.text(
-                          "No active quests", // TODO: Add to messages
-                          NamedTextColor.GRAY
-                      )
+                      messaging.getLocalizedRawMessage("signs.quests.none")
+                          .color(NamedTextColor.GRAY)
                   ),
                   null
               });

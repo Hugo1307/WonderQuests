@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -60,7 +61,6 @@ public class QuestsMediator {
 
   public void giveQuestRewardsToPlayer(Player player, Integer questId) {
 
-    // TODO: Add messages to the player when the rewards are granted
     questsService.getQuestById(questId).thenAccept(questOptional -> {
 
       if (questOptional.isEmpty()) {
@@ -89,6 +89,9 @@ public class QuestsMediator {
               ));
         }
       });
+
+      // Play a sound to the player
+      player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
 
     });
 
