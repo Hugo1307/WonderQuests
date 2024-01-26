@@ -71,6 +71,7 @@ public class ActiveQuestsService {
   }
 
   public boolean isQuestCompleted(UUID playerId, Integer questId) {
+
     return activeQuestsCache.get(playerId).stream()
         .filter(activeQuestDto -> activeQuestDto.getQuestId().equals(questId))
         .findFirst()
@@ -104,9 +105,7 @@ public class ActiveQuestsService {
   public CompletableFuture<Boolean> saveActiveQuest(ActiveQuestDto activeQuestDto) {
 
     ActiveQuestModel activeQuestModel = activeQuestDto.toModel();
-
-    return activeQuestRepository.save(activeQuestModel)
-        .thenApply(Objects::nonNull);
+    return activeQuestRepository.save(activeQuestModel);
 
   }
 
