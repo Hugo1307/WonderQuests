@@ -22,6 +22,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of creating a quest.
+ */
 public class CreateQuestAction extends AbstractAction<Boolean> {
 
   private final Logger logger;

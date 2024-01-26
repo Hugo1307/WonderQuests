@@ -19,6 +19,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * This class provides services for managing quests in the game.
+ */
 public class QuestsService {
 
   private final QuestsRepository questsRepository;
@@ -27,6 +30,15 @@ public class QuestsService {
   private final QuestRewardsRepository questRewardsRepository;
   private final QuestsCache questsCache;
 
+  /**
+   * Constructor for the QuestsService class.
+   *
+   * @param questsRepository The repository instance used for database operations related to quests.
+   * @param questObjectivesRepository The repository instance used for database operations related to quest objectives.
+   * @param questRequirementsRepository The repository instance used for database operations related to quest requirements.
+   * @param questRewardsRepository The repository instance used for database operations related to quest rewards.
+   * @param questsCache The cache instance used for caching quests.
+   */
   @Inject
   public QuestsService(QuestsRepository questsRepository,
       QuestObjectivesRepository questObjectivesRepository,
@@ -41,43 +53,67 @@ public class QuestsService {
 
   }
 
+  /**
+   * This method creates a new quest.
+   *
+   * @param questDto The DTO of the quest.
+   * @return a CompletableFuture that will be completed with the id of the created quest.
+   */
   public CompletableFuture<Integer> createNewQuest(QuestDto questDto) {
     QuestModel questModel = questDto.toModel();
     return questsRepository.insert(questModel);
   }
 
+  /**
+   * This method adds a quest objective.
+   *
+   * @param questObjectiveDto The DTO of the quest objective.
+   * @return a CompletableFuture that will be completed with the id of the added quest objective.
+   */
   public CompletableFuture<Integer> addQuestObjective(QuestObjectiveDto questObjectiveDto) {
     QuestObjectiveModel questObjectiveModel = questObjectiveDto.toModel();
     return questObjectivesRepository.insert(questObjectiveModel);
   }
 
+  /**
+   * This method adds a quest requirement.
+   *
+   * @param questRequirementDto The DTO of the quest requirement.
+   * @return a CompletableFuture that will be completed with the id of the added quest requirement.
+   */
   public CompletableFuture<Integer> addQuestRequirement(QuestRequirementDto questRequirementDto) {
     QuestRequirementModel questRequirementModel = questRequirementDto.toModel();
     return questRequirementsRepository.insert(questRequirementModel);
   }
 
+  /**
+   * This method adds a quest reward.
+   *
+   * @param questRewardDto The DTO of the quest reward.
+   * @return a CompletableFuture that will be completed with the id of the added quest reward.
+   */
   public CompletableFuture<Integer> addQuestReward(QuestRewardDto questRewardDto) {
     QuestRewardModel questRewardModel = questRewardDto.toModel();
     return questRewardsRepository.insert(questRewardModel);
   }
 
+  /**
+   * This method retrieves a quest by its id.
+   *
+   * @param id The id of the quest.
+   * @return a CompletableFuture that will be completed with an Optional containing the quest if it exists, or empty if it does not.
+   */
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id) {
     return questsRepository.findById(id)
         .thenApply(questModel -> questModel.map(QuestModel::toDto));
   }
 
   /**
-   * <h4>Retrieves a quest by its ID, with an option to use cache.</h4>
-   * <br>
-   * <p>If the quest is found, the Optional will contain the QuestDto.</p>
-   * <p>If the quest is not found, the Optional will be empty.</p>
-   * <p>If useCache is true and the quest is in the cache, the quest will be retrieved the cache.</p>
-   * <p>If useCache is true and the quest is not in the cache, the quest will be retrieved from the repository and then stored in the cache for future requests.</p>
-   * <p>If useCache is false, the quest will be retrieved directly from the repository.</p>
+   * This method retrieves a quest by its id, with an option to use cache.
    *
-   * @param id       The ID of the quest to retrieve.
+   * @param id The id of the quest.
    * @param useCache A boolean indicating whether to use cache for retrieving the quest.
-   * @return A CompletableFuture that, when completed, will contain an Optional<QuestDto>.
+   * @return a CompletableFuture that will be completed with an Optional containing the quest if it exists, or empty if it does not.
    */
   public CompletableFuture<Optional<QuestDto>> getQuestById(Integer id, boolean useCache) {
 
@@ -100,11 +136,24 @@ public class QuestsService {
 
   }
 
+  /**
+   * This method checks if a quest exists.
+   *
+   * @param id The id of the quest.
+   * @return a CompletableFuture that will be completed with a boolean indicating if the quest exists.
+   */
   public CompletableFuture<Boolean> checkIfQuestExists(Integer id) {
     return questsRepository.findById(id)
         .thenApply(Optional::isPresent);
   }
 
+  /**
+   * This method retrieves all quests in a given interval.
+   *
+   * @param start The start of the interval.
+   * @param end The end of the interval.
+   * @return a CompletableFuture that will be completed with a list of quests in the given interval.
+   */
   public CompletableFuture<List<QuestDto>> getAllQuestsInInterval(Integer start, Integer end) {
     return questsRepository.findAllInInterval(start, end)
         .thenApply(questModels -> questModels.stream()
@@ -112,6 +161,11 @@ public class QuestsService {
             .collect(Collectors.toList()));
   }
 
+  /**
+   * This method retrieves all quests.
+   *
+   * @return a CompletableFuture that will be completed with a list of all quests.
+   */
   public CompletableFuture<List<QuestDto>> getAllQuests() {
     return questsRepository.findAll()
         .thenApply(questModels -> questModels.stream()
@@ -119,6 +173,12 @@ public class QuestsService {
             .collect(Collectors.toList()));
   }
 
+  /**
+   * This method deletes a quest.
+   *
+   * @param id The id of the quest.
+   * @return a CompletableFuture that will be completed when the quest is deleted.
+   */
   public CompletableFuture<Void> deleteQuest(Integer id) {
     return questsRepository.delete(id);
   }

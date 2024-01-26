@@ -8,12 +8,21 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class is responsible for initializing and checking the database.
+ */
 public class DbInitializer {
 
   private final Logger logger;
 
   private final List<AbstractDataRepository<?,?>> dataRepositories;
 
+  /**
+   * Constructor for the DbInitializer class.
+   *
+   * @param logger The logger instance used for logging.
+   * @param dataRepositories The list of data repositories.
+   */
   @Inject
   public DbInitializer(@Named("bukkitLogger") Logger logger,
       List<AbstractDataRepository<?,?>> dataRepositories) {
@@ -21,10 +30,20 @@ public class DbInitializer {
     this.dataRepositories = dataRepositories;
   }
 
+  /**
+   * This method checks the database.
+   *
+   * @return a CompletableFuture that will be completed when the database is checked.
+   */
   public CompletableFuture<Void> checkDatabase() {
     return checkTables();
   }
 
+  /**
+   * This method checks the tables in the database.
+   *
+   * @return a CompletableFuture that will be completed when the tables are checked.
+   */
   private CompletableFuture<Void> checkTables() {
 
     // List of CompletableFutures, each one of them checks if one of the tables exists

@@ -16,15 +16,31 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class extends the AbstractDataRepository and provides the implementation for the abstract methods.
+ * It represents a repository for completed quests in the game.
+ */
 public class CompletedQuestRepository extends
     AbstractDataRepository<CompletedQuestModel, PlayerQuestKey> {
 
+  /**
+   * Constructor for the CompletedQuestRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
   public CompletedQuestRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
       ConcurrencyHandler concurrencyHandler) {
     super("completed_quest", 1, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * This method creates the completed_quest table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -55,6 +71,12 @@ public class CompletedQuestRepository extends
 
   }
 
+  /**
+   * This method finds a completed quest by its id.
+   *
+   * @param id the id of the completed quest
+   * @return a CompletableFuture that will be completed with an Optional containing the found completed quest, or empty if no completed quest was found.
+   */
   @Override
   public CompletableFuture<Optional<CompletedQuestModel>> findById(PlayerQuestKey id) {
 
@@ -90,6 +112,12 @@ public class CompletedQuestRepository extends
 
   }
 
+  /**
+   * This method inserts a completed quest into the completed_quest table.
+   *
+   * @param model the completed quest to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted completed quest.
+   */
   @Override
   public CompletableFuture<PlayerQuestKey> insert(CompletedQuestModel model) {
 
@@ -123,6 +151,12 @@ public class CompletedQuestRepository extends
 
   }
 
+  /**
+   * This method deletes a completed quest by its id.
+   *
+   * @param id the id of the completed quest
+   * @return a CompletableFuture that will be completed when the completed quest is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(PlayerQuestKey id) {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
@@ -145,6 +179,12 @@ public class CompletedQuestRepository extends
     }), true);
   }
 
+  /**
+   * This method finds all completed quests by player id.
+   *
+   * @param playerId the id of the player
+   * @return a CompletableFuture that will be completed with a Set containing all found completed quests.
+   */
   public CompletableFuture<Set<CompletedQuestModel>> findAllByPlayer(UUID playerId) {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {

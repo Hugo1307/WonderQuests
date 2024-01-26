@@ -22,6 +22,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+/**
+ * This class represents the action of accepting a quest.
+ */
 public class AcceptQuestAction extends AbstractAction<CompletableFuture<Boolean>> {
 
   private final ItemStack questItem;

@@ -14,14 +14,30 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class extends the AbstractDataRepository and provides the implementation for the abstract methods.
+ * It represents a repository for quest rewards in the game.
+ */
 public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardModel, Integer> {
 
+  /**
+   * Constructor for the QuestRewardsRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
   public QuestRewardsRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
       ConcurrencyHandler concurrencyHandler) {
     super("quest_reward", 1, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * This method creates the quest_reward table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -29,7 +45,6 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
 
       try {
-
         PreparedStatement ps = con.prepareStatement(
             "CREATE TABLE IF NOT EXISTS quest_reward ("
                 + "id SERIAL PRIMARY KEY,"
@@ -60,6 +75,12 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
 
   }
 
+  /**
+   * This method finds a quest reward by its id.
+   *
+   * @param id the id of the quest reward
+   * @return a CompletableFuture that will be completed with an Optional containing the found quest reward, or empty if no quest reward was found.
+   */
   @Override
   public CompletableFuture<Optional<QuestRewardModel>> findById(Integer id) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -94,6 +115,12 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
     }), true);
   }
 
+  /**
+   * This method inserts a quest reward into the quest_reward table.
+   *
+   * @param model the quest reward to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted quest reward.
+   */
   @Override
   public CompletableFuture<Integer> insert(QuestRewardModel model) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -135,6 +162,12 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
     }), true);
   }
 
+  /**
+   * This method deletes a quest reward by its id.
+   *
+   * @param id the id of the quest reward
+   * @return a CompletableFuture that will be completed when the quest reward is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(Integer id) {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
@@ -157,6 +190,12 @@ public class QuestRewardsRepository extends AbstractDataRepository<QuestRewardMo
     }), true);
   }
 
+  /**
+   * This method finds all quest rewards by quest id.
+   *
+   * @param questId the id of the quest
+   * @return a CompletableFuture that will be completed with a List containing all found quest rewards.
+   */
   public CompletableFuture<List<QuestRewardModel>> findAllByQuestId(Integer questId) {
 
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {

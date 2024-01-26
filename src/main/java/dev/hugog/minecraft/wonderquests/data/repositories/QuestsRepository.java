@@ -19,14 +19,30 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class extends the AbstractDataRepository and provides the implementation for the abstract methods.
+ * It represents a repository for quests in the game.
+ */
 public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer> {
 
+  /**
+   * Constructor for the QuestsRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
   public QuestsRepository(@Named("bukkitLogger") Logger logger,
       DataSource dataSource, ConcurrencyHandler concurrencyHandler) {
     super("quest", 0, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * This method creates the quest table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -62,6 +78,12 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
 
   }
 
+  /**
+   * This method finds a quest by its id.
+   *
+   * @param id the id of the quest
+   * @return a CompletableFuture that will be completed with an Optional containing the found quest, or empty if no quest was found.
+   */
   @Override
   public CompletableFuture<Optional<QuestModel>> findById(Integer id) {
 
@@ -155,6 +177,12 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
 
   }
 
+  /**
+   * This method inserts a quest into the quest table.
+   *
+   * @param model the quest to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted quest.
+   */
   @Override
   public CompletableFuture<Integer> insert(QuestModel model) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -188,6 +216,12 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
     }), true);
   }
 
+  /**
+   * This method deletes a quest by its id.
+   *
+   * @param id the id of the quest
+   * @return a CompletableFuture that will be completed when the quest is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(Integer id) {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {
@@ -209,6 +243,11 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
     }), true);
   }
 
+  /**
+   * This method finds all quests.
+   *
+   * @return a CompletableFuture that will be completed with a Set containing all found quests.
+   */
   public CompletableFuture<Set<QuestModel>> findAll() {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
@@ -312,6 +351,13 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
     }), true);
   }
 
+  /**
+   * This method finds all quests in a given interval.
+   *
+   * @param bottom the lower bound of the interval
+   * @param top the upper bound of the interval
+   * @return a CompletableFuture that will be completed with a List containing all found quests in the given interval.
+   */
   public CompletableFuture<List<QuestModel>> findAllInInterval(Integer bottom, Integer top) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 

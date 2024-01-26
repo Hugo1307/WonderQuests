@@ -7,6 +7,9 @@ import dev.hugog.minecraft.wonderquests.chat.summaries.AvailableQuestsStatusSumm
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of showing the active quests to a player.
+ */
 public class ShowActiveQuestsAction extends AbstractAction<Boolean> {
 
   private final AvailableQuestsStatusSummary availableQuestsStatusSummary;

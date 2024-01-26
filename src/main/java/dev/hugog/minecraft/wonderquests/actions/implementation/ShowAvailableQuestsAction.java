@@ -7,6 +7,9 @@ import dev.hugog.minecraft.wonderquests.injection.factories.GuiFactory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of showing the available quests to a player.
+ */
 public class ShowAvailableQuestsAction extends AbstractAction<Boolean> {
 
   private final GuiFactory guiFactory;

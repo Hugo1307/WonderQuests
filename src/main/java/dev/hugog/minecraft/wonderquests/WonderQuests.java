@@ -24,6 +24,13 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * This is the main class of the WonderQuests plugin.
+ *
+ * <p>It handles the enabling and disabling of the plugin, initializes the dependency injection module,
+ * saves the default config, configures the language files, connects to the database, registers commands and listeners,
+ * starts the cache scheduler, and sets up the Vault Economy Hook.</p>
+ */
 public final class WonderQuests extends JavaPlugin {
 
   @Inject private DataSource dataSource;
@@ -41,6 +48,13 @@ public final class WonderQuests extends JavaPlugin {
   @Inject private MessagingConfigurator messagingConfigurator;
   @Inject private EconomyHook economyHook;
 
+  /**
+   * This method is called when the plugin is enabled.
+   *
+   * <p>It initializes the dependency injection module, saves the default config, configures the language files,
+   * connects to the database, checks the state of the database, loads localized messaging bundles,
+   * registers commands and listeners, starts the cache scheduler, and sets up the Vault Economy Hook.</p>
+   */
   @Override
   public void onEnable() {
 
@@ -90,6 +104,11 @@ public final class WonderQuests extends JavaPlugin {
 
   }
 
+  /**
+   * This method is called when the plugin is disabled.
+   *
+   * <p>It closes the data source.</p>
+   */
   @Override
   public void onDisable() {
 
@@ -98,12 +117,18 @@ public final class WonderQuests extends JavaPlugin {
 
   }
 
+  /**
+   * Initializes the dependency injection module.
+   */
   private void initDependencyInjectionModule() {
     BasicBinderModule guiceBinderModule = new BasicBinderModule(this);
     Injector injector = Guice.createInjector(guiceBinderModule);
     injector.injectMembers(this);
   }
 
+  /**
+   * Registers the plugin's commands.
+   */
   private void registerCommands() {
 
     PluginCommand command = getCommand("quests");
@@ -116,6 +141,9 @@ public final class WonderQuests extends JavaPlugin {
 
   }
 
+  /**
+   * Registers the plugin's listeners.
+   */
   private void registerListeners() {
     getServer().getPluginManager().registerEvents(interactiveChatListener, this);
     getServer().getPluginManager().registerEvents(guiClickListener, this);
@@ -125,6 +153,12 @@ public final class WonderQuests extends JavaPlugin {
     getServer().getPluginManager().registerEvents(activeQuestUpdateListener, this);
   }
 
+  /**
+   * Connects to the database.
+   * If the connection fails, the plugin is disabled.
+   *
+   * @return true if the connection was successful, false otherwise.
+   */
   private boolean connectToDatabase() {
     boolean connectedToDb = dataSource.initDataSource(new PluginConfigHandler(getConfig()));
     if (!connectedToDb) {

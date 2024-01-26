@@ -21,6 +21,9 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of creating a quest requirement.
+ */
 public class CreateQuestRequirementAction extends AbstractAction<Boolean> {
 
   private final int questId;

@@ -21,6 +21,9 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of creating a quest reward.
+ */
 public class CreateQuestRewardAction extends AbstractAction<Boolean> {
 
   private final int questId;

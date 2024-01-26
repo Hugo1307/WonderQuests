@@ -14,6 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of cancelling a quest.
+ */
 public class CancelQuestAction extends AbstractAction<CompletableFuture<Boolean>> {
 
   private final int questId;

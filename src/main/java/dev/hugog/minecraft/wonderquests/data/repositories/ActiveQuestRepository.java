@@ -18,9 +18,21 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * ActiveQuestRepository is a class that extends the AbstractDataRepository.
+ * It provides the implementation for the abstract methods in the AbstractDataRepository.
+ * It also includes additional methods for finding all active quests by player id and saving an active quest.
+ */
 public class ActiveQuestRepository extends
     AbstractDataRepository<ActiveQuestModel, PlayerQuestKey> {
 
+  /**
+   * Constructor for the ActiveQuestRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
   public ActiveQuestRepository(@Named("bukkitLogger") Logger logger,
       DataSource dataSource,
@@ -28,6 +40,11 @@ public class ActiveQuestRepository extends
     super("active_quest", 1, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * Creates the active_quest table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -61,6 +78,12 @@ public class ActiveQuestRepository extends
 
   }
 
+  /**
+   * Finds an active quest by its id.
+   *
+   * @param id the id of the active quest
+   * @return a CompletableFuture that will be completed with an Optional containing the found active quest, or empty if no active quest was found.
+   */
   @Override
   public CompletableFuture<Optional<ActiveQuestModel>> findById(PlayerQuestKey id) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -110,6 +133,12 @@ public class ActiveQuestRepository extends
     }), true);
   }
 
+  /**
+   * Inserts an active quest into the active_quest table.
+   *
+   * @param model the active quest to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted active quest.
+   */
   @Override
   public CompletableFuture<PlayerQuestKey> insert(ActiveQuestModel model) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
@@ -152,6 +181,12 @@ public class ActiveQuestRepository extends
     }), true);
   }
 
+  /**
+   * Deletes an active quest by its id.
+   *
+   * @param id the id of the active quest
+   * @return a CompletableFuture that will be completed when the active quest is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(PlayerQuestKey id) {
 
@@ -176,6 +211,12 @@ public class ActiveQuestRepository extends
 
   }
 
+  /**
+   * Finds all active quests by player id.
+   *
+   * @param playerId the id of the player
+   * @return a CompletableFuture that will be completed with a Set containing all found active quests.
+   */
   public CompletableFuture<Set<ActiveQuestModel>> findAllByPlayerId(UUID playerId) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
@@ -223,6 +264,12 @@ public class ActiveQuestRepository extends
     }), true);
   }
 
+  /**
+   * Saves an active quest.
+   *
+   * @param model the active quest to save
+   * @return a CompletableFuture that will be completed with a boolean indicating whether the active quest was saved successfully.
+   */
   public CompletableFuture<Boolean> save(ActiveQuestModel model) {
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 

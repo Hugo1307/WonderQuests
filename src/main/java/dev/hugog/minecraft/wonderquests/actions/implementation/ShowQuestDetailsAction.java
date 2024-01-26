@@ -9,6 +9,9 @@ import dev.hugog.minecraft.wonderquests.commands.CommandsPermissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents the action of showing the details of a quest to a player.
+ */
 public class ShowQuestDetailsAction extends AbstractAction<Boolean> {
 
   private final int questId;
