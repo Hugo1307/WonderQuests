@@ -164,14 +164,17 @@ public class ActiveQuestsServiceTest {
 
   @Test
   public void isQuestExpiredReturnsTrue() {
-    when(activeQuestsCache.get(any(UUID.class))).thenReturn(Set.of(completedQuestDto));
+
+    when(activeQuestsCache.get(any(UUID.class)))
+        .thenReturn(Set.of(completedQuestDto));
 
     // A low time limit to ensure that the quest is expired
-    when(questDto.getTimeLimit()).thenReturn(0);
+    when(questDto.getTimeLimit()).thenReturn(-1);
 
     boolean result = activeQuestsService.isQuestExpired(playerId, questId);
 
     assertTrue(result);
+
   }
 
   @Test
