@@ -28,7 +28,7 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandResolver {
 
-  private PluginCommand pluginCommand;
+  protected PluginCommand pluginCommand;
 
   private final CommandDependencies dependencies;
 

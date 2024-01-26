@@ -1,10 +1,12 @@
 package dev.hugog.minecraft.wonderquests.commands;
 
+import lombok.Generated;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+@Generated
 public enum CommandsPermissions {
 
   ABORT_QUEST("wonderquests.commands.quest.abort"),
