@@ -13,14 +13,30 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+/**
+ * This class extends the AbstractDataRepository and provides the implementation for the abstract methods.
+ * It represents a repository for players in the game.
+ */
 public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID> {
 
+  /**
+   * Constructor for the PlayersRepository class.
+   *
+   * @param logger             The logger instance used for logging.
+   * @param dataSource         The data source instance used for database connectivity.
+   * @param concurrencyHandler The concurrency handler instance used for managing concurrency.
+   */
   @Inject
-  public PlayersRepository(@Named("bukkitLogger") Logger logger,
-      DataSource dataSource, ConcurrencyHandler concurrencyHandler) {
+  public PlayersRepository(@Named("bukkitLogger") Logger logger, DataSource dataSource,
+      ConcurrencyHandler concurrencyHandler) {
     super("player", 0, logger, dataSource, concurrencyHandler);
   }
 
+  /**
+   * This method creates the player table in the database.
+   *
+   * @return a CompletableFuture that will be completed when the table is created.
+   */
   @Override
   public CompletableFuture<Void> createTable() {
 
@@ -49,8 +65,15 @@ public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID>
 
   }
 
+  /**
+   * This method finds a player by its id.
+   *
+   * @param id the id of the player
+   * @return a CompletableFuture that will be completed with an Optional containing the found player, or empty if no player was found.
+   */
   @Override
   public CompletableFuture<Optional<PlayerModel>> findById(UUID id) {
+
     return concurrencyHandler.supply(() -> dataSource.execute(con -> {
 
       try {
@@ -78,6 +101,12 @@ public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID>
     }), true);
   }
 
+  /**
+   * This method inserts a player into the player table.
+   *
+   * @param model the player to insert
+   * @return a CompletableFuture that will be completed with the id of the inserted player.
+   */
   @Override
   public CompletableFuture<UUID> insert(PlayerModel model) {
 
@@ -103,6 +132,12 @@ public class PlayersRepository extends AbstractDataRepository<PlayerModel, UUID>
 
   }
 
+  /**
+   * This method deletes a player by its id.
+   *
+   * @param id the id of the player
+   * @return a CompletableFuture that will be completed when the player is deleted.
+   */
   @Override
   public CompletableFuture<Void> delete(UUID id) {
     return concurrencyHandler.run(() -> dataSource.apply(con -> {

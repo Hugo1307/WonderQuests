@@ -31,9 +31,14 @@ public class SignsRepository extends AbstractDataRepository<SignModel, Integer> 
       try {
 
         PreparedStatement ps = con.prepareStatement(
-            "CREATE TABLE IF NOT EXISTS sign (" + "id SERIAL PRIMARY KEY,"
-                + "type VARCHAR(64) NOT NULL," + "world_name VARCHAR(128) NOT NULL,"
-                + "x INTEGER NOT NULL," + "y INTEGER NOT NULL," + "z INTEGER NOT NULL" + ");");
+            "CREATE TABLE IF NOT EXISTS sign ("
+                + "id SERIAL PRIMARY KEY,"
+                + "type VARCHAR(64) NOT NULL,"
+                + "world_name VARCHAR(128) NOT NULL,"
+                + "x INTEGER NOT NULL,"
+                + "y INTEGER NOT NULL,"
+                + "z INTEGER NOT NULL"
+                + ");");
 
         ps.execute();
 
