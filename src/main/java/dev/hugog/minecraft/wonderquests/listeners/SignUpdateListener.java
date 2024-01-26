@@ -1,11 +1,13 @@
 package dev.hugog.minecraft.wonderquests.listeners;
 
 import com.google.inject.Inject;
+import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.services.SignService;
 import dev.hugog.minecraft.wonderquests.data.types.SignType;
 import dev.hugog.minecraft.wonderquests.language.Messaging;
 import dev.hugog.minecraft.wonderquests.mediators.SignsMediator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Server;
@@ -25,16 +27,19 @@ public class SignUpdateListener implements Listener {
   private final SignsMediator signsMediator;
   private final Server server;
   private final Messaging messaging;
+  private final ConcurrencyHandler concurrencyHandler;
 
   @Inject
   public SignUpdateListener(SignService signService, SignsMediator signsMediator,
       Server server,
-      Messaging messaging) {
+      Messaging messaging,
+      ConcurrencyHandler concurrencyHandler) {
 
     this.signService = signService;
     this.signsMediator = signsMediator;
     this.server = server;
     this.messaging = messaging;
+    this.concurrencyHandler = concurrencyHandler;
 
   }
 
@@ -74,7 +79,9 @@ public class SignUpdateListener implements Listener {
           player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.successful"));
 
           // Send packet to all online players to update the recently created sign
-          server.getOnlinePlayers().forEach(signsMediator::updateQuestsSign);
+          concurrencyHandler.runDelayed(() -> {
+                server.getOnlinePlayers().forEach(signsMediator::updateQuestsSign);
+          }, 1, TimeUnit.SECONDS, false);
 
         }).exceptionally(throwable -> {
           player.sendMessage(messaging.getLocalizedChatWithPrefix("signs.creation.failed"));
