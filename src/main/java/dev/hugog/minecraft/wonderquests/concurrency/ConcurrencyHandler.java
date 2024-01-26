@@ -12,12 +12,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import org.bukkit.plugin.Plugin;
 
 @Singleton
 public class ConcurrencyHandler {
 
-  public Executor executorPool;
+  private final Executor executorPool;
 
   private final WonderQuests plugin;
 

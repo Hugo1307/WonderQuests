@@ -31,7 +31,6 @@ public class EconomyHook {
 
     if (economyProvider != null) {
       economy = economyProvider.getProvider();
-      System.out.println(economy);
       logger.info("Successfully hooked into Vault economy.");
     } else {
       economy = null;
@@ -43,12 +42,6 @@ public class EconomyHook {
   public void depositPlayer(UUID playerId, double amount) {
     if (checkEconomy()) {
       economy.depositPlayer(getOfflinePlayer(playerId), amount);
-    }
-  }
-
-  public void withdrawPlayer(UUID playerId, double amount) {
-    if (checkEconomy()) {
-      economy.withdrawPlayer(getOfflinePlayer(playerId), amount);
     }
   }
 

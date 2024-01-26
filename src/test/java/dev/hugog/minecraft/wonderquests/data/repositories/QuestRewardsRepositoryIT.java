@@ -20,7 +20,7 @@ class QuestRewardsRepositoryIT {
 
   private DataSource dataSource;
   private QuestRewardsRepository questRewardsRepository;
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.1-alpine");
 
   @BeforeAll
   static void setUpAll() {

@@ -15,14 +15,14 @@ import lombok.Getter;
 public abstract class AbstractDataRepository<T extends DataModel<?>, C> {
 
   @Getter
-  protected String tableName;
+  protected final String tableName;
 
   @Getter
-  protected int priority;
+  protected final int priority;
 
-  protected Logger logger;
-  protected DataSource dataSource;
-  protected ConcurrencyHandler concurrencyHandler;
+  protected final Logger logger;
+  protected final DataSource dataSource;
+  protected final ConcurrencyHandler concurrencyHandler;
 
   /**
    * Constructor for the AbstractDataRepository class.

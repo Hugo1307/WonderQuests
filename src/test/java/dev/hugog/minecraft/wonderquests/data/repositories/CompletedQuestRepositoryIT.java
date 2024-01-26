@@ -25,7 +25,7 @@ public class CompletedQuestRepositoryIT {
 
   private PlayerQuestKey id;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
       "postgres:16.1-alpine"
   );
 

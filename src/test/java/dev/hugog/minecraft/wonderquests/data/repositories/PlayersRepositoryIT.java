@@ -20,7 +20,7 @@ class PlayersRepositoryIT {
 
   private PlayersRepository playersRepository;
 
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+  final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
       "postgres:16.1-alpine"
   );
 

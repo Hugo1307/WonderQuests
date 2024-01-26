@@ -11,10 +11,10 @@ import org.bukkit.command.CommandSender;
  */
 public abstract class AbstractPluginCommand implements PluginCommand {
 
-  protected CommandSender sender;
-  protected String[] args;
-  protected CommandDependencies dependencies;
-  protected Object[] extraDependencies;
+  protected final CommandSender sender;
+  protected final String[] args;
+  protected final CommandDependencies dependencies;
+  protected final Object[] extraDependencies;
 
   public AbstractPluginCommand(CommandSender sender, String[] args,
       CommandDependencies commandDependencies, Object... extraDependencies) {
