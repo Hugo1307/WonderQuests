@@ -14,6 +14,9 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import lombok.Getter;
 
+/**
+ * This class provides a data source for the application using HikariCP.
+ */
 @Singleton
 public class DataSource {
 
@@ -29,12 +32,28 @@ public class DataSource {
   @Getter
   private String databaseUser;
 
+  /**
+   * Constructor for the DataSource class.
+   *
+   * @param logger The logger instance used for logging.
+   */
   @Inject
   public DataSource(@Named("bukkitLogger") Logger logger) {
     this.config = new HikariConfig();
     this.logger = logger;
   }
 
+  /**
+   * This method initializes the data source with the provided parameters.
+   *
+   * @param host The host of the database.
+   * @param port The port of the database.
+   * @param databaseName The name of the database.
+   * @param username The username for the database.
+   * @param password The password for the database.
+   * @param maxPoolSize The maximum pool size for the data source.
+   * @return a boolean indicating if the data source was initialized successfully.
+   */
   public boolean initDataSource(String host, String port, String databaseName, String username,
       String password, int maxPoolSize) {
 
@@ -75,6 +94,12 @@ public class DataSource {
 
   }
 
+  /**
+   * This method initializes the data source with the parameters from the provided PluginConfigHandler.
+   *
+   * @param pluginConfigHandler The PluginConfigHandler instance containing the configuration for the data source.
+   * @return a boolean indicating if the data source was initialized successfully.
+   */
   public boolean initDataSource(PluginConfigHandler pluginConfigHandler) {
 
     try {
@@ -94,10 +119,21 @@ public class DataSource {
 
   }
 
+  /**
+   * This method gets a connection from the data source.
+   *
+   * @return a Connection instance.
+   * @throws SQLException if a database access error occurs.
+   */
   private Connection getConnection() throws SQLException {
     return dataSource.getConnection();
   }
 
+  /**
+   * This method applies an operation on a connection.
+   *
+   * @param operation The operation to be applied on the connection.
+   */
   public void apply(Consumer<Connection> operation) {
 
     try (Connection con = getConnection()) {
@@ -109,6 +145,12 @@ public class DataSource {
 
   }
 
+  /**
+   * This method executes an operation on a connection and returns a result.
+   *
+   * @param operation The operation to be executed on the connection.
+   * @return the result of the operation.
+   */
   public <T> T execute(Function<Connection, T> operation) {
 
     try (Connection con = getConnection()) {
@@ -120,6 +162,9 @@ public class DataSource {
 
   }
 
+  /**
+   * This method closes the data source.
+   */
   public void closeDataSource() {
     if (dataSource != null) {
       dataSource.close();
