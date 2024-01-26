@@ -118,12 +118,20 @@ public class ActiveQuestRepository extends
 
         // The timestamp will be completed with the current timestamp
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO active_quest (player_id, quest_id, target, progress) VALUES (?, ?, ?, ?) RETURNING player_id, quest_id;");
+            "INSERT INTO active_quest (player_id, quest_id, target, progress, started_at) "
+                + "VALUES (?, ?, ?, ?, ?) "
+                + "RETURNING player_id, quest_id;");
 
         ps.setObject(1, model.playerId());
         ps.setInt(2, model.questId());
         ps.setFloat(3, model.target());
         ps.setFloat(4, model.progress());
+
+        if (model.startedAt() == null) {
+          ps.setTimestamp(5, null);
+        } else {
+          ps.setTimestamp(5, new java.sql.Timestamp(model.startedAt()));
+        }
 
         ResultSet rs = ps.executeQuery();
 

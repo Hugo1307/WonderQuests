@@ -104,13 +104,14 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 rs.getString("closing_msg"),
                 rs.getString("item"),
                 rs.getInt("time_limit"),
-                new QuestObjectiveModel(
-                    rs.getInt("quest_objective_id"),
-                    rs.getInt("id"),
-                    rs.getString("quest_objective_type"),
-                    rs.getString("quest_objective_str_value"),
-                    rs.getFloat("quest_objective_num_value")
-                ),
+                rs.getInt("quest_objective_id") == 0 ? null :
+                    new QuestObjectiveModel(
+                        rs.getInt("quest_objective_id"),
+                        rs.getInt("id"),
+                        rs.getString("quest_objective_type"),
+                        rs.getString("quest_objective_str_value"),
+                        rs.getFloat("quest_objective_num_value")
+                    ),
                 new HashSet<>(),
                 new HashSet<>()
             );
@@ -252,13 +253,14 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 rs.getString("closing_msg"),
                 rs.getString("item"),
                 rs.getInt("time_limit"),
-                new QuestObjectiveModel(
-                    rs.getInt("quest_objective_id"),
-                    rs.getInt("id"),
-                    rs.getString("quest_objective_type"),
-                    rs.getString("quest_objective_str_value"),
-                    rs.getFloat("quest_objective_num_value")
-                ),
+                rs.getInt("quest_objective_id") == 0 ? null :
+                    new QuestObjectiveModel(
+                        rs.getInt("quest_objective_id"),
+                        rs.getInt("id"),
+                        rs.getString("quest_objective_type"),
+                        rs.getString("quest_objective_str_value"),
+                        rs.getFloat("quest_objective_num_value")
+                    ),
                 new HashSet<>(),
                 new HashSet<>()
             ));
@@ -359,13 +361,14 @@ public class QuestsRepository extends AbstractDataRepository<QuestModel, Integer
                 rs.getString("closing_msg"),
                 rs.getString("item"),
                 rs.getInt("time_limit"),
-                new QuestObjectiveModel(
-                    rs.getInt("quest_objective_id"),
-                    rs.getInt("id"),
-                    rs.getString("quest_objective_type"),
-                    rs.getString("quest_objective_str_value"),
-                    rs.getFloat("quest_objective_num_value")
-                ),
+                rs.getInt("quest_objective_id") == 0 ? null :
+                    new QuestObjectiveModel(
+                        rs.getInt("quest_objective_id"),
+                        rs.getInt("id"),
+                        rs.getString("quest_objective_type"),
+                        rs.getString("quest_objective_str_value"),
+                        rs.getFloat("quest_objective_num_value")
+                    ),
                 new HashSet<>(),
                 new HashSet<>()
             ));
