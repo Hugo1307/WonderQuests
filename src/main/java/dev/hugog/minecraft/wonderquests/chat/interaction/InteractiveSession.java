@@ -4,18 +4,30 @@ import java.util.List;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
+/**
+ * This class represents an interactive session with a player.
+ * It manages the flow of the interaction, including starting the session, receiving player input,
+ * determining the next step based on the current step and player input, and finishing or cancelling the session.
+ */
 @Getter
 public class InteractiveSession {
 
   private final InteractiveSessionManager interactiveSessionManager;
-
   private final Player targetPlayer; // The player interacting with the chat
   private final List<InteractiveStep> interactionSteps;
   private final InteractiveSessionFormatter interactiveSessionFormatter;
   private final Runnable onSessionEnd;
-
   private int currentStepIdx;
 
+  /**
+   * Constructor for the InteractiveSession class.
+   *
+   * @param targetPlayer The player interacting with the chat.
+   * @param interactiveSessionManager The manager for interactive sessions.
+   * @param interactionSteps The steps for the interaction.
+   * @param interactiveSessionFormatter The formatter for the interactive session.
+   * @param onSessionEnd The action to be performed when the session ends.
+   */
   InteractiveSession(Player targetPlayer, InteractiveSessionManager interactiveSessionManager,
       List<InteractiveStep> interactionSteps,
       InteractiveSessionFormatter interactiveSessionFormatter, Runnable onSessionEnd) {
@@ -25,11 +37,17 @@ public class InteractiveSession {
     this.interactionSteps = interactionSteps;
     this.interactiveSessionFormatter = interactiveSessionFormatter;
     this.onSessionEnd = onSessionEnd;
-
     this.currentStepIdx = 0;
 
   }
 
+  /**
+   * Starts the interactive session.
+   * If the player already has an active session, the method returns false and does not start a new session.
+   * Otherwise, it adds the session to the session manager, sends the description messages, and runs the first step.
+   *
+   * @return true if the session was started, false otherwise.
+   */
   public boolean startSession() {
 
     if (interactiveSessionManager.hasActiveSession(targetPlayer)) {
@@ -53,6 +71,14 @@ public class InteractiveSession {
 
   }
 
+  /**
+   * Receives player input and processes it based on the current step.
+   * If the input is "!cancel", the session is cancelled.
+   * If the input is valid for the current step, the input is submitted and the next step is determined.
+   * If the input is not valid, an invalid input message is sent to the player.
+   *
+   * @param playerInput The input from the player.
+   */
   public void receivePlayerInput(String playerInput) {
 
     if (playerInput.equalsIgnoreCase("!cancel")) {
@@ -94,6 +120,15 @@ public class InteractiveSession {
 
   }
 
+  /**
+   * Determines the next step based on the current step and player input.
+   * If there is no branching condition, it simply returns the next step in the list.
+   * If there is a branching condition, it applies the condition to the player input to determine the next step.
+   *
+   * @param currentStep The current step.
+   * @param playerInput The input from the player.
+   * @return The next interactive step, or null if there is no next step.
+   */
   InteractiveStep getNextStep(InteractiveStep currentStep, String playerInput) {
 
     // If there is no branching condition, we just go to the next step
@@ -117,6 +152,10 @@ public class InteractiveSession {
 
   }
 
+  /**
+   * Finishes the session.
+   * Sends a finishing message, runs the onSessionEnd action if it exists, and removes the session from the session manager.
+   */
   void finishSession() {
 
     interactiveSessionFormatter.sendFinishingMessage();
@@ -129,6 +168,10 @@ public class InteractiveSession {
 
   }
 
+  /**
+   * Cancels the session.
+   * Sends a cancellation message and removes the session from the session manager.
+   */
   private void cancelSession() {
     interactiveSessionFormatter.sendCancelMessage();
     interactiveSessionManager.removeSession(this);
