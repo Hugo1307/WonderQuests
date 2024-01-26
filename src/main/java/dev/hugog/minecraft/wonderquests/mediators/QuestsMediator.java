@@ -7,7 +7,7 @@ import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.ActiveQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.CompletedQuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.keys.PlayerQuestKey;
 import dev.hugog.minecraft.wonderquests.data.services.ActiveQuestsService;
 import dev.hugog.minecraft.wonderquests.data.services.CompletedQuestsService;

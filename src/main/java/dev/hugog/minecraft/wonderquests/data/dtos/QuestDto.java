@@ -1,6 +1,5 @@
 package dev.hugog.minecraft.wonderquests.data.dtos;
 
-import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import java.util.List;
 import lombok.AllArgsConstructor;

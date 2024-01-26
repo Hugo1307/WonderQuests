@@ -6,7 +6,7 @@ import dev.hugog.minecraft.wonderquests.WonderQuests;
 import dev.hugog.minecraft.wonderquests.concurrency.ConcurrencyHandler;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.injection.factories.ActionsFactory;
 import dev.hugog.minecraft.wonderquests.mediators.QuestsMediator;
 import java.util.ArrayList;

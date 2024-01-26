@@ -1,6 +1,5 @@
-package dev.hugog.minecraft.wonderquests.data.dtos.requirements;
+package dev.hugog.minecraft.wonderquests.data.dtos;
 
-import dev.hugog.minecraft.wonderquests.data.dtos.Dto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
 import dev.hugog.minecraft.wonderquests.data.types.RequirementType;
 import lombok.AllArgsConstructor;

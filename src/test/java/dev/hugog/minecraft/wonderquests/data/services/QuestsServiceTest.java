@@ -13,7 +13,7 @@ import dev.hugog.minecraft.wonderquests.cache.implementation.QuestsCache;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestObjectiveDto;
 import dev.hugog.minecraft.wonderquests.data.dtos.QuestRewardDto;
-import dev.hugog.minecraft.wonderquests.data.dtos.requirements.QuestRequirementDto;
+import dev.hugog.minecraft.wonderquests.data.dtos.QuestRequirementDto;
 import dev.hugog.minecraft.wonderquests.data.models.QuestModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestObjectiveModel;
 import dev.hugog.minecraft.wonderquests.data.models.QuestRequirementModel;
