@@ -26,63 +26,35 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class WonderQuests extends JavaPlugin {
 
-  @Inject
-  private DataSource dataSource;
-
-  @Inject
-  private DbInitializer dbInitializer;
-
-  @Inject
-  private QuestsService questsService;
-
-  @Inject
-  private ConcurrencyHandler concurrencyHandler;
-
-  @Inject
-  private Messaging messaging;
-
-  @Inject
-  private BukkitCommandExecutor bukkitCommandExecutor;
-
-  @Inject
-  private InteractiveChatListener interactiveChatListener;
-  @Inject
-  private GuiClickListener guiClickListener;
-  @Inject
-  private PlayerJoinListener playerJoinListener;
-
-  @Inject
-  private QuestGoalsListener questGoalsListener;
-
-  @Inject
-  private SignUpdateListener signUpdateListener;
-
-  @Inject
-  private ActiveQuestUpdateListener activeQuestUpdateListener;
-
-  @Inject
-  private CacheScheduler cacheScheduler;
-
-  @Inject
-  private MessagingConfigurator messagingConfigurator;
-
-  @Inject
-  private EconomyHook economyHook;
+  @Inject private DataSource dataSource;
+  @Inject private DbInitializer dbInitializer;
+  @Inject private ConcurrencyHandler concurrencyHandler;
+  @Inject private Messaging messaging;
+  @Inject private BukkitCommandExecutor bukkitCommandExecutor;
+  @Inject private InteractiveChatListener interactiveChatListener;
+  @Inject private GuiClickListener guiClickListener;
+  @Inject private PlayerJoinListener playerJoinListener;
+  @Inject private QuestGoalsListener questGoalsListener;
+  @Inject private SignUpdateListener signUpdateListener;
+  @Inject private ActiveQuestUpdateListener activeQuestUpdateListener;
+  @Inject private CacheScheduler cacheScheduler;
+  @Inject private MessagingConfigurator messagingConfigurator;
+  @Inject private EconomyHook economyHook;
 
   @Override
   public void onEnable() {
 
+    // Initialize the dependency injection module
     initDependencyInjectionModule();
 
+    // Save default config
     saveDefaultConfig();
 
+    // Configure the language files - create new files if needed.
     messagingConfigurator.configure();
 
-    boolean connectedToDb = dataSource.initDataSource(new PluginConfigHandler(getConfig()));
-
-    if (!connectedToDb) {
-      getLogger().severe("Error while connecting to the database! Disabling plugin...");
-      getServer().getPluginManager().disablePlugin(this);
+    // If we can't connect to the database, we can't continue.
+    if (!connectToDatabase()) {
       return;
     }
 
@@ -95,24 +67,21 @@ public final class WonderQuests extends JavaPlugin {
     concurrencyHandler.runAfterMultiple(futuresToWaitFor, () -> {
 
       // Sync Logic
-
       getLogger().info("Database check finished! Enabling plugin...");
 
+      // Load localized messaging bundles
       messaging.loadBundles();
 
+      // Register Commands
       registerCommands();
 
       // Register Listener
-      getServer().getPluginManager().registerEvents(interactiveChatListener, this);
-      getServer().getPluginManager().registerEvents(guiClickListener, this);
-      getServer().getPluginManager().registerEvents(playerJoinListener, this);
-      getServer().getPluginManager().registerEvents(questGoalsListener, this);
-      getServer().getPluginManager().registerEvents(signUpdateListener, this);
-      getServer().getPluginManager().registerEvents(activeQuestUpdateListener, this);
+      registerListeners();
 
       // Start cache scheduler
       cacheScheduler.runTaskTimerAsynchronously(this, 10 * 20L, 10 * 20L);
 
+      // Setup Vault Economy Hook
       economyHook.setupEconomy();
 
       getLogger().info("Plugin successfully enabled!");
@@ -125,7 +94,6 @@ public final class WonderQuests extends JavaPlugin {
   public void onDisable() {
 
     dataSource.closeDataSource();
-
     getLogger().info("Plugin successfully disabled!");
 
   }
@@ -146,6 +114,24 @@ public final class WonderQuests extends JavaPlugin {
       getLogger().warning("Default plugin's command not not found!");
     }
 
+  }
+
+  private void registerListeners() {
+    getServer().getPluginManager().registerEvents(interactiveChatListener, this);
+    getServer().getPluginManager().registerEvents(guiClickListener, this);
+    getServer().getPluginManager().registerEvents(playerJoinListener, this);
+    getServer().getPluginManager().registerEvents(questGoalsListener, this);
+    getServer().getPluginManager().registerEvents(signUpdateListener, this);
+    getServer().getPluginManager().registerEvents(activeQuestUpdateListener, this);
+  }
+
+  private boolean connectToDatabase() {
+    boolean connectedToDb = dataSource.initDataSource(new PluginConfigHandler(getConfig()));
+    if (!connectedToDb) {
+      getLogger().severe("Error while connecting to the database! Disabling plugin...");
+      getServer().getPluginManager().disablePlugin(this);
+    }
+    return connectedToDb;
   }
 
 }
