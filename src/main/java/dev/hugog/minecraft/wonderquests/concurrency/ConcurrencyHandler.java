@@ -99,7 +99,7 @@ public class ConcurrencyHandler {
   public CompletableFuture<Void> runDelayed(Runnable runnable, long delay, TimeUnit timeUnit,
       boolean async) {
 
-    Executor delayedExecutor = CompletableFuture.delayedExecutor(delay, TimeUnit.SECONDS);
+    Executor delayedExecutor = CompletableFuture.delayedExecutor(delay, timeUnit);
 
     if (async) {
       return CompletableFuture.runAsync(runnable, delayedExecutor);
